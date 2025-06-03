@@ -19,7 +19,7 @@ pub struct AccountsOptions {
     /// Show as account directives, for use in journals
     pub directives: bool,
     /// Find the first account matched by the pattern
-    pub find: bool,
+    pub find: Option<String>,
 
     /// Flat mode: omit N leading account name parts
     pub drop: Option<u32>,
@@ -85,8 +85,8 @@ impl AccountsOptions {
         self
     }
 
-    pub fn find(mut self) -> Self {
-        self.find = true;
+    pub fn find(mut self, pattern: impl Into<String>) -> Self {
+        self.find = Some(pattern.into());
         self
     }
 
@@ -183,8 +183,8 @@ pub fn get_accounts(journal_file: Option<&str>, options: &AccountsOptions) -> Re
     if options.directives {
         cmd.arg("--directives");
     }
-    if options.find {
-        cmd.arg("--find");
+    if let Some(pattern) = &options.find {
+        cmd.arg("--find").arg(pattern);
     }
     // Always use flat format (default)
     cmd.arg("--flat");
@@ -291,5 +291,12 @@ mod tests {
         assert_eq!(options.depth, Some(2));
         assert_eq!(options.begin, Some("2024-01-01".to_string()));
         assert_eq!(options.queries, vec!["assets"]);
+    }
+
+    #[test]
+    fn test_accounts_options_with_find() {
+        let options = AccountsOptions::new().find("assets");
+
+        assert_eq!(options.find, Some("assets".to_string()));
     }
 }
