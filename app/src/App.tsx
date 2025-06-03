@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { invoke } from "@tauri-apps/api/core";
@@ -9,10 +15,11 @@ function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [accounts, setAccounts] = useState<string[]>([]);
 
   async function greet() {
     if (!name.trim()) return;
-    
+
     setIsLoading(true);
     try {
       const message = await invoke<string>("greet", { name });
@@ -22,6 +29,16 @@ function App() {
       setGreetMsg("Failed to connect to Tauri backend");
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function fetchAccounts() {
+    try {
+      const accountsList = await invoke<string[]>("get_accounts");
+      setAccounts(accountsList);
+    } catch (error) {
+      console.error("Failed to fetch accounts:", error);
+      setAccounts([]);
     }
   }
 
@@ -57,12 +74,9 @@ function App() {
                 placeholder="Enter your name..."
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && greet()}
+                onKeyPress={(e) => e.key === "Enter" && greet()}
               />
-              <Button 
-                onClick={greet} 
-                disabled={isLoading || !name.trim()}
-              >
+              <Button onClick={greet} disabled={isLoading || !name.trim()}>
                 {isLoading ? "..." : "Greet"}
               </Button>
             </div>
@@ -74,45 +88,41 @@ function App() {
           </CardContent>
         </Card>
 
-        {/* Features */}
-        <div className="grid md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">⚡ Fast</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Rust-powered backend with native performance
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">🎨 Modern</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Beautiful UI with shadcn/ui and Tailwind CSS
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">🔐 Secure</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Memory safety with Rust and Tauri's security model
-              </CardDescription>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Accounts */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Accounts</CardTitle>
+            <CardDescription>
+              View all accounts from your hledger journal
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button onClick={fetchAccounts}>Load Accounts</Button>
+            {accounts.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Found {accounts.length} account
+                  {accounts.length !== 1 ? "s" : ""}:
+                </p>
+                <div className="max-h-64 overflow-y-auto bg-muted rounded-md p-3">
+                  <ul className="space-y-1">
+                    {accounts.map((account, index) => (
+                      <li key={index} className="text-sm font-mono">
+                        {account}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Footer */}
         <div className="text-center text-sm text-muted-foreground">
-          <p>Built with Tauri, React, TypeScript, shadcn/ui, and Tailwind CSS</p>
+          <p>
+            Built with Tauri, React, TypeScript, shadcn/ui, and Tailwind CSS
+          </p>
         </div>
       </div>
     </div>
