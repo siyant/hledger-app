@@ -20,8 +20,7 @@ pub struct AccountsOptions {
     pub directives: bool,
     /// Find the first account matched by the pattern
     pub find: bool,
-    /// Show accounts as a tree (default is flat list)
-    pub tree: bool,
+
     /// Flat mode: omit N leading account name parts
     pub drop: Option<u32>,
     /// Limit depth of accounts shown
@@ -88,11 +87,6 @@ impl AccountsOptions {
 
     pub fn find(mut self) -> Self {
         self.find = true;
-        self
-    }
-
-    pub fn tree(mut self) -> Self {
-        self.tree = true;
         self
     }
 
@@ -192,11 +186,8 @@ pub fn get_accounts(journal_file: Option<&str>, options: &AccountsOptions) -> Re
     if options.find {
         cmd.arg("--find");
     }
-    if options.tree {
-        cmd.arg("--tree");
-    } else {
-        cmd.arg("--flat");
-    }
+    // Always use flat format (default)
+    cmd.arg("--flat");
 
     if let Some(n) = options.drop {
         cmd.arg(format!("--drop={}", n));
@@ -292,13 +283,11 @@ mod tests {
     fn test_accounts_options_builder() {
         let options = AccountsOptions::new()
             .used()
-            .tree()
             .depth(2)
             .begin("2024-01-01")
             .query("assets");
 
         assert!(options.used);
-        assert!(options.tree);
         assert_eq!(options.depth, Some(2));
         assert_eq!(options.begin, Some("2024-01-01".to_string()));
         assert_eq!(options.queries, vec!["assets"]);

@@ -9,12 +9,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("  {}", account);
     }
 
-    println!("\n=== Tree format ===");
-    let accounts = get_accounts(journal_file.into(), &AccountsOptions::new().tree())?;
-    for account in &accounts {
-        println!("{}", account);
-    }
-
     println!("\n=== Depth 1 only ===");
     let accounts = get_accounts(journal_file.into(), &AccountsOptions::new().depth(1))?;
     for account in &accounts {

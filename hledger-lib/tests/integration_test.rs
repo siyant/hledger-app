@@ -35,17 +35,6 @@ fn test_get_accounts_no_journal() {
 }
 
 #[test]
-fn test_get_accounts_tree_format() {
-    let options = AccountsOptions::new().tree();
-    let accounts = get_accounts(Some("tests/fixtures/test.journal"), &options)
-        .expect("Failed to get accounts");
-
-    // Tree format should include indentation for hierarchical display
-    // The exact format may vary, so we just check that we get some accounts
-    assert!(!accounts.is_empty());
-}
-
-#[test]
 fn test_get_accounts_depth_filter() {
     let options = AccountsOptions::new().depth(1);
     let accounts = get_accounts(Some("tests/fixtures/test.journal"), &options)
