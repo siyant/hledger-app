@@ -1,38 +1,9 @@
 {
-  "name": "tauri-shadcn-tailwind-boilerplate",
+  "name": "hledger-app",
   "private": false,
   "version": "1.0.0",
   "description": "🚀 A modern desktop app boilerplate built with Tauri v2, Tailwind CSS v4, shadcn/ui, React 18, and TypeScript. Features glassmorphism design, blazing-fast performance, and developer experience.",
   "type": "module",
-  "keywords": [
-    "tauri",
-    "tauri-v2",
-    "tailwindcss",
-    "tailwind-v4",
-    "shadcn-ui",
-    "react",
-    "typescript",
-    "desktop-app",
-    "boilerplate",
-    "template",
-    "starter",
-    "glassmorphism",
-    "modern-ui",
-    "bun"
-  ],
-  "author": {
-    "name": "WABISABI",
-    "url": "https://github.com/wabisabi"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wabisabi/tauri-shadcn-tailwind-boilerplate.git"
-  },
-  "bugs": {
-    "url": "https://github.com/wabisabi/tauri-shadcn-tailwind-boilerplate/issues"
-  },
-  "homepage": "https://github.com/wabisabi/tauri-shadcn-tailwind-boilerplate#readme",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -42,6 +13,30 @@
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build"
   },
+  "keywords": [
+    "tauri",
+    "tauri-v2",
+    "tailwindcss",
+    "tailwind-v4",
+    "shadcn-ui",
+    "react",
+    "typescript",
+    "desktop-app",
+    "bun"
+  ],
+  "author": {
+    "name": "Vivek Kalyan",
+    "url": "https://github.com/vivekkalyan"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vivekkalyan/hledger-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vivekkalyan/hledger-app/issues"
+  },
+  "homepage": "https://github.com/vivekkalyan/hledger-app#readme",
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
     "@tauri-apps/api": ">=2.0.0",
