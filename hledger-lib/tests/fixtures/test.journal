@@ -1,0 +1,12 @@
+2024-01-01 income
+    assets:bank:checking  $100
+    income:salary
+
+2024-01-05 expenses
+    expenses:groceries  $20
+    assets:bank:checking
+
+2024-01-10 Investment purchase
+    assets:investments:fidelity:goog  2 GOOG @ $150.00
+    assets:investments:fidelity:cash  $-300.50
+    expenses:fees:brokerage  $0.50
