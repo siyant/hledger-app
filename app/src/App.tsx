@@ -9,11 +9,20 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { JollySearchField } from "@/components/ui/searchfield";
 import { invoke } from "@tauri-apps/api/core";
-import { createDefaultAccountsOptions } from "./types/hledger.types";
+import { 
+  createDefaultAccountsOptions, 
+  createDefaultBalanceOptions,
+  type BalanceReport,
+  type SimpleBalance,
+  type PeriodicBalance,
+  type BalanceAccount
+} from "./types/hledger.types";
 
 function App() {
   const [accounts, setAccounts] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [balances, setBalances] = useState<BalanceAccount[]>([]);
+  const [balanceSearchQuery, setBalanceSearchQuery] = useState("");
 
   async function fetchAccounts(query = "") {
     const options = createDefaultAccountsOptions();
@@ -32,15 +41,61 @@ function App() {
     }
   }
 
+  async function fetchBalances(query = "") {
+    const options = createDefaultBalanceOptions();
+
+    // Add the search query if provided
+    if (query.trim()) {
+      options.queries = [query];
+    }
+
+    try {
+      const balanceReport = await invoke<BalanceReport>("get_balance", { options });
+      
+      // Extract accounts from the balance report
+      // Check if it's a SimpleBalance (has accounts property) or PeriodicBalance (has dates/rows properties)
+      if ("accounts" in balanceReport) {
+        const simpleBalance = balanceReport as SimpleBalance;
+        // Filter out accounts that have only zero amounts
+        const accountsWithBalances = simpleBalance.accounts.filter(account => 
+          account.amounts.some(amount => parseFloat(amount.quantity) !== 0)
+        );
+        setBalances(accountsWithBalances);
+      } else if ("dates" in balanceReport && "rows" in balanceReport) {
+        const periodicBalance = balanceReport as PeriodicBalance;
+        // For periodic balances, we'll show the account names from rows
+        const accounts: BalanceAccount[] = periodicBalance.rows.map(row => ({
+          name: row.account,
+          display_name: row.display_name,
+          indent: 0,
+          amounts: row.amounts[0] || [], // Use first period's amounts
+        })).filter(account => 
+          account.amounts.some(amount => parseFloat(amount.quantity) !== 0)
+        );
+        setBalances(accounts);
+      }
+    } catch (error) {
+      console.error("Failed to fetch balances:", error);
+      setBalances([]);
+    }
+  }
+
   // Clear search query
   const clearSearch = () => {
     setSearchQuery("");
     fetchAccounts("");
   };
 
-  // Load accounts when component mounts
+  // Clear balance search query
+  const clearBalanceSearch = () => {
+    setBalanceSearchQuery("");
+    fetchBalances("");
+  };
+
+  // Load accounts and balances when component mounts
   useEffect(() => {
     fetchAccounts();
+    fetchBalances();
   }, []);
 
   return (
@@ -62,7 +117,7 @@ function App() {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Accounts */}
           <Card>
             <CardHeader>
@@ -102,6 +157,63 @@ function App() {
                   <div className="flex justify-center items-center h-full">
                     <p className="text-sm text-muted-foreground">
                       No accounts found
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Balances */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Balances</CardTitle>
+              <CardDescription>
+                View account balances from your hledger journal
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <JollySearchField
+                value={balanceSearchQuery}
+                onChange={(value) => {
+                  setBalanceSearchQuery(value);
+                  fetchBalances(value);
+                }}
+                onClear={clearBalanceSearch}
+              />
+
+              <div className="min-h-[250px]">
+                {balances.length > 0 ? (
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Found {balances.length} account
+                      {balances.length !== 1 ? "s" : ""} with balances:
+                    </p>
+                    <div className="h-[200px] overflow-y-auto bg-muted rounded-md p-3">
+                      <ul className="space-y-2">
+                        {balances.map((balance, index) => (
+                          <li key={index} className="flex justify-between items-start text-sm">
+                            <span className="font-mono text-muted-foreground flex-1 mr-2">
+                              {balance.display_name || balance.name}
+                            </span>
+                            <div className="flex flex-col items-end">
+                              {balance.amounts
+                                .filter(amount => parseFloat(amount.quantity) !== 0)
+                                .map((amount, amountIndex) => (
+                                <span key={amountIndex} className="font-mono text-xs">
+                                  {amount.commodity}{amount.quantity}
+                                </span>
+                              ))}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex justify-center items-center h-full">
+                    <p className="text-sm text-muted-foreground">
+                      No balances found
                     </p>
                   </div>
                 )}
