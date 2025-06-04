@@ -4,6 +4,7 @@
     "": {
       "name": "hledger-app",
       "dependencies": {
+        "@internationalized/date": "^3.8.1",
         "@radix-ui/react-slot": "^1.2.3",
         "@tauri-apps/api": ">=2.0.0",
         "@tauri-apps/plugin-shell": ">=2.0.0",
