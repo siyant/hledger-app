@@ -5,9 +5,7 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-fn get_accounts() -> Result<Vec<String>, String> {
-    let options = hledger_lib::AccountsOptions::new();
-    
+fn get_accounts(options: hledger_lib::AccountsOptions) -> Result<Vec<String>, String> {
     match hledger_lib::get_accounts(None, &options) {
         Ok(accounts) => Ok(accounts),
         Err(e) => Err(format!("Failed to get accounts: {}", e)),

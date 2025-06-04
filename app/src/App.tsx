@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { invoke } from "@tauri-apps/api/core";
+import { createDefaultAccountsOptions } from "./types/hledger.types";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
@@ -33,8 +34,10 @@ function App() {
   }
 
   async function fetchAccounts() {
+    const options = createDefaultAccountsOptions();
+
     try {
-      const accountsList = await invoke<string[]>("get_accounts");
+      const accountsList = await invoke<string[]>("get_accounts", { options });
       setAccounts(accountsList);
     } catch (error) {
       console.error("Failed to fetch accounts:", error);
