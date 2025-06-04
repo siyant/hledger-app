@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    sukunai_lib::run()
+    hledger_app_lib::run()
 }

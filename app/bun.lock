@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "sukunai",
+      "name": "hledger-app",
       "dependencies": {
         "@radix-ui/react-slot": "^1.2.3",
         "@tauri-apps/api": ">=2.0.0",
