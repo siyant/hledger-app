@@ -392,7 +392,7 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
                       {periodicData.rows
                         .filter((row) => isAccountVisible(row.account))
                         .map((row, index) => {
-                          const indent = (row.account.match(/:/g) || []).length;
+                          const indent = balanceDisplayMode === "tree" ? (row.account.match(/:/g) || []).length : 0;
                           const hasChildAccounts = balanceDisplayMode === "tree" && hasChildren(row.account);
                           
                           return (
