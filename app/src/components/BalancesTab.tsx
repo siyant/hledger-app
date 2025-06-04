@@ -26,7 +26,9 @@ interface BalancesTabProps {
 
 export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
   const [balances, setBalances] = useState<BalanceAccount[]>([]);
+  const [periodicData, setPeriodicData] = useState<PeriodicBalance | null>(null);
   const [balanceDisplayMode, setBalanceDisplayMode] = useState<string>("flat");
+  const [periodMode, setPeriodMode] = useState<string>("none");
   const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(
     new Set(),
   );
@@ -34,55 +36,101 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
   // Memoized calculation of which accounts have children
   const accountsWithChildren = useMemo(() => {
     const childrenMap = new Map<string, boolean>();
-    balances.forEach((account, index) => {
-      const hasChild =
-        index < balances.length - 1 &&
-        balances[index + 1].indent > account.indent;
-      childrenMap.set(account.name, hasChild);
-    });
+    
+    if (periodicData) {
+      // For periodic data, use the rows to determine children
+      periodicData.rows.forEach((row, index) => {
+        // In periodic data, we need to compute indent from account name
+        const indent = (row.account.match(/:/g) || []).length;
+        const hasChild = index < periodicData.rows.length - 1 &&
+          (periodicData.rows[index + 1].account.match(/:/g) || []).length > indent;
+        childrenMap.set(row.account, hasChild);
+      });
+    } else {
+      // For simple data, use existing logic
+      balances.forEach((account, index) => {
+        const hasChild =
+          index < balances.length - 1 &&
+          balances[index + 1].indent > account.indent;
+        childrenMap.set(account.name, hasChild);
+      });
+    }
+    
     return childrenMap;
-  }, [balances]);
+  }, [balances, periodicData]);
 
   // Memoized visibility calculations
   const visibilityCache = useMemo(() => {
     if (balanceDisplayMode !== "tree") {
-      return new Map(balances.map((account) => [account.name, true]));
+      if (periodicData) {
+        return new Map(periodicData.rows.map((row) => [row.account, true]));
+      } else {
+        return new Map(balances.map((account) => [account.name, true]));
+      }
     }
 
     const visibilityMap = new Map<string, boolean>();
 
-    balances.forEach((account, index) => {
-      // Root level accounts are always visible
-      if (account.indent === 0) {
-        visibilityMap.set(account.name, true);
-        return;
-      }
-
-      // Find parent account by looking backwards
-      let isVisible = false;
-      for (let i = index - 1; i >= 0; i--) {
-        if (balances[i].indent === account.indent - 1) {
-          const parent = balances[i];
-          // Account is visible if parent is expanded AND parent itself is visible
-          const parentVisible = visibilityMap.get(parent.name) ?? false;
-          isVisible = expandedAccounts.has(parent.name) && parentVisible;
-          break;
+    if (periodicData) {
+      // For periodic data
+      periodicData.rows.forEach((row, index) => {
+        const indent = (row.account.match(/:/g) || []).length;
+        
+        // Root level accounts are always visible
+        if (indent === 0) {
+          visibilityMap.set(row.account, true);
+          return;
         }
-      }
 
-      visibilityMap.set(account.name, isVisible);
-    });
+        // Find parent account by looking backwards
+        let isVisible = false;
+        for (let i = index - 1; i >= 0; i--) {
+          const parentIndent = (periodicData.rows[i].account.match(/:/g) || []).length;
+          if (parentIndent === indent - 1) {
+            const parent = periodicData.rows[i];
+            const parentVisible = visibilityMap.get(parent.account) ?? false;
+            isVisible = expandedAccounts.has(parent.account) && parentVisible;
+            break;
+          }
+        }
+
+        visibilityMap.set(row.account, isVisible);
+      });
+    } else {
+      // For simple data, use existing logic
+      balances.forEach((account, index) => {
+        // Root level accounts are always visible
+        if (account.indent === 0) {
+          visibilityMap.set(account.name, true);
+          return;
+        }
+
+        // Find parent account by looking backwards
+        let isVisible = false;
+        for (let i = index - 1; i >= 0; i--) {
+          if (balances[i].indent === account.indent - 1) {
+            const parent = balances[i];
+            // Account is visible if parent is expanded AND parent itself is visible
+            const parentVisible = visibilityMap.get(parent.name) ?? false;
+            isVisible = expandedAccounts.has(parent.name) && parentVisible;
+            break;
+          }
+        }
+
+        visibilityMap.set(account.name, isVisible);
+      });
+    }
 
     return visibilityMap;
-  }, [balances, expandedAccounts, balanceDisplayMode]);
+  }, [balances, periodicData, expandedAccounts, balanceDisplayMode]);
 
   // Helper functions using memoized data
-  const hasChildren = (account: BalanceAccount): boolean => {
-    return accountsWithChildren.get(account.name) ?? false;
+  const hasChildren = (accountName: string): boolean => {
+    return accountsWithChildren.get(accountName) ?? false;
   };
 
-  const isAccountVisible = (account: BalanceAccount): boolean => {
-    return visibilityCache.get(account.name) ?? false;
+  const isAccountVisible = (accountName: string): boolean => {
+    return visibilityCache.get(accountName) ?? false;
   };
 
   // Toggle expand/collapse state
@@ -129,6 +177,26 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
         options.end = customRange.end.toString();
       }
 
+      // Set period mode
+      switch (periodMode) {
+        case "daily":
+          options.daily = true;
+          break;
+        case "weekly":
+          options.weekly = true;
+          break;
+        case "monthly":
+          options.monthly = true;
+          break;
+        case "quarterly":
+          options.quarterly = true;
+          break;
+        case "yearly":
+          options.yearly = true;
+          break;
+        // "none" or default - no period flags set
+      }
+
       // Set tree/flat display mode
       if (balanceDisplayMode === "tree") {
         options.tree = true;
@@ -142,6 +210,10 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
         const balanceReport = await invoke<BalanceReport>("get_balance", {
           options,
         });
+
+        // Clear previous data
+        setBalances([]);
+        setPeriodicData(null);
 
         // Extract accounts from the balance report
         // Check if it's a SimpleBalance (has accounts property) or PeriodicBalance (has dates/rows properties)
@@ -157,27 +229,24 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
           setBalances(accountsWithBalances);
         } else if ("dates" in balanceReport && "rows" in balanceReport) {
           const periodicBalance = balanceReport as PeriodicBalance;
-          // For periodic balances, we'll show the account names from rows
-          const accounts: BalanceAccount[] = periodicBalance.rows
-            .map((row) => ({
-              name: row.account,
-              display_name: row.display_name,
-              indent: 0,
-              amounts: row.amounts[0] || [], // Use first period's amounts
-            }))
-            .filter((account) =>
-              account.amounts.some(
-                (amount) => parseFloat(amount.quantity) !== 0,
-              ),
-            );
-          setBalances(accounts);
+          // Filter out rows that have only zero amounts across all periods
+          const filteredRows = periodicBalance.rows.filter((row) =>
+            row.amounts.some((periodAmounts) =>
+              periodAmounts.some((amount) => parseFloat(amount.quantity) !== 0)
+            )
+          );
+          setPeriodicData({
+            ...periodicBalance,
+            rows: filteredRows,
+          });
         }
       } catch (error) {
         console.error("Failed to fetch balances:", error);
         setBalances([]);
+        setPeriodicData(null);
       }
     },
-    [balanceDisplayMode],
+    [balanceDisplayMode, periodMode],
   );
 
   // Handle balance display mode selection
@@ -186,6 +255,16 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
     if (selected) {
       setBalanceDisplayMode(selected);
       // Clear expanded state when switching modes
+      setExpandedAccounts(new Set());
+    }
+  };
+
+  // Handle period mode selection
+  const handlePeriodMode = (keys: Set<React.Key>) => {
+    const selected = Array.from(keys)[0] as string;
+    if (selected) {
+      setPeriodMode(selected);
+      // Clear expanded state when switching period modes
       setExpandedAccounts(new Set());
     }
   };
@@ -203,28 +282,68 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
             View account balances from your hledger journal
           </CardDescription>
 
-          <ToggleButtonGroup
-            selectedKeys={[balanceDisplayMode]}
-            onSelectionChange={handleBalanceDisplayMode}
-            className="mt-2 justify-start"
-          >
-            <Toggle id="flat" className="text-xs font-normal">
-              Flat
-            </Toggle>
-            <Toggle id="tree" className="text-xs font-normal">
-              Tree
-            </Toggle>
-          </ToggleButtonGroup>
+          <div className="flex flex-col space-y-2 mt-2">
+            <div>
+              <label className="text-sm font-medium text-muted-foreground mb-1 block">
+                Display Mode
+              </label>
+              <ToggleButtonGroup
+                selectedKeys={[balanceDisplayMode]}
+                onSelectionChange={handleBalanceDisplayMode}
+                className="justify-start"
+              >
+                <Toggle id="flat" className="text-xs font-normal">
+                  Flat
+                </Toggle>
+                <Toggle id="tree" className="text-xs font-normal">
+                  Tree
+                </Toggle>
+              </ToggleButtonGroup>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-muted-foreground mb-1 block">
+                Period
+              </label>
+              <ToggleButtonGroup
+                selectedKeys={[periodMode]}
+                onSelectionChange={handlePeriodMode}
+                className="justify-start"
+              >
+                <Toggle id="none" className="text-xs font-normal">
+                  None
+                </Toggle>
+                <Toggle id="daily" className="text-xs font-normal">
+                  Daily
+                </Toggle>
+                <Toggle id="weekly" className="text-xs font-normal">
+                  Weekly
+                </Toggle>
+                <Toggle id="monthly" className="text-xs font-normal">
+                  Monthly
+                </Toggle>
+                <Toggle id="quarterly" className="text-xs font-normal">
+                  Quarterly
+                </Toggle>
+                <Toggle id="yearly" className="text-xs font-normal">
+                  Yearly
+                </Toggle>
+              </ToggleButtonGroup>
+            </div>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
         <div>
-          {balances.length > 0 ? (
+          {(balances.length > 0 || periodicData) ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">
-                  Found {balances.length} account
-                  {balances.length !== 1 ? "s" : ""} with balances:
+                  {periodicData ? (
+                    <>Found {periodicData.rows.length} account{periodicData.rows.length !== 1 ? "s" : ""} with balances:</>
+                  ) : (
+                    <>Found {balances.length} account{balances.length !== 1 ? "s" : ""} with balances:</>
+                  )}
                 </p>
                 {balanceDisplayMode === "tree" && (
                   <div className="flex gap-2">
@@ -247,77 +366,168 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
                   </div>
                 )}
               </div>
-              <div className="bg-muted rounded-md p-3">
-                <ul className="space-y-1">
-                  {balances
-                    .filter((balance) => isAccountVisible(balance))
-                    .map((balance, index) => {
-                      const hasChildAccounts =
-                        balanceDisplayMode === "tree" && hasChildren(balance);
-                      return (
-                        <li
-                          key={index}
-                          className="flex justify-between items-start text-sm"
-                          style={{ paddingLeft: `${balance.indent * 16}px` }}
-                        >
-                          <span className="flex-1 mr-2 flex items-center">
-                            {balanceDisplayMode === "tree" && (
-                              <>
+
+              {periodicData ? (
+                // Periodic balance display
+                <div className="bg-muted rounded-md p-3 overflow-x-auto">
+                  <div className="min-w-fit">
+                    {/* Period headers */}
+                    <div className="flex mb-2 border-b border-muted-foreground/20 pb-2">
+                      <div className="flex-1 min-w-[200px] font-medium text-sm">
+                        Account
+                      </div>
+                      {periodicData.dates.map((periodDate, index) => (
+                        <div key={index} className="w-24 text-right font-medium text-sm px-1">
+                          {new Date(periodDate.start).toLocaleDateString('en-US', {
+                            month: 'short',
+                            year: periodMode === 'yearly' ? '2-digit' : undefined,
+                            day: periodMode === 'daily' ? 'numeric' : undefined,
+                          })}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Account rows */}
+                    <div className="space-y-1">
+                      {periodicData.rows
+                        .filter((row) => isAccountVisible(row.account))
+                        .map((row, index) => {
+                          const indent = (row.account.match(/:/g) || []).length;
+                          const hasChildAccounts = balanceDisplayMode === "tree" && hasChildren(row.account);
+                          
+                          return (
+                            <div
+                              key={index}
+                              className="flex items-start text-sm"
+                              style={{ paddingLeft: `${indent * 16}px` }}
+                            >
+                              <div className="flex-1 min-w-[200px] flex items-center mr-2">
+                                {balanceDisplayMode === "tree" && (
+                                  <>
+                                    {hasChildAccounts ? (
+                                      <button
+                                        onClick={() => toggleAccount(row.account)}
+                                        className="mr-1 p-0 hover:bg-muted rounded flex items-center"
+                                      >
+                                        {expandedAccounts.has(row.account) ? (
+                                          <ChevronDown className="h-4 w-4" />
+                                        ) : (
+                                          <ChevronRight className="h-4 w-4" />
+                                        )}
+                                      </button>
+                                    ) : (
+                                      <span className="mr-1 flex items-center w-4">
+                                        <Dot className="h-4 w-4" />
+                                      </span>
+                                    )}
+                                  </>
+                                )}
                                 {hasChildAccounts ? (
                                   <button
-                                    onClick={() => toggleAccount(balance.name)}
-                                    className="mr-1 p-0 hover:bg-muted rounded flex items-center"
+                                    onClick={() => toggleAccount(row.account)}
+                                    className="hover:underline text-left"
                                   >
-                                    {expandedAccounts.has(balance.name) ? (
-                                      <ChevronDown className="h-4 w-4" />
-                                    ) : (
-                                      <ChevronRight className="h-4 w-4" />
-                                    )}
+                                    {row.display_name || row.account}
                                   </button>
                                 ) : (
-                                  <span className="mr-1 flex items-center w-4">
-                                    <Dot className="h-4 w-4" />
-                                  </span>
+                                  row.display_name || row.account
                                 )}
-                              </>
-                            )}
-                            {hasChildAccounts ? (
-                              <button
-                                onClick={() => toggleAccount(balance.name)}
-                                className="hover:underline text-left"
-                              >
-                                {balance.display_name || balance.name}
-                              </button>
-                            ) : (
-                              balance.display_name || balance.name
-                            )}
-                          </span>
-                          <div className="flex flex-col items-end">
-                            {balance.amounts
-                              .filter(
-                                (amount) => parseFloat(amount.quantity) !== 0,
-                              )
-                              .map((amount, amountIndex) => {
-                                // Check if this is an expanded parent account (has children and is expanded)
-                                const isExpandedParent =
-                                  hasChildAccounts &&
-                                  expandedAccounts.has(balance.name);
-                                return (
-                                  <span
-                                    key={amountIndex}
-                                    className={`font-mono text-xs ${isExpandedParent ? "text-muted-foreground" : ""}`}
-                                  >
-                                    {amount.commodity}
-                                    {amount.quantity}
-                                  </span>
-                                );
-                              })}
-                          </div>
-                        </li>
-                      );
-                    })}
-                </ul>
-              </div>
+                              </div>
+                              
+                              {/* Period amounts */}
+                              {row.amounts.map((periodAmounts, periodIndex) => (
+                                <div key={periodIndex} className="w-24 text-right px-1">
+                                  {periodAmounts
+                                    .filter((amount) => parseFloat(amount.quantity) !== 0)
+                                    .map((amount, amountIndex) => {
+                                      const isExpandedParent = hasChildAccounts && expandedAccounts.has(row.account);
+                                      return (
+                                        <div
+                                          key={amountIndex}
+                                          className={`font-mono text-xs ${isExpandedParent ? "text-muted-foreground" : ""}`}
+                                        >
+                                          {amount.commodity}{amount.quantity}
+                                        </div>
+                                      );
+                                    })}
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // Simple balance display (existing logic)
+                <div className="bg-muted rounded-md p-3">
+                  <ul className="space-y-1">
+                    {balances
+                      .filter((balance) => isAccountVisible(balance.name))
+                      .map((balance, index) => {
+                        const hasChildAccounts = balanceDisplayMode === "tree" && hasChildren(balance.name);
+                        return (
+                          <li
+                            key={index}
+                            className="flex justify-between items-start text-sm"
+                            style={{ paddingLeft: `${balance.indent * 16}px` }}
+                          >
+                            <span className="flex-1 mr-2 flex items-center">
+                              {balanceDisplayMode === "tree" && (
+                                <>
+                                  {hasChildAccounts ? (
+                                    <button
+                                      onClick={() => toggleAccount(balance.name)}
+                                      className="mr-1 p-0 hover:bg-muted rounded flex items-center"
+                                    >
+                                      {expandedAccounts.has(balance.name) ? (
+                                        <ChevronDown className="h-4 w-4" />
+                                      ) : (
+                                        <ChevronRight className="h-4 w-4" />
+                                      )}
+                                    </button>
+                                  ) : (
+                                    <span className="mr-1 flex items-center w-4">
+                                      <Dot className="h-4 w-4" />
+                                    </span>
+                                  )}
+                                </>
+                              )}
+                              {hasChildAccounts ? (
+                                <button
+                                  onClick={() => toggleAccount(balance.name)}
+                                  className="hover:underline text-left"
+                                >
+                                  {balance.display_name || balance.name}
+                                </button>
+                              ) : (
+                                balance.display_name || balance.name
+                              )}
+                            </span>
+                            <div className="flex flex-col items-end">
+                              {balance.amounts
+                                .filter(
+                                  (amount) => parseFloat(amount.quantity) !== 0,
+                                )
+                                .map((amount, amountIndex) => {
+                                  const isExpandedParent = hasChildAccounts && expandedAccounts.has(balance.name);
+                                  return (
+                                    <span
+                                      key={amountIndex}
+                                      className={`font-mono text-xs ${isExpandedParent ? "text-muted-foreground" : ""}`}
+                                    >
+                                      {amount.commodity}
+                                      {amount.quantity}
+                                    </span>
+                                  );
+                                })}
+                            </div>
+                          </li>
+                        );
+                      })}
+                  </ul>
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex justify-center items-center py-8">

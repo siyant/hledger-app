@@ -4,6 +4,8 @@ import type { BalanceOptions } from "../../../hledger-lib/bindings/BalanceOption
 import type { BalanceReport } from "../../../hledger-lib/bindings/BalanceReport.ts";
 import type { SimpleBalance } from "../../../hledger-lib/bindings/SimpleBalance.ts";
 import type { PeriodicBalance } from "../../../hledger-lib/bindings/PeriodicBalance.ts";
+import type { PeriodicBalanceRow } from "../../../hledger-lib/bindings/PeriodicBalanceRow.ts";
+import type { PeriodDate } from "../../../hledger-lib/bindings/PeriodDate.ts";
 import type { BalanceAccount } from "../../../hledger-lib/bindings/BalanceAccount.ts";
 import type { Amount } from "../../../hledger-lib/bindings/Amount.ts";
 import type { Price } from "../../../hledger-lib/bindings/Price.ts";
@@ -14,6 +16,8 @@ export type {
   BalanceReport, 
   SimpleBalance, 
   PeriodicBalance, 
+  PeriodicBalanceRow,
+  PeriodDate,
   BalanceAccount, 
   Amount, 
   Price 
