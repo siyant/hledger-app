@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { JollySearchField } from "@/components/ui/searchfield";
 import { invoke } from "@tauri-apps/api/core";
 import { createDefaultAccountsOptions } from "./types/hledger.types";
 
@@ -17,6 +18,7 @@ function App() {
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [accounts, setAccounts] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   async function greet() {
     if (!name.trim()) return;
@@ -33,17 +35,36 @@ function App() {
     }
   }
 
-  async function fetchAccounts() {
+  async function fetchAccounts(query: string = "") {
     const options = createDefaultAccountsOptions();
 
+    // Add the search query if provided
+    if (query.trim()) {
+      options.queries = [query];
+    }
+
     try {
+      setIsLoading(true);
       const accountsList = await invoke<string[]>("get_accounts", { options });
       setAccounts(accountsList);
     } catch (error) {
       console.error("Failed to fetch accounts:", error);
       setAccounts([]);
+    } finally {
+      setIsLoading(false);
     }
   }
+
+  // Clear search query
+  const clearSearch = () => {
+    setSearchQuery("");
+    fetchAccounts("");
+  };
+
+  // Load accounts when component mounts
+  useEffect(() => {
+    fetchAccounts();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8">
@@ -100,8 +121,20 @@ function App() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button onClick={fetchAccounts}>Load Accounts</Button>
-            {accounts.length > 0 && (
+            <JollySearchField
+              value={searchQuery}
+              onChange={(value) => {
+                setSearchQuery(value);
+                fetchAccounts(value);
+              }}
+              onClear={clearSearch}
+            />
+
+            {isLoading ? (
+              <div className="flex justify-center">
+                <p>Loading accounts...</p>
+              </div>
+            ) : accounts.length > 0 ? (
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
                   Found {accounts.length} account
@@ -116,6 +149,12 @@ function App() {
                     ))}
                   </ul>
                 </div>
+              </div>
+            ) : (
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">
+                  No accounts found
+                </p>
               </div>
             )}
           </CardContent>
