@@ -398,7 +398,7 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
                           return (
                             <div
                               key={index}
-                              className="flex items-start text-sm"
+                              className="flex items-start text-sm hover:bg-muted-foreground/10 rounded px-2 py-1"
                               style={{ paddingLeft: `${indent * 16}px` }}
                             >
                               <div className="flex-1 min-w-[200px] flex items-center mr-2">
@@ -469,7 +469,7 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
                         return (
                           <li
                             key={index}
-                            className="flex justify-between items-start text-sm"
+                            className="flex justify-between items-start text-sm hover:bg-muted-foreground/10 rounded px-2 py-1"
                             style={{ paddingLeft: `${balance.indent * 16}px` }}
                           >
                             <span className="flex-1 mr-2 flex items-center">

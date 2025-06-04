@@ -67,7 +67,7 @@ export function AccountsTab({ searchQuery, dateRange }: AccountsTabProps) {
               <div className="bg-muted rounded-md p-3">
                 <ul className="space-y-1">
                   {accounts.map((account, index) => (
-                    <li key={index} className="text-sm">
+                    <li key={index} className="text-sm hover:bg-muted-foreground/10 rounded px-2 py-1">
                       {account}
                     </li>
                   ))}
