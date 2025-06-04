@@ -13,4 +13,10 @@ pub enum HLedgerError {
 
     #[error("Invalid UTF-8 in hledger output: {0}")]
     InvalidUtf8(#[from] std::string::FromUtf8Error),
+
+    #[error("JSON parsing error: {0}")]
+    Json(#[from] serde_json::Error),
+
+    #[error("Parse error: {0}")]
+    ParseError(String),
 }
