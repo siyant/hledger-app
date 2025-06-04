@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import React from "react";
 import {
   Card,
@@ -78,6 +78,7 @@ function App() {
     start: DateValue;
     end: DateValue;
   } | null>(null);
+  const [balanceDisplayMode, setBalanceDisplayMode] = useState<string>("flat");
 
   async function fetchAccounts(
     query = "",
@@ -105,10 +106,10 @@ function App() {
     }
   }
 
-  async function fetchBalances(
+  const fetchBalances = useCallback(async (
     query = "",
     customRange: { start: DateValue; end: DateValue } | null = null,
-  ) {
+  ) => {
     const options = createDefaultBalanceOptions();
 
     // Add the search query if provided
@@ -120,6 +121,15 @@ function App() {
     if (customRange) {
       options.begin = customRange.start.toString();
       options.end = customRange.end.toString();
+    }
+
+    // Set tree/flat display mode
+    if (balanceDisplayMode === "tree") {
+      options.tree = true;
+      options.flat = false;
+    } else {
+      options.flat = true;
+      options.tree = false;
     }
 
     try {
@@ -155,7 +165,7 @@ function App() {
       console.error("Failed to fetch balances:", error);
       setBalances([]);
     }
-  }
+  }, [balanceDisplayMode]);
 
   // Clear search query
   const clearSearch = () => {
@@ -197,15 +207,23 @@ function App() {
     }
   };
 
+  // Handle balance display mode selection
+  const handleBalanceDisplayMode = (keys: Set<React.Key>) => {
+    const selected = Array.from(keys)[0] as string;
+    if (selected) {
+      setBalanceDisplayMode(selected);
+    }
+  };
+
   // Fetch accounts when searchQuery or customDateRange changes
   useEffect(() => {
     fetchAccounts(searchQuery, customDateRange);
   }, [searchQuery, customDateRange]);
 
-  // Fetch balances when searchQuery or customDateRange changes
+  // Fetch balances when searchQuery, customDateRange, or balanceDisplayMode changes
   useEffect(() => {
     fetchBalances(searchQuery, customDateRange);
-  }, [searchQuery, customDateRange]);
+  }, [searchQuery, customDateRange, fetchBalances]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -266,6 +284,7 @@ function App() {
                   />
                 </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -299,7 +318,7 @@ function App() {
                         <div className="bg-muted rounded-md p-3">
                           <ul className="space-y-1">
                             {accounts.map((account, index) => (
-                              <li key={index} className="text-sm font-mono">
+                              <li key={index} className="text-sm">
                                 {account}
                               </li>
                             ))}
@@ -321,10 +340,26 @@ function App() {
             <TabPanel id="balances">
               <Card>
                 <CardHeader>
-                  <CardTitle>Balances</CardTitle>
-                  <CardDescription>
-                    View account balances from your hledger journal
-                  </CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Balances</CardTitle>
+                      <CardDescription>
+                        View account balances from your hledger journal
+                      </CardDescription>
+                    </div>
+                    <ToggleButtonGroup
+                      selectedKeys={[balanceDisplayMode]}
+                      onSelectionChange={handleBalanceDisplayMode}
+                      className="-mx-1"
+                    >
+                      <Toggle id="flat" className="text-xs font-normal">
+                        Flat
+                      </Toggle>
+                      <Toggle id="tree" className="text-xs font-normal">
+                        Tree
+                      </Toggle>
+                    </ToggleButtonGroup>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div>
@@ -340,8 +375,9 @@ function App() {
                               <li
                                 key={index}
                                 className="flex justify-between items-start text-sm"
+                                style={{ paddingLeft: `${balance.indent * 16}px` }}
                               >
-                                <span className="font-mono text-muted-foreground flex-1 mr-2">
+                                <span className="text-muted-foreground flex-1 mr-2">
                                   {balance.display_name || balance.name}
                                 </span>
                                 <div className="flex flex-col items-end">
