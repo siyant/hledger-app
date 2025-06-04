@@ -1,8 +1,11 @@
 use crate::{HLedgerError, Result};
 use std::process::Command;
+use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
 /// Options for the accounts command
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct AccountsOptions {
     /// Show only accounts used by transactions
     pub used: bool,
@@ -259,6 +262,11 @@ pub fn get_accounts(journal_file: Option<&str>, options: &AccountsOptions) -> Re
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn export_bindings() {
+        AccountsOptions::export_all().unwrap();
+    }
 
     #[test]
     fn test_parse_accounts_output() {
