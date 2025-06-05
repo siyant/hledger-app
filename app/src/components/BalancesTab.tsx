@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Toggle, ToggleButtonGroup } from "@/components/ui/toggle";
+import { cn } from "@/lib/utils";
 import {
   type BalanceAccount,
   type BalanceReport,
@@ -262,50 +263,48 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
   return (
     <Card>
       <CardHeader>
-        <div>
-          <CardTitle>Balances</CardTitle>
-          <CardDescription>View account balances from your hledger journal</CardDescription>
+        <CardTitle>Balances</CardTitle>
+        <CardDescription>View balance changes, end balances, budgets, gains..</CardDescription>
 
-          <div className="flex flex-col space-y-2 mt-2">
-            <div className="flex flex-row gap-2 items-center">
-              <label className="text-sm font-medium text-muted-foreground block w-16">Display</label>
-              <ToggleButtonGroup selectedKeys={[balanceDisplayMode]} onSelectionChange={handleBalanceDisplayMode}>
-                <Toggle id="flat" size="xs" className="text-xs font-normal text-muted-foreground">
-                  Flat
-                </Toggle>
-                <Toggle id="tree" size="xs" className="text-xs font-normal text-muted-foreground">
-                  Tree
-                </Toggle>
-              </ToggleButtonGroup>
-            </div>
+        <div className="flex flex-col space-y-2 mt-2">
+          <div className="flex flex-row gap-2 items-center">
+            <label className="text-sm font-medium text-muted-foreground block w-16">Display</label>
+            <ToggleButtonGroup selectedKeys={[balanceDisplayMode]} onSelectionChange={handleBalanceDisplayMode}>
+              <Toggle id="flat" size="xs" className="text-xs font-normal text-muted-foreground">
+                Flat
+              </Toggle>
+              <Toggle id="tree" size="xs" className="text-xs font-normal text-muted-foreground">
+                Tree
+              </Toggle>
+            </ToggleButtonGroup>
+          </div>
 
-            <div className="flex flex-row gap-2 items-center">
-              <label className="text-sm font-medium text-muted-foreground block w-16">Period</label>
-              <ToggleButtonGroup
-                selectedKeys={[periodMode]}
-                onSelectionChange={handlePeriodMode}
-                className="justify-start"
-              >
-                <Toggle id="none" size="xs" className="font-normal">
-                  None
-                </Toggle>
-                <Toggle id="daily" size="xs" className="font-normal">
-                  Daily
-                </Toggle>
-                <Toggle id="weekly" size="xs" className="font-normal">
-                  Weekly
-                </Toggle>
-                <Toggle id="monthly" size="xs" className="font-normal">
-                  Monthly
-                </Toggle>
-                <Toggle id="quarterly" size="xs" className="font-normal">
-                  Quarterly
-                </Toggle>
-                <Toggle id="yearly" size="xs" className="font-normal">
-                  Yearly
-                </Toggle>
-              </ToggleButtonGroup>
-            </div>
+          <div className="flex flex-row gap-2 items-center">
+            <label className="text-sm font-medium text-muted-foreground block w-16">Period</label>
+            <ToggleButtonGroup
+              selectedKeys={[periodMode]}
+              onSelectionChange={handlePeriodMode}
+              className="justify-start"
+            >
+              <Toggle id="none" size="xs" className="font-normal">
+                None
+              </Toggle>
+              <Toggle id="daily" size="xs" className="font-normal">
+                Daily
+              </Toggle>
+              <Toggle id="weekly" size="xs" className="font-normal">
+                Weekly
+              </Toggle>
+              <Toggle id="monthly" size="xs" className="font-normal">
+                Monthly
+              </Toggle>
+              <Toggle id="quarterly" size="xs" className="font-normal">
+                Quarterly
+              </Toggle>
+              <Toggle id="yearly" size="xs" className="font-normal">
+                Yearly
+              </Toggle>
+            </ToggleButtonGroup>
           </div>
         </div>
       </CardHeader>
@@ -317,13 +316,11 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
                 <p className="text-sm text-muted-foreground">
                   {periodicData ? (
                     <>
-                      Found {periodicData.rows.length} account
-                      {periodicData.rows.length !== 1 ? "s" : ""} with balances:
+                      {periodicData.rows.length} {periodicData.rows.length !== 1 ? "entries" : "entry"}
                     </>
                   ) : (
                     <>
-                      Found {balances.length} account
-                      {balances.length !== 1 ? "s" : ""} with balances:
+                      {balances.length} {balances.length !== 1 ? "entries" : "entry"}
                     </>
                   )}
                 </p>
@@ -345,7 +342,14 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
                   <div className="min-w-fit">
                     {/* Period headers */}
                     <div className="flex mb-2 border-b border-muted-foreground/20 pb-2">
-                      <div className="flex-1 min-w-[200px] font-medium text-sm">Account</div>
+                      <div
+                        className={cn(
+                          "flex-1 min-w-[200px] font-medium text-sm",
+                          balanceDisplayMode === "flat" && "px-2",
+                        )}
+                      >
+                        Account
+                      </div>
                       {periodicData.dates.map((periodDate, index) => (
                         <div key={index} className="w-24 text-right font-medium text-sm px-1">
                           {new Date(periodDate.start).toLocaleDateString("en-US", {
@@ -369,7 +373,13 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
                             <div
                               key={index}
                               className="flex items-start text-sm hover:bg-muted-foreground/10 rounded px-2 py-1"
-                              style={{ paddingLeft: `${indent * 16}px` }}
+                              style={
+                                balanceDisplayMode === "tree"
+                                  ? {
+                                      paddingLeft: `${indent * 16}px`,
+                                    }
+                                  : {}
+                              }
                             >
                               <div className="flex-1 min-w-[200px] flex items-center mr-2">
                                 {balanceDisplayMode === "tree" && (
@@ -441,7 +451,13 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
                           <li
                             key={index}
                             className="flex justify-between items-start text-sm hover:bg-muted-foreground/10 rounded px-2 py-1"
-                            style={{ paddingLeft: `${balance.indent * 16}px` }}
+                            style={
+                              balanceDisplayMode === "tree"
+                                ? {
+                                    paddingLeft: `${balance.indent * 16}px`,
+                                  }
+                                : {}
+                            }
                           >
                             <span className="flex-1 mr-2 flex items-center">
                               {balanceDisplayMode === "tree" && (
@@ -500,7 +516,7 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
             </div>
           ) : (
             <div className="flex justify-center items-center py-8">
-              <p className="text-sm text-muted-foreground">No balances found</p>
+              <p className="text-sm text-muted-foreground">No entries found</p>
             </div>
           )}
         </div>

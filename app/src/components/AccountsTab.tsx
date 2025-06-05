@@ -43,15 +43,14 @@ export function AccountsTab({ searchQuery, dateRange }: AccountsTabProps) {
     <Card>
       <CardHeader>
         <CardTitle>Accounts</CardTitle>
-        <CardDescription>View all accounts from your hledger journal</CardDescription>
+        <CardDescription>View account names</CardDescription>
       </CardHeader>
       <CardContent>
         <div>
           {accounts.length > 0 ? (
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">
-                Found {accounts.length} account
-                {accounts.length !== 1 ? "s" : ""}:
+                {accounts.length} {accounts.length !== 1 ? "entries" : "entry"}
               </p>
               <div className="bg-muted rounded-md p-3">
                 <ul className="space-y-1">
@@ -65,7 +64,7 @@ export function AccountsTab({ searchQuery, dateRange }: AccountsTabProps) {
             </div>
           ) : (
             <div className="flex justify-center items-center py-8">
-              <p className="text-sm text-muted-foreground">No accounts found</p>
+              <p className="text-sm text-muted-foreground">No entries found</p>
             </div>
           )}
         </div>
