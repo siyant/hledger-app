@@ -8,6 +8,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint src",
+    "format": "biome format --write src/",
+    "format:check": "biome format src/",
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
@@ -47,6 +49,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@eslint/js": "^9.28.0",
     "@tailwindcss/vite": "^4.0.0",
     "@tauri-apps/cli": ">=2.0.0",
