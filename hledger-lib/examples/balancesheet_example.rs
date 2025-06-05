@@ -17,8 +17,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             
             println!("Found {} subreports:", report.subreports.len());
             for subreport in &report.subreports {
-                println!("  {} (has_data: {}): {} rows", 
-                    subreport.name, subreport.has_data, subreport.rows.len());
+                println!("  {} (increases_total: {}): {} rows", 
+                    subreport.name, subreport.increases_total, subreport.rows.len());
                     
                 for row in &subreport.rows {
                     println!("    {}: {} amounts", row.account, row.amounts.iter().map(|a| a.len()).sum::<usize>());
@@ -94,13 +94,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Ok(report) => {
             println!("Historical balance sheet:");
             for subreport in &report.subreports {
-                if subreport.has_data {
-                    println!("  {} (with data):", subreport.name);
-                    for row in &subreport.rows {
-                        println!("    {}", row.account);
-                    }
-                } else {
-                    println!("  {} (no data)", subreport.name);
+                println!("  {} (increases_total: {}):", subreport.name, subreport.increases_total);
+                for row in &subreport.rows {
+                    println!("    {}", row.account);
                 }
             }
         }

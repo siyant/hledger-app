@@ -266,7 +266,7 @@ fn test_get_balancesheet_simple() {
     let assets = report.subreports.iter().find(|s| s.name == "Assets");
     assert!(assets.is_some());
     let assets = assets.unwrap();
-    assert!(assets.has_data); // Our test journal has asset accounts
+    assert!(assets.increases_total); // Assets increase net worth
 
     // Check for specific asset accounts
     let asset_accounts: Vec<&str> = assets.rows.iter().map(|r| r.account.as_str()).collect();
@@ -305,11 +305,9 @@ fn test_get_balancesheet_tree_mode() {
     assert!(assets.is_some());
     let assets = assets.unwrap();
 
-    if assets.has_data {
-        let account_names: Vec<&str> = assets.rows.iter().map(|r| r.account.as_str()).collect();
-        // Should have aggregated accounts like "assets" and "assets:bank"
-        assert!(account_names.iter().any(|&name| name == "assets" || name.starts_with("assets:")));
-    }
+    let account_names: Vec<&str> = assets.rows.iter().map(|r| r.account.as_str()).collect();
+    // Should have aggregated accounts like "assets" and "assets:bank"
+    assert!(account_names.iter().any(|&name| name == "assets" || name.starts_with("assets:")));
 }
 
 #[test]
@@ -324,11 +322,9 @@ fn test_get_balancesheet_with_query() {
     // Assets subreport should only contain bank-related accounts
     let assets = report.subreports.iter().find(|s| s.name == "Assets");
     if let Some(assets) = assets {
-        if assets.has_data {
-            for row in &assets.rows {
-                // All accounts should contain "bank" or be related to bank accounts
-                assert!(row.account.contains("bank") || row.account == "assets");
-            }
+        for row in &assets.rows {
+            // All accounts should contain "bank" or be related to bank accounts
+            assert!(row.account.contains("bank") || row.account == "assets");
         }
     }
 }
@@ -364,14 +360,12 @@ fn test_get_balancesheet_with_dates() {
     // With date filter, should only include transactions up to 2024-01-06
     // This should include the first two transactions but not the investment transaction on 2024-01-10
     let assets = assets.unwrap();
-    if assets.has_data {
-        let account_names: Vec<&str> = assets.rows.iter().map(|r| r.account.as_str()).collect();
-        // Should include checking account
-        assert!(account_names.contains(&"assets:bank:checking"));
-        // Should NOT include investment accounts (transaction is on 2024-01-10)
-        assert!(!account_names.contains(&"assets:investments:fidelity:goog"));
-        assert!(!account_names.contains(&"assets:investments:fidelity:cash"));
-    }
+    let account_names: Vec<&str> = assets.rows.iter().map(|r| r.account.as_str()).collect();
+    // Should include checking account
+    assert!(account_names.contains(&"assets:bank:checking"));
+    // Should NOT include investment accounts (transaction is on 2024-01-10)
+    assert!(!account_names.contains(&"assets:investments:fidelity:goog"));
+    assert!(!account_names.contains(&"assets:investments:fidelity:cash"));
 }
 
 #[test]
@@ -383,11 +377,9 @@ fn test_get_balancesheet_depth_limit() {
     // With depth 1, should only see top-level accounts
     let assets = report.subreports.iter().find(|s| s.name == "Assets");
     if let Some(assets) = assets {
-        if assets.has_data {
-            for row in &assets.rows {
-                // All accounts should be at depth 1 (only "assets")
-                assert!(!row.account.contains(':') || row.account == "assets");
-            }
+        for row in &assets.rows {
+            // All accounts should be at depth 1 (only "assets")
+            assert!(!row.account.contains(':') || row.account == "assets");
         }
     }
 }
@@ -403,7 +395,7 @@ fn test_get_balancesheet_with_totals() {
 
     // Each subreport should have totals
     for subreport in &report.subreports {
-        if subreport.has_data && !subreport.rows.is_empty() {
+        if !subreport.rows.is_empty() {
             // At least some rows should have totals and averages
             let has_totals = subreport.rows.iter().any(|r| r.total.is_some());
             let has_averages = subreport.rows.iter().any(|r| r.average.is_some());
@@ -500,7 +492,7 @@ fn test_get_incomestatement_simple() {
     let revenues = report.subreports.iter().find(|s| s.name == "Revenues");
     assert!(revenues.is_some());
     let revenues = revenues.unwrap();
-    assert!(revenues.has_data); // Our test journal has revenue accounts
+    assert!(revenues.increases_total); // Our test journal has revenue accounts
 
     // Check for specific revenue accounts
     let revenue_accounts: Vec<&str> = revenues.rows.iter().map(|r| r.account.as_str()).collect();
@@ -510,7 +502,7 @@ fn test_get_incomestatement_simple() {
     let expenses = report.subreports.iter().find(|s| s.name == "Expenses");
     assert!(expenses.is_some());
     let expenses = expenses.unwrap();
-    assert!(!expenses.has_data); // Note: expenses.has_data is false when expenses exist (inverted logic)
+    assert!(!expenses.increases_total); // Expenses decrease net income
 
     // Check for specific expense accounts
     let expense_accounts: Vec<&str> = expenses.rows.iter().map(|r| r.account.as_str()).collect();
@@ -551,11 +543,9 @@ fn test_get_incomestatement_tree_mode() {
     assert!(expenses.is_some());
     let expenses = expenses.unwrap();
 
-    if !expenses.has_data { // Remember: has_data is inverted for expenses
-        let account_names: Vec<&str> = expenses.rows.iter().map(|r| r.account.as_str()).collect();
-        // Should have aggregated accounts like "expenses" and "expenses:fees"
-        assert!(account_names.iter().any(|&name| name == "expenses" || name.starts_with("expenses:")));
-    }
+    let account_names: Vec<&str> = expenses.rows.iter().map(|r| r.account.as_str()).collect();
+    // Should have aggregated accounts like "expenses" and "expenses:fees"
+    assert!(account_names.iter().any(|&name| name == "expenses" || name.starts_with("expenses:")));
 }
 
 #[test]
@@ -570,11 +560,9 @@ fn test_get_incomestatement_with_query() {
     // Expenses subreport should only contain groceries-related accounts
     let expenses = report.subreports.iter().find(|s| s.name == "Expenses");
     if let Some(expenses) = expenses {
-        if !expenses.has_data { // Remember: has_data is inverted for expenses
-            for row in &expenses.rows {
-                // All accounts should contain "groceries" or be related to groceries accounts
-                assert!(row.account.contains("groceries") || row.account == "expenses");
-            }
+        for row in &expenses.rows {
+            // All accounts should contain "groceries" or be related to groceries accounts
+            assert!(row.account.contains("groceries") || row.account == "expenses");
         }
     }
 }
@@ -598,7 +586,7 @@ fn test_get_incomestatement_with_dates() {
     // With date filter, should only include transactions up to 2024-01-06
     // This should include groceries but not the investment fees on 2024-01-10
     let expenses = expenses.unwrap();
-    if !expenses.has_data { // Remember: has_data is inverted for expenses
+    if !expenses.increases_total { // Expenses decrease net income
         let account_names: Vec<&str> = expenses.rows.iter().map(|r| r.account.as_str()).collect();
         // Should include groceries
         assert!(account_names.contains(&"expenses:groceries"));

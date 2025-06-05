@@ -114,8 +114,10 @@ pub struct BalanceSheetSubreport {
     pub rows: Vec<PeriodicBalanceRow>,
     /// Totals for this subreport
     pub totals: Option<PeriodicBalanceRow>,
-    /// Whether this subreport has data
-    pub has_data: bool,
+    /// Whether this subreport increases the overall total (true) or decreases it (false)
+    /// - Assets: true (increases net worth)
+    /// - Liabilities: false (decreases net worth)
+    pub increases_total: bool,
 }
 
 /// Balance sheet report structure
@@ -485,9 +487,9 @@ fn parse_balancesheet_report(value: &serde_json::Value) -> Result<BalanceSheetRe
                 if entry_array.len() >= 3 {
                     let name = entry_array[0].as_str().unwrap_or("").to_string();
                     let report_data = &entry_array[1];
-                    let has_data = entry_array[2].as_bool().unwrap_or(false);
+                    let increases_total = entry_array[2].as_bool().unwrap_or(false);
                     
-                    let subreport = parse_balancesheet_subreport(name, report_data, has_data)?;
+                    let subreport = parse_balancesheet_subreport(name, report_data, increases_total)?;
                     subreports.push(subreport);
                 }
             }
@@ -513,7 +515,7 @@ fn parse_balancesheet_report(value: &serde_json::Value) -> Result<BalanceSheetRe
 fn parse_balancesheet_subreport(
     name: String,
     value: &serde_json::Value,
-    has_data: bool,
+    increases_total: bool,
 ) -> Result<BalanceSheetSubreport> {
     use crate::commands::balance::extract_date_from_tagged_value;
     let obj = value.as_object().ok_or_else(|| {
@@ -563,7 +565,7 @@ fn parse_balancesheet_subreport(
         dates,
         rows,
         totals,
-        has_data,
+        increases_total,
     })
 }
 

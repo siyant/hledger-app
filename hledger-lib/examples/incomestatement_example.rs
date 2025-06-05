@@ -84,7 +84,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Report: {}", report.title);
     
     for subreport in &report.subreports {
-        println!("\n{} ({}data):", subreport.name, if subreport.has_data { "has " } else { "no " });
+        println!("\n{} (increases_total: {}):", subreport.name, subreport.increases_total);
         for row in &subreport.rows {
             println!("  {}: {:?}", row.account, row.amounts);
         }

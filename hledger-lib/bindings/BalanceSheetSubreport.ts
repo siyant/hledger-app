@@ -23,6 +23,8 @@ rows: Array<PeriodicBalanceRow>,
  */
 totals: PeriodicBalanceRow | null, 
 /**
- * Whether this subreport has data
+ * Whether this subreport increases the overall total (true) or decreases it (false)
+ * - Assets: true (increases net worth)
+ * - Liabilities: false (decreases net worth)
  */
-has_data: boolean, };
+increases_total: boolean, };
