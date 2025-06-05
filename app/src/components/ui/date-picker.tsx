@@ -1,18 +1,18 @@
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon } from "lucide-react";
 import {
-  DatePicker as AriaDatePicker,
-  DatePickerProps as AriaDatePickerProps,
-  DateRangePicker as AriaDateRangePicker,
-  DateRangePickerProps as AriaDateRangePickerProps,
-  DateValue as AriaDateValue,
-  Dialog as AriaDialog,
-  ValidationResult as AriaValidationResult,
-  composeRenderProps,
-  Text,
   Button as AriaButton,
-} from "react-aria-components"
+  DatePicker as AriaDatePicker,
+  type DatePickerProps as AriaDatePickerProps,
+  DateRangePicker as AriaDateRangePicker,
+  type DateRangePickerProps as AriaDateRangePickerProps,
+  type DateValue as AriaDateValue,
+  Dialog as AriaDialog,
+  type ValidationResult as AriaValidationResult,
+  Text,
+  composeRenderProps,
+} from "react-aria-components";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 import {
   Calendar,
   CalendarCell,
@@ -22,21 +22,19 @@ import {
   CalendarHeaderCell,
   CalendarHeading,
   RangeCalendar,
-} from "./calendar"
-import { DateInput } from "./datefield"
-import { FieldError, FieldGroup, Label } from "./field"
-import { Popover } from "./popover"
+} from "./calendar";
+import { DateInput } from "./datefield";
+import { FieldError, FieldGroup, Label } from "./field";
+import { Popover } from "./popover";
 
-const DatePicker = AriaDatePicker
+const DatePicker = AriaDatePicker;
 
-const DateRangePicker = AriaDateRangePicker
+const DateRangePicker = AriaDateRangePicker;
 
-
-interface JollyDatePickerProps<T extends AriaDateValue>
-  extends AriaDatePickerProps<T> {
-  label?: string
-  description?: string
-  errorMessage?: string | ((validation: AriaValidationResult) => string)
+interface JollyDatePickerProps<T extends AriaDateValue> extends AriaDatePickerProps<T> {
+  label?: string;
+  description?: string;
+  errorMessage?: string | ((validation: AriaValidationResult) => string);
 }
 
 function JollyDatePicker<T extends AriaDateValue>({
@@ -48,9 +46,7 @@ function JollyDatePicker<T extends AriaDateValue>({
 }: JollyDatePickerProps<T>) {
   return (
     <DatePicker
-      className={composeRenderProps(className, (className) =>
-        cn("group flex flex-col gap-2", className)
-      )}
+      className={composeRenderProps(className, (className) => cn("group flex flex-col gap-2", className))}
       {...props}
     >
       <Label>{label}</Label>
@@ -71,25 +67,20 @@ function JollyDatePicker<T extends AriaDateValue>({
           <Calendar>
             <CalendarHeading />
             <CalendarGrid>
-              <CalendarGridHeader>
-                {(day) => <CalendarHeaderCell>{day}</CalendarHeaderCell>}
-              </CalendarGridHeader>
-              <CalendarGridBody>
-                {(date) => <CalendarCell date={date} />}
-              </CalendarGridBody>
+              <CalendarGridHeader>{(day) => <CalendarHeaderCell>{day}</CalendarHeaderCell>}</CalendarGridHeader>
+              <CalendarGridBody>{(date) => <CalendarCell date={date} />}</CalendarGridBody>
             </CalendarGrid>
           </Calendar>
         </AriaDialog>
       </Popover>
     </DatePicker>
-  )
+  );
 }
 
-interface JollyDateRangePickerProps<T extends AriaDateValue>
-  extends AriaDateRangePickerProps<T> {
-  label?: string
-  description?: string
-  errorMessage?: string | ((validation: AriaValidationResult) => string)
+interface JollyDateRangePickerProps<T extends AriaDateValue> extends AriaDateRangePickerProps<T> {
+  label?: string;
+  description?: string;
+  errorMessage?: string | ((validation: AriaValidationResult) => string);
 }
 
 function JollyDateRangePicker<T extends AriaDateValue>({
@@ -101,9 +92,7 @@ function JollyDateRangePicker<T extends AriaDateValue>({
 }: JollyDateRangePickerProps<T>) {
   return (
     <DateRangePicker
-      className={composeRenderProps(className, (className) =>
-        cn("group flex flex-col gap-2", className)
-      )}
+      className={composeRenderProps(className, (className) => cn("group flex flex-col gap-2", className))}
       {...props}
     >
       <Label>{label}</Label>
@@ -129,24 +118,15 @@ function JollyDateRangePicker<T extends AriaDateValue>({
           <RangeCalendar>
             <CalendarHeading />
             <CalendarGrid>
-              <CalendarGridHeader>
-                {(day) => <CalendarHeaderCell>{day}</CalendarHeaderCell>}
-              </CalendarGridHeader>
-              <CalendarGridBody>
-                {(date) => <CalendarCell date={date} />}
-              </CalendarGridBody>
+              <CalendarGridHeader>{(day) => <CalendarHeaderCell>{day}</CalendarHeaderCell>}</CalendarGridHeader>
+              <CalendarGridBody>{(date) => <CalendarCell date={date} />}</CalendarGridBody>
             </CalendarGrid>
           </RangeCalendar>
         </AriaDialog>
       </Popover>
     </DateRangePicker>
-  )
+  );
 }
 
-export {
-  DatePicker,
-  DateRangePicker,
-  JollyDatePicker,
-  JollyDateRangePicker,
-}
-export type { JollyDatePickerProps, JollyDateRangePickerProps }
+export { DatePicker, DateRangePicker, JollyDatePicker, JollyDateRangePicker };
+export type { JollyDatePickerProps, JollyDateRangePickerProps };

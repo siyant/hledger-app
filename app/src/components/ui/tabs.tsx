@@ -1,16 +1,16 @@
 import {
   Tab as AriaTab,
   TabList as AriaTabList,
-  TabListProps as AriaTabListProps,
+  type TabListProps as AriaTabListProps,
   TabPanel as AriaTabPanel,
-  TabPanelProps as AriaTabPanelProps,
-  TabProps as AriaTabProps,
+  type TabPanelProps as AriaTabPanelProps,
+  type TabProps as AriaTabProps,
   Tabs as AriaTabs,
-  TabsProps as AriaTabsProps,
+  type TabsProps as AriaTabsProps,
   composeRenderProps,
-} from "react-aria-components"
+} from "react-aria-components";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function Tabs({ className, ...props }: AriaTabsProps) {
   return (
@@ -20,30 +20,27 @@ function Tabs({ className, ...props }: AriaTabsProps) {
           "group flex flex-col gap-2",
           /* Orientation */
           "data-[orientation=vertical]:flex-row",
-          className
-        )
+          className,
+        ),
       )}
       {...props}
     />
-  )
+  );
 }
 
-const TabList = <T extends object>({
-  className,
-  ...props
-}: AriaTabListProps<T>) => (
+const TabList = <T extends object>({ className, ...props }: AriaTabListProps<T>) => (
   <AriaTabList
     className={composeRenderProps(className, (className) =>
       cn(
         "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
         /* Orientation */
         "data-[orientation=vertical]:h-auto data-[orientation=vertical]:flex-col",
-        className
-      )
+        className,
+      ),
     )}
     {...props}
   />
-)
+);
 
 const Tab = ({ className, ...props }: AriaTabProps) => (
   <AriaTab
@@ -58,12 +55,12 @@ const Tab = ({ className, ...props }: AriaTabProps) => (
         "data-[selected]:bg-background data-[selected]:text-foreground data-[selected]:shadow-sm ",
         /* Orientation */
         "group-data-[orientation=vertical]:w-full",
-        className
-      )
+        className,
+      ),
     )}
     {...props}
   />
-)
+);
 
 const TabPanel = ({ className, ...props }: AriaTabPanelProps) => (
   <AriaTabPanel
@@ -72,11 +69,11 @@ const TabPanel = ({ className, ...props }: AriaTabPanelProps) => (
         "mt-2 ring-offset-background",
         /* Focus Visible */
         "data-[focus-visible]:outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring data-[focus-visible]:ring-offset-2",
-        className
-      )
+        className,
+      ),
     )}
     {...props}
   />
-)
+);
 
-export { Tabs, TabList, TabPanel, Tab }
+export { Tabs, TabList, TabPanel, Tab };

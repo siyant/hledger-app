@@ -1,10 +1,10 @@
-import { cva, type VariantProps } from "class-variance-authority";
+import { type VariantProps, cva } from "class-variance-authority";
 import {
   ToggleButton as AriaToggleButton,
   ToggleButtonGroup as AriaToggleButtonGroup,
-  composeRenderProps,
   type ToggleButtonGroupProps as AriaToggleButtonGroupProps,
   type ToggleButtonProps as AriaToggleButtonProps,
+  composeRenderProps,
 } from "react-aria-components";
 
 import { cn } from "@/lib/utils";
@@ -27,8 +27,7 @@ const toggleVariants = cva(
     variants: {
       variant: {
         default: "bg-transparent",
-        outline:
-          "border border-input bg-transparent data-[hovered]:bg-accent data-[hovered]:text-accent-foreground",
+        outline: "border border-input bg-transparent data-[hovered]:bg-accent data-[hovered]:text-accent-foreground",
       },
       size: {
         default: "h-10 px-3",
@@ -44,9 +43,7 @@ const toggleVariants = cva(
   },
 );
 
-interface ToggleProps
-  extends AriaToggleButtonProps,
-    VariantProps<typeof toggleVariants> {}
+interface ToggleProps extends AriaToggleButtonProps, VariantProps<typeof toggleVariants> {}
 
 const Toggle = ({ className, variant, size, ...props }: ToggleProps) => (
   <AriaToggleButton
@@ -64,17 +61,10 @@ const Toggle = ({ className, variant, size, ...props }: ToggleProps) => (
   />
 );
 
-const ToggleButtonGroup = ({
-  children,
-  className,
-  ...props
-}: AriaToggleButtonGroupProps) => (
+const ToggleButtonGroup = ({ children, className, ...props }: AriaToggleButtonGroupProps) => (
   <AriaToggleButtonGroup
     className={composeRenderProps(className, (className) =>
-      cn(
-        "group/togglegroup flex items-center justify-start gap-1 data-[orientation=vertical]:flex-col",
-        className,
-      ),
+      cn("group/togglegroup flex items-center justify-start gap-1 data-[orientation=vertical]:flex-col", className),
     )}
     {...props}
   >

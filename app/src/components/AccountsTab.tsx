@@ -1,14 +1,8 @@
-import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { invoke } from "@tauri-apps/api/core";
-import { DateValue } from "@internationalized/date";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createDefaultAccountsOptions } from "@/types/hledger.types";
+import type { DateValue } from "@internationalized/date";
+import { invoke } from "@tauri-apps/api/core";
+import { useEffect, useState } from "react";
 
 interface AccountsTabProps {
   searchQuery: string;
@@ -18,10 +12,7 @@ interface AccountsTabProps {
 export function AccountsTab({ searchQuery, dateRange }: AccountsTabProps) {
   const [accounts, setAccounts] = useState<string[]>([]);
 
-  async function fetchAccounts(
-    query = "",
-    customRange: { start: DateValue; end: DateValue } | null = null,
-  ) {
+  async function fetchAccounts(query = "", customRange: { start: DateValue; end: DateValue } | null = null) {
     const options = createDefaultAccountsOptions();
 
     // Add the search query if provided
@@ -52,9 +43,7 @@ export function AccountsTab({ searchQuery, dateRange }: AccountsTabProps) {
     <Card>
       <CardHeader>
         <CardTitle>Accounts</CardTitle>
-        <CardDescription>
-          View all accounts from your hledger journal
-        </CardDescription>
+        <CardDescription>View all accounts from your hledger journal</CardDescription>
       </CardHeader>
       <CardContent>
         <div>
@@ -76,9 +65,7 @@ export function AccountsTab({ searchQuery, dateRange }: AccountsTabProps) {
             </div>
           ) : (
             <div className="flex justify-center items-center py-8">
-              <p className="text-sm text-muted-foreground">
-                No accounts found
-              </p>
+              <p className="text-sm text-muted-foreground">No accounts found</p>
             </div>
           )}
         </div>

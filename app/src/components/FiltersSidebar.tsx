@@ -1,34 +1,28 @@
-import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { JollyDateRangePicker } from "@/components/ui/date-picker";
 import { JollySearchField } from "@/components/ui/searchfield";
 import { Toggle, ToggleButtonGroup } from "@/components/ui/toggle";
-import { JollyDateRangePicker } from "@/components/ui/date-picker";
+import { type DateValue, getLocalTimeZone, today } from "@internationalized/date";
 import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { DateValue, getLocalTimeZone, today } from "@internationalized/date";
+import type React from "react";
+import { useState } from "react";
 
 interface FiltersSidebarProps {
   searchQuery: string;
   onSearchQueryChange: (query: string) => void;
   dateRange: { start: DateValue; end: DateValue } | null;
-  onDateRangeChange: (
-    range: { start: DateValue; end: DateValue } | null,
-  ) => void;
+  onDateRangeChange: (range: { start: DateValue; end: DateValue } | null) => void;
 }
 
 // Date range utilities
-function getDateRange(
-  preset: string,
-): { begin: DateValue; end: DateValue } | null {
+function getDateRange(preset: string): { begin: DateValue; end: DateValue } | null {
   const now = today(getLocalTimeZone());
 
   switch (preset) {
     case "this-month": {
       const startOfMonth = now.set({ day: 1 });
       // Get last day of current month
-      const endOfMonth = now
-        .add({ months: 1 })
-        .set({ day: 1 })
-        .subtract({ days: 1 });
+      const endOfMonth = now.add({ months: 1 }).set({ day: 1 }).subtract({ days: 1 });
       return {
         begin: startOfMonth,
         end: endOfMonth,
@@ -52,12 +46,8 @@ function getDateRange(
       };
     }
     case "last-year": {
-      const startOfLastYear = now
-        .subtract({ years: 1 })
-        .set({ month: 1, day: 1 });
-      const endOfLastYear = now
-        .subtract({ years: 1 })
-        .set({ month: 12, day: 31 });
+      const startOfLastYear = now.subtract({ years: 1 }).set({ month: 1, day: 1 });
+      const endOfLastYear = now.subtract({ years: 1 }).set({ month: 12, day: 31 });
       return {
         begin: startOfLastYear,
         end: endOfLastYear,
@@ -105,9 +95,7 @@ export function FiltersSidebar({
   };
 
   // Handle custom date range selection
-  const handleCustomDateRange = (
-    range: { start: DateValue; end: DateValue } | null,
-  ) => {
+  const handleCustomDateRange = (range: { start: DateValue; end: DateValue } | null) => {
     if (range) {
       onDateRangeChange(range);
       setSelectedDateRange(""); // Clear preset when custom is selected manually
@@ -122,21 +110,13 @@ export function FiltersSidebar({
           <h2 className="text-lg font-semibold mb-3">Filters & Options</h2>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Search Accounts
-              </label>
-              <JollySearchField
-                value={searchQuery}
-                onChange={onSearchQueryChange}
-                onClear={clearSearch}
-              />
+              <label className="text-sm font-medium text-muted-foreground mb-2 block">Search Accounts</label>
+              <JollySearchField value={searchQuery} onChange={onSearchQueryChange} onClear={clearSearch} />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-muted-foreground">
-                  Date Range
-                </label>
+                <label className="text-sm font-medium text-muted-foreground">Date Range</label>
                 {(selectedDateRange || dateRange) && (
                   <Button
                     variant="ghost"
@@ -153,34 +133,18 @@ export function FiltersSidebar({
                   selectedKeys={selectedDateRange ? [selectedDateRange] : []}
                   onSelectionChange={handlePresetSelection}
                 >
-                  <Toggle
-                    id="this-month"
-                    size="sm"
-                    className="text-xs font-normal"
-                  >
+                  <Toggle id="this-month" size="sm" className="text-xs font-normal">
                     This Month
                   </Toggle>
-                  <Toggle
-                    id="last-month"
-                    size="sm"
-                    className="text-xs font-normal"
-                  >
+                  <Toggle id="last-month" size="sm" className="text-xs font-normal">
                     Last Month
                   </Toggle>
-                  <Toggle
-                    id="this-year"
-                    size="sm"
-                    className="text-xs font-normal"
-                  >
+                  <Toggle id="this-year" size="sm" className="text-xs font-normal">
                     This Year
                   </Toggle>
                 </ToggleButtonGroup>
 
-                <JollyDateRangePicker
-                  className="w-full"
-                  value={dateRange}
-                  onChange={handleCustomDateRange}
-                />
+                <JollyDateRangePicker className="w-full" value={dateRange} onChange={handleCustomDateRange} />
               </div>
             </div>
           </div>

@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/tabs";
-import { DateValue } from "@internationalized/date";
-import { FiltersSidebar } from "@/components/FiltersSidebar";
 import { AccountsTab } from "@/components/AccountsTab";
 import { BalancesTab } from "@/components/BalancesTab";
+import { FiltersSidebar } from "@/components/FiltersSidebar";
+import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/tabs";
+import type { DateValue } from "@internationalized/date";
+import { useState } from "react";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -11,9 +11,6 @@ function App() {
     start: DateValue;
     end: DateValue;
   } | null>(null);
-
-
-
 
   return (
     <div className="min-h-screen bg-background">
@@ -34,17 +31,11 @@ function App() {
             </TabList>
 
             <TabPanel id="accounts">
-              <AccountsTab 
-                searchQuery={searchQuery}
-                dateRange={dateRange}
-              />
+              <AccountsTab searchQuery={searchQuery} dateRange={dateRange} />
             </TabPanel>
 
             <TabPanel id="balances">
-              <BalancesTab 
-                searchQuery={searchQuery}
-                dateRange={dateRange}
-              />
+              <BalancesTab searchQuery={searchQuery} dateRange={dateRange} />
             </TabPanel>
           </Tabs>
         </div>

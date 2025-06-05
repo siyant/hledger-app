@@ -1,16 +1,16 @@
 import { SearchIcon, XIcon } from "lucide-react";
 import {
   Button as AriaButton,
-  ButtonProps as AriaButtonProps,
+  type ButtonProps as AriaButtonProps,
   Group as AriaGroup,
-  GroupProps as AriaGroupProps,
+  type GroupProps as AriaGroupProps,
   Input as AriaInput,
-  InputProps as AriaInputProps,
+  type InputProps as AriaInputProps,
   SearchField as AriaSearchField,
-  SearchFieldProps as AriaSearchFieldProps,
-  ValidationResult as AriaValidationResult,
-  composeRenderProps,
+  type SearchFieldProps as AriaSearchFieldProps,
+  type ValidationResult as AriaValidationResult,
   Text,
+  composeRenderProps,
 } from "react-aria-components";
 
 import { cn } from "@/lib/utils";
@@ -19,12 +19,7 @@ import { FieldError, FieldGroup, Label } from "./field";
 
 function SearchField({ className, ...props }: AriaSearchFieldProps) {
   return (
-    <AriaSearchField
-      className={composeRenderProps(className, (className) =>
-        cn("group", className),
-      )}
-      {...props}
-    />
+    <AriaSearchField className={composeRenderProps(className, (className) => cn("group", className))} {...props} />
   );
 }
 
@@ -86,18 +81,10 @@ interface JollySearchFieldProps extends AriaSearchFieldProps {
   errorMessage?: string | ((validation: AriaValidationResult) => string);
 }
 
-function JollySearchField({
-  label,
-  description,
-  className,
-  errorMessage,
-  ...props
-}: JollySearchFieldProps) {
+function JollySearchField({ label, description, className, errorMessage, ...props }: JollySearchFieldProps) {
   return (
     <SearchField
-      className={composeRenderProps(className, (className) =>
-        cn("group flex flex-col gap-2", className),
-      )}
+      className={composeRenderProps(className, (className) => cn("group flex flex-col gap-2", className))}
       {...props}
     >
       {label != undefined && <Label>{label}</Label>}
@@ -118,11 +105,5 @@ function JollySearchField({
   );
 }
 
-export {
-  SearchField,
-  SearchFieldGroup,
-  SearchFieldInput,
-  SearchFieldClear,
-  JollySearchField,
-};
+export { SearchField, SearchFieldGroup, SearchFieldInput, SearchFieldClear, JollySearchField };
 export type { JollySearchFieldProps };
