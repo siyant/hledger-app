@@ -653,7 +653,7 @@ fn parse_balance_account(value: &serde_json::Value) -> Result<BalanceAccount> {
 }
 
 /// Parse amounts from JSON
-fn parse_amounts(value: &serde_json::Value) -> Result<Vec<Amount>> {
+pub(crate) fn parse_amounts(value: &serde_json::Value) -> Result<Vec<Amount>> {
     let mut amounts = Vec::new();
 
     if let Some(amounts_array) = value.as_array() {
@@ -775,7 +775,7 @@ fn parse_periodic_row(value: &serde_json::Value) -> Result<PeriodicBalanceRow> {
 }
 
 /// Extract date from tagged value format
-fn extract_date_from_tagged_value(value: &serde_json::Value) -> String {
+pub(crate) fn extract_date_from_tagged_value(value: &serde_json::Value) -> String {
     if let Some(obj) = value.as_object() {
         if let Some(contents) = obj.get("contents").and_then(|c| c.as_str()) {
             return contents.to_string();
