@@ -1,4 +1,7 @@
-use hledger_lib::{get_accounts, AccountsOptions, get_balancesheet, BalanceSheetOptions, get_incomestatement, IncomeStatementOptions, HLedgerError};
+use hledger_lib::{
+    get_accounts, get_balancesheet, get_incomestatement, AccountsOptions, BalanceSheetOptions,
+    HLedgerError, IncomeStatementOptions,
+};
 
 #[test]
 fn test_get_accounts_with_journal() {
@@ -307,7 +310,9 @@ fn test_get_balancesheet_tree_mode() {
 
     let account_names: Vec<&str> = assets.rows.iter().map(|r| r.account.as_str()).collect();
     // Should have aggregated accounts like "assets" and "assets:bank"
-    assert!(account_names.iter().any(|&name| name == "assets" || name.starts_with("assets:")));
+    assert!(account_names
+        .iter()
+        .any(|&name| name == "assets" || name.starts_with("assets:")));
 }
 
 #[test]
@@ -545,7 +550,9 @@ fn test_get_incomestatement_tree_mode() {
 
     let account_names: Vec<&str> = expenses.rows.iter().map(|r| r.account.as_str()).collect();
     // Should have aggregated accounts like "expenses" and "expenses:fees"
-    assert!(account_names.iter().any(|&name| name == "expenses" || name.starts_with("expenses:")));
+    assert!(account_names
+        .iter()
+        .any(|&name| name == "expenses" || name.starts_with("expenses:")));
 }
 
 #[test]
@@ -586,7 +593,8 @@ fn test_get_incomestatement_with_dates() {
     // With date filter, should only include transactions up to 2024-01-06
     // This should include groceries but not the investment fees on 2024-01-10
     let expenses = expenses.unwrap();
-    if !expenses.increases_total { // Expenses decrease net income
+    if !expenses.increases_total {
+        // Expenses decrease net income
         let account_names: Vec<&str> = expenses.rows.iter().map(|r| r.account.as_str()).collect();
         // Should include groceries
         assert!(account_names.contains(&"expenses:groceries"));
@@ -605,9 +613,9 @@ fn test_get_incomestatement_depth_limit() {
     for subreport in &report.subreports {
         for row in &subreport.rows {
             // All accounts should be at depth 1
-            assert!(!row.account.contains(':') || 
-                   row.account == "income" || 
-                   row.account == "expenses");
+            assert!(
+                !row.account.contains(':') || row.account == "income" || row.account == "expenses"
+            );
         }
     }
 }
@@ -640,7 +648,10 @@ fn test_get_incomestatement_with_totals() {
 
 #[test]
 fn test_get_incomestatement_error_nonexistent_file() {
-    let result = get_incomestatement(Some("nonexistent.journal"), &IncomeStatementOptions::default());
+    let result = get_incomestatement(
+        Some("nonexistent.journal"),
+        &IncomeStatementOptions::default(),
+    );
 
     // Should return an error for non-existent file
     assert!(result.is_err());
@@ -723,7 +734,7 @@ fn test_get_incomestatement_quarterly() {
     // Should have quarterly periods
     assert!(!report.dates.is_empty());
     assert!(report.title.contains("Income Statement"));
-    
+
     // Should have appropriate period range
     if let Some(first_date) = report.dates.first() {
         // Q1 should start on Jan 1
@@ -740,7 +751,7 @@ fn test_get_incomestatement_sort_amount() {
     // Should work without error
     assert!(!report.title.is_empty());
     assert!(!report.subreports.is_empty());
-    
+
     // Note: Verifying sort order would require comparing amounts,
     // which is complex with multi-commodity support
 }

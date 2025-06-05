@@ -1,5 +1,5 @@
-use crate::{HLedgerError, Result};
 use crate::commands::balance::{PeriodDate, PeriodicBalanceRow};
+use crate::{HLedgerError, Result};
 use serde::{Deserialize, Serialize};
 use std::process::Command;
 use ts_rs::TS;
@@ -276,7 +276,10 @@ impl IncomeStatementOptions {
 }
 
 /// Get income statement report from hledger
-pub fn get_incomestatement(journal_file: Option<&str>, options: &IncomeStatementOptions) -> Result<IncomeStatementReport> {
+pub fn get_incomestatement(
+    journal_file: Option<&str>,
+    options: &IncomeStatementOptions,
+) -> Result<IncomeStatementReport> {
     let mut cmd = Command::new("hledger");
 
     if let Some(file) = journal_file {
@@ -436,10 +439,10 @@ pub fn get_incomestatement(journal_file: Option<&str>, options: &IncomeStatement
     }
 
     let stdout = String::from_utf8(output.stdout)?;
-    
+
     // Parse the JSON output
     let json_value: serde_json::Value = serde_json::from_str(&stdout)?;
-    
+
     parse_incomestatement_report(&json_value)
 }
 
@@ -461,7 +464,7 @@ fn parse_incomestatement_report(value: &serde_json::Value) -> Result<IncomeState
     let dates_json = obj.get("cbrDates").ok_or_else(|| {
         HLedgerError::ParseError("Missing cbrDates in income statement".to_string())
     })?;
-    
+
     let mut dates = Vec::new();
     if let Some(dates_array) = dates_json.as_array() {
         for date_pair in dates_array {
@@ -479,7 +482,7 @@ fn parse_incomestatement_report(value: &serde_json::Value) -> Result<IncomeState
     let subreports_json = obj.get("cbrSubreports").ok_or_else(|| {
         HLedgerError::ParseError("Missing cbrSubreports in income statement".to_string())
     })?;
-    
+
     let mut subreports = Vec::new();
     if let Some(subreports_array) = subreports_json.as_array() {
         for subreport_entry in subreports_array {
@@ -488,8 +491,9 @@ fn parse_incomestatement_report(value: &serde_json::Value) -> Result<IncomeState
                     let name = entry_array[0].as_str().unwrap_or("").to_string();
                     let report_data = &entry_array[1];
                     let increases_total = entry_array[2].as_bool().unwrap_or(false);
-                    
-                    let subreport = parse_incomestatement_subreport(name, report_data, increases_total)?;
+
+                    let subreport =
+                        parse_incomestatement_subreport(name, report_data, increases_total)?;
                     subreports.push(subreport);
                 }
             }
@@ -518,15 +522,15 @@ fn parse_incomestatement_subreport(
     increases_total: bool,
 ) -> Result<IncomeStatementSubreport> {
     use crate::commands::balance::extract_date_from_tagged_value;
-    let obj = value.as_object().ok_or_else(|| {
-        HLedgerError::ParseError("Subreport should be an object".to_string())
-    })?;
+    let obj = value
+        .as_object()
+        .ok_or_else(|| HLedgerError::ParseError("Subreport should be an object".to_string()))?;
 
     // Parse dates
-    let dates_json = obj.get("prDates").ok_or_else(|| {
-        HLedgerError::ParseError("Missing prDates in subreport".to_string())
-    })?;
-    
+    let dates_json = obj
+        .get("prDates")
+        .ok_or_else(|| HLedgerError::ParseError("Missing prDates in subreport".to_string()))?;
+
     let mut dates = Vec::new();
     if let Some(dates_array) = dates_json.as_array() {
         for date_pair in dates_array {
@@ -541,10 +545,10 @@ fn parse_incomestatement_subreport(
     }
 
     // Parse rows
-    let rows_json = obj.get("prRows").ok_or_else(|| {
-        HLedgerError::ParseError("Missing prRows in subreport".to_string())
-    })?;
-    
+    let rows_json = obj
+        .get("prRows")
+        .ok_or_else(|| HLedgerError::ParseError("Missing prRows in subreport".to_string()))?;
+
     let mut rows = Vec::new();
     if let Some(rows_array) = rows_json.as_array() {
         for row_json in rows_array {
@@ -572,10 +576,10 @@ fn parse_incomestatement_subreport(
 /// Parse a periodic balance row (reusing from balance.rs)
 fn parse_periodic_row(value: &serde_json::Value) -> Result<PeriodicBalanceRow> {
     use crate::commands::balance::parse_amounts;
-    
-    let obj = value.as_object().ok_or_else(|| {
-        HLedgerError::ParseError("Periodic row should be an object".to_string())
-    })?;
+
+    let obj = value
+        .as_object()
+        .ok_or_else(|| HLedgerError::ParseError("Periodic row should be an object".to_string()))?;
 
     // Extract account name
     let account = obj
@@ -595,7 +599,7 @@ fn parse_periodic_row(value: &serde_json::Value) -> Result<PeriodicBalanceRow> {
             }
         })
         .unwrap_or_else(|| "".to_string());
-    
+
     let display_name = account.clone();
 
     // Parse period amounts (prrAmounts is an array of arrays of amounts)
@@ -628,7 +632,6 @@ fn parse_periodic_row(value: &serde_json::Value) -> Result<PeriodicBalanceRow> {
         average,
     })
 }
-
 
 #[cfg(test)]
 mod tests {

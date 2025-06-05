@@ -4,7 +4,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Simple balance report
     let options = BalanceOptions::new();
     let report = get_balance(Some("tests/fixtures/test.journal"), &options)?;
-    
+
     match report {
         BalanceReport::Simple(balance) => {
             println!("=== Simple Balance Report ===");
@@ -17,7 +17,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             }
-        },
+        }
         BalanceReport::Periodic(_) => {
             println!("Unexpected periodic report");
         }
@@ -26,7 +26,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Monthly balance report
     let options = BalanceOptions::new().monthly().row_total().average();
     let report = get_balance(Some("tests/fixtures/test.journal"), &options)?;
-    
+
     match report {
         BalanceReport::Periodic(balance) => {
             println!("\n=== Monthly Balance Report ===");
@@ -34,7 +34,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             for (i, date) in balance.dates.iter().enumerate() {
                 println!("  {}: {} to {}", i + 1, date.start, date.end);
             }
-            
+
             println!("\nAccounts:");
             for row in balance.rows {
                 println!("{}", row.account);
@@ -44,7 +44,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         println!("    {} {}", amount.quantity, amount.commodity);
                     }
                 }
-                
+
                 if let Some(total) = row.total {
                     println!("  Total: {} amounts", total.len());
                     for amount in total {
@@ -52,7 +52,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             }
-        },
+        }
         BalanceReport::Simple(_) => {
             println!("Unexpected simple report");
         }

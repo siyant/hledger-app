@@ -1,6 +1,6 @@
 use crate::{HLedgerError, Result};
 use rust_decimal::Decimal;
-use serde::{Deserialize, Serialize, Deserializer, Serializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::process::Command;
 use ts_rs::TS;
 
@@ -532,10 +532,10 @@ pub fn get_balance(journal_file: Option<&str>, options: &BalanceOptions) -> Resu
     }
 
     let stdout = String::from_utf8(output.stdout)?;
-    
+
     // Parse the JSON output
     let json_value: serde_json::Value = serde_json::from_str(&stdout)?;
-    
+
     // Determine if it's a periodic or simple balance based on structure
     let report = if json_value.is_array() {
         // Simple balance format: [accounts, totals]
@@ -554,9 +554,9 @@ pub fn get_balance(journal_file: Option<&str>, options: &BalanceOptions) -> Resu
 
 /// Parse simple balance format
 fn parse_simple_balance(value: &serde_json::Value) -> Result<BalanceReport> {
-    let array = value.as_array().ok_or_else(|| {
-        HLedgerError::ParseError("Expected array for simple balance".to_string())
-    })?;
+    let array = value
+        .as_array()
+        .ok_or_else(|| HLedgerError::ParseError("Expected array for simple balance".to_string()))?;
 
     if array.len() != 2 {
         return Err(HLedgerError::ParseError(
@@ -586,7 +586,7 @@ fn parse_periodic_balance(value: &serde_json::Value) -> Result<BalanceReport> {
     let dates_json = value.get("prDates").ok_or_else(|| {
         HLedgerError::ParseError("Missing prDates in periodic balance".to_string())
     })?;
-    
+
     let mut dates = Vec::new();
     if let Some(dates_array) = dates_json.as_array() {
         for date_pair in dates_array {
@@ -604,7 +604,7 @@ fn parse_periodic_balance(value: &serde_json::Value) -> Result<BalanceReport> {
     let rows_json = value.get("prRows").ok_or_else(|| {
         HLedgerError::ParseError("Missing prRows in periodic balance".to_string())
     })?;
-    
+
     let mut rows = Vec::new();
     if let Some(rows_array) = rows_json.as_array() {
         for row_json in rows_array {
@@ -629,9 +629,9 @@ fn parse_periodic_balance(value: &serde_json::Value) -> Result<BalanceReport> {
 
 /// Parse a balance account entry
 fn parse_balance_account(value: &serde_json::Value) -> Result<BalanceAccount> {
-    let array = value.as_array().ok_or_else(|| {
-        HLedgerError::ParseError("Account should be an array".to_string())
-    })?;
+    let array = value
+        .as_array()
+        .ok_or_else(|| HLedgerError::ParseError("Account should be an array".to_string()))?;
 
     if array.len() < 4 {
         return Err(HLedgerError::ParseError(
@@ -706,7 +706,10 @@ fn parse_price(value: &serde_json::Value) -> Result<Option<Price>> {
                 Decimal::ZERO
             };
 
-            return Ok(Some(Price { commodity, quantity }));
+            return Ok(Some(Price {
+                commodity,
+                quantity,
+            }));
         }
         // Legacy format fallback
         if let Some(amount_obj) = price_obj.get("priceAmount").and_then(|a| a.as_object()) {
@@ -722,7 +725,10 @@ fn parse_price(value: &serde_json::Value) -> Result<Option<Price>> {
                 Decimal::ZERO
             };
 
-            return Ok(Some(Price { commodity, quantity }));
+            return Ok(Some(Price {
+                commodity,
+                quantity,
+            }));
         }
     }
     Ok(None)
@@ -730,9 +736,9 @@ fn parse_price(value: &serde_json::Value) -> Result<Option<Price>> {
 
 /// Parse a periodic balance row
 fn parse_periodic_row(value: &serde_json::Value) -> Result<PeriodicBalanceRow> {
-    let obj = value.as_object().ok_or_else(|| {
-        HLedgerError::ParseError("Periodic row should be an object".to_string())
-    })?;
+    let obj = value
+        .as_object()
+        .ok_or_else(|| HLedgerError::ParseError("Periodic row should be an object".to_string()))?;
 
     // Extract account name
     let account = obj
@@ -740,7 +746,7 @@ fn parse_periodic_row(value: &serde_json::Value) -> Result<PeriodicBalanceRow> {
         .and_then(|n| n.as_str())
         .unwrap_or("")
         .to_string();
-    
+
     let display_name = account.clone(); // For now, use same as account name
 
     // Parse period amounts (prrAmounts is an array of arrays of amounts)
@@ -790,7 +796,10 @@ fn parse_decimal_from_json(value: &serde_json::Value) -> Result<Decimal> {
     if let Some(obj) = value.as_object() {
         // Handle decimal object format
         if let Some(mantissa) = obj.get("decimalMantissa").and_then(|m| m.as_i64()) {
-            let places = obj.get("decimalPlaces").and_then(|p| p.as_u64()).unwrap_or(0) as u32;
+            let places = obj
+                .get("decimalPlaces")
+                .and_then(|p| p.as_u64())
+                .unwrap_or(0) as u32;
             return Ok(Decimal::new(mantissa, places));
         }
     } else if let Some(num) = value.as_f64() {
@@ -803,8 +812,10 @@ fn parse_decimal_from_json(value: &serde_json::Value) -> Result<Decimal> {
             .parse()
             .map_err(|_| HLedgerError::ParseError("Invalid decimal string".to_string()));
     }
-    
-    Err(HLedgerError::ParseError("Unknown decimal format".to_string()))
+
+    Err(HLedgerError::ParseError(
+        "Unknown decimal format".to_string(),
+    ))
 }
 
 #[cfg(test)]
