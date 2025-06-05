@@ -1,44 +1,64 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { createDefaultAccountsOptions } from "@/types/hledger.types";
 import type { DateValue } from "@internationalized/date";
 import { invoke } from "@tauri-apps/api/core";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface AccountsTabProps {
   searchQuery: string;
   dateRange: { start: DateValue; end: DateValue } | null;
+  selectedJournalFile: string;
 }
 
-export function AccountsTab({ searchQuery, dateRange }: AccountsTabProps) {
+export function AccountsTab({
+  searchQuery,
+  dateRange,
+  selectedJournalFile,
+}: AccountsTabProps) {
   const [accounts, setAccounts] = useState<string[]>([]);
 
-  async function fetchAccounts(query = "", customRange: { start: DateValue; end: DateValue } | null = null) {
-    const options = createDefaultAccountsOptions();
+  const fetchAccounts = useCallback(
+    async (
+      query = "",
+      customRange: { start: DateValue; end: DateValue } | null = null,
+    ) => {
+      const options = createDefaultAccountsOptions();
 
-    // Add the search query if provided
-    if (query.trim()) {
-      options.queries = [query];
-    }
+      // Add the search query if provided
+      if (query.trim()) {
+        options.queries = [query];
+      }
 
-    // Add date range if provided (custom always used since presets populate it)
-    if (customRange) {
-      options.begin = customRange.start.toString();
-      options.end = customRange.end.toString();
-    }
+      // Add date range if provided (custom always used since presets populate it)
+      if (customRange) {
+        options.begin = customRange.start.toString();
+        options.end = customRange.end.toString();
+      }
 
-    try {
-      const accountsList = await invoke<string[]>("get_accounts", { options });
-      setAccounts(accountsList);
-    } catch (error) {
-      console.error("Failed to fetch accounts:", error);
-      setAccounts([]);
-    }
-  }
+      try {
+        const accountsList = await invoke<string[]>("get_accounts", {
+          journalFile: selectedJournalFile,
+          options,
+        });
+        setAccounts(accountsList);
+      } catch (error) {
+        console.error("Failed to fetch accounts:", error);
+        setAccounts([]);
+      }
+    },
+    [selectedJournalFile],
+  );
 
-  // Fetch accounts when searchQuery or dateRange changes
+  // Fetch accounts when searchQuery, dateRange, or selectedJournalFile changes
   useEffect(() => {
     fetchAccounts(searchQuery, dateRange);
-  }, [searchQuery, dateRange]);
+  }, [searchQuery, dateRange, selectedJournalFile]);
   return (
     <Card>
       <CardHeader>
@@ -55,7 +75,10 @@ export function AccountsTab({ searchQuery, dateRange }: AccountsTabProps) {
               <div className="bg-muted rounded-md p-3">
                 <ul className="space-y-1">
                   {accounts.map((account, index) => (
-                    <li key={index} className="text-sm hover:bg-muted-foreground/10 rounded px-2 py-1">
+                    <li
+                      key={index}
+                      className="text-sm hover:bg-muted-foreground/10 rounded px-2 py-1"
+                    >
                       {account}
                     </li>
                   ))}

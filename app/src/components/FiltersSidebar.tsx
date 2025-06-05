@@ -1,17 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { JollyDateRangePicker } from "@/components/ui/date-picker";
 import { JollySearchField } from "@/components/ui/searchfield";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Toggle, ToggleButtonGroup } from "@/components/ui/toggle";
 import { type DateValue, getLocalTimeZone, today } from "@internationalized/date";
+import { invoke } from "@tauri-apps/api/core";
 import { X } from "lucide-react";
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface FiltersSidebarProps {
   searchQuery: string;
   onSearchQueryChange: (query: string) => void;
   dateRange: { start: DateValue; end: DateValue } | null;
   onDateRangeChange: (range: { start: DateValue; end: DateValue } | null) => void;
+  selectedJournalFile: string;
+  onJournalFileChange: (file: string) => void;
 }
 
 // Date range utilities
@@ -63,8 +67,34 @@ export function FiltersSidebar({
   onSearchQueryChange,
   dateRange,
   onDateRangeChange,
+  selectedJournalFile,
+  onJournalFileChange,
 }: FiltersSidebarProps) {
   const [selectedDateRange, setSelectedDateRange] = useState<string>("");
+  const [journalFiles, setJournalFiles] = useState<string[]>([]);
+
+  // Load journal files from environment variable on mount
+  useEffect(() => {
+    async function loadJournalFiles() {
+      try {
+        const files = await invoke<string[]>("get_journal_files");
+        setJournalFiles(files);
+        // If no journal file is selected and files are available, select the first one
+        if (!selectedJournalFile && files.length > 0) {
+          onJournalFileChange(files[0]);
+        }
+      } catch (error) {
+        console.error("Failed to load journal files:", error);
+        setJournalFiles([]);
+      }
+    }
+    loadJournalFiles();
+  }, [selectedJournalFile, onJournalFileChange]);
+
+  // Helper function to get just the filename from a full path
+  const getFileName = (filePath: string) => {
+    return filePath.split("/").pop() || filePath;
+  };
 
   // Clear search query
   const clearSearch = () => {
@@ -109,6 +139,35 @@ export function FiltersSidebar({
         <div>
           <h2 className="text-lg font-semibold mb-3">Filters & Options</h2>
           <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-muted-foreground mb-2 block">Journal File</label>
+              {journalFiles.length === 0 && (
+                <div className="mb-2">
+                  <p className="text-sm text-red-500">Please set HLEDGER_JOURNAL_FILES</p>
+                </div>
+              )}
+              <Select value={selectedJournalFile} onValueChange={onJournalFileChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a journal file">
+                    {selectedJournalFile ? getFileName(selectedJournalFile) : "Select a journal file"}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {journalFiles.length > 0 ? (
+                    journalFiles.map((file) => (
+                      <SelectItem key={file} value={file}>
+                        {getFileName(file)}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="__no_files__" disabled>
+                      No journal files available
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div>
               <label className="text-sm font-medium text-muted-foreground mb-2 block">Search Accounts</label>
               <JollySearchField value={searchQuery} onChange={onSearchQueryChange} onClear={clearSearch} />

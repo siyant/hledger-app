@@ -13,6 +13,7 @@ function App() {
     start: DateValue;
     end: DateValue;
   } | null>(null);
+  const [selectedJournalFile, setSelectedJournalFile] = useState("");
 
   return (
     <div className="min-h-screen bg-background">
@@ -21,6 +22,8 @@ function App() {
         onSearchQueryChange={setSearchQuery}
         dateRange={dateRange}
         onDateRangeChange={setDateRange}
+        selectedJournalFile={selectedJournalFile}
+        onJournalFileChange={setSelectedJournalFile}
       />
 
       {/* Main Content */}
@@ -35,19 +38,27 @@ function App() {
             </TabList>
 
             <TabPanel id="accounts">
-              <AccountsTab searchQuery={searchQuery} dateRange={dateRange} />
+              <AccountsTab searchQuery={searchQuery} dateRange={dateRange} selectedJournalFile={selectedJournalFile} />
             </TabPanel>
 
             <TabPanel id="balances">
-              <BalancesTab searchQuery={searchQuery} dateRange={dateRange} />
+              <BalancesTab searchQuery={searchQuery} dateRange={dateRange} selectedJournalFile={selectedJournalFile} />
             </TabPanel>
 
             <TabPanel id="balancesheet">
-              <BalanceSheetTab searchQuery={searchQuery} dateRange={dateRange} />
+              <BalanceSheetTab
+                searchQuery={searchQuery}
+                dateRange={dateRange}
+                selectedJournalFile={selectedJournalFile}
+              />
             </TabPanel>
 
             <TabPanel id="incomestatement">
-              <IncomeStatementTab searchQuery={searchQuery} dateRange={dateRange} />
+              <IncomeStatementTab
+                searchQuery={searchQuery}
+                dateRange={dateRange}
+                selectedJournalFile={selectedJournalFile}
+              />
             </TabPanel>
           </Tabs>
         </div>
