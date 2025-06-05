@@ -342,14 +342,7 @@ export function BalancesTab({ searchQuery, dateRange }: BalancesTabProps) {
                   <div className="min-w-fit">
                     {/* Period headers */}
                     <div className="flex mb-2 border-b border-muted-foreground/20 pb-2">
-                      <div
-                        className={cn(
-                          "flex-1 min-w-[200px] font-medium text-sm",
-                          balanceDisplayMode === "flat" && "px-2",
-                        )}
-                      >
-                        Account
-                      </div>
+                      <div className={cn("flex-1 min-w-[200px] font-medium text-sm px-2")}>Account</div>
                       {periodicData.dates.map((periodDate, index) => (
                         <div key={index} className="w-24 text-right font-medium text-sm px-1">
                           {new Date(periodDate.start).toLocaleDateString("en-US", {

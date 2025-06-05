@@ -4,6 +4,9 @@ import type { Amount } from "../../../hledger-lib/bindings/Amount.ts";
 import type { BalanceAccount } from "../../../hledger-lib/bindings/BalanceAccount.ts";
 import type { BalanceOptions } from "../../../hledger-lib/bindings/BalanceOptions.ts";
 import type { BalanceReport } from "../../../hledger-lib/bindings/BalanceReport.ts";
+import type { BalanceSheetOptions } from "../../../hledger-lib/bindings/BalanceSheetOptions.ts";
+import type { BalanceSheetReport } from "../../../hledger-lib/bindings/BalanceSheetReport.ts";
+import type { BalanceSheetSubreport } from "../../../hledger-lib/bindings/BalanceSheetSubreport.ts";
 import type { PeriodDate } from "../../../hledger-lib/bindings/PeriodDate.ts";
 import type { PeriodicBalance } from "../../../hledger-lib/bindings/PeriodicBalance.ts";
 import type { PeriodicBalanceRow } from "../../../hledger-lib/bindings/PeriodicBalanceRow.ts";
@@ -14,6 +17,9 @@ export type {
   AccountsOptions,
   BalanceOptions,
   BalanceReport,
+  BalanceSheetOptions,
+  BalanceSheetReport,
+  BalanceSheetSubreport,
   SimpleBalance,
   PeriodicBalance,
   PeriodicBalanceRow,
@@ -79,6 +85,51 @@ export function createDefaultBalanceOptions(): BalanceOptions {
     related: false,
     invert: false,
     transpose: false,
+    layout: null,
+    daily: false,
+    weekly: false,
+    monthly: false,
+    quarterly: false,
+    yearly: false,
+    period: null,
+    begin: null,
+    end: null,
+    depth: null,
+    unmarked: false,
+    pending: false,
+    cleared: false,
+    real: false,
+    empty: false,
+    cost: false,
+    market: false,
+    exchange: null,
+    value: null,
+    queries: [],
+  };
+}
+
+/**
+ * Create a new BalanceSheetOptions object with default values
+ */
+export function createDefaultBalanceSheetOptions(): BalanceSheetOptions {
+  return {
+    sum: false,
+    valuechange: false,
+    gain: false,
+    change: false,
+    cumulative: false,
+    historical: true,
+    flat: true,
+    tree: false,
+    drop: null,
+    declared: false,
+    average: false,
+    row_total: false,
+    summary_only: false,
+    no_total: false,
+    no_elide: false,
+    sort_amount: false,
+    percent: false,
     layout: null,
     daily: false,
     weekly: false,

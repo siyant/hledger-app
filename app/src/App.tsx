@@ -1,5 +1,6 @@
 import { AccountsTab } from "@/components/AccountsTab";
 import { BalancesTab } from "@/components/BalancesTab";
+import { BalanceSheetTab } from "@/components/BalanceSheetTab";
 import { FiltersSidebar } from "@/components/FiltersSidebar";
 import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/tabs";
 import type { DateValue } from "@internationalized/date";
@@ -28,6 +29,7 @@ function App() {
             <TabList aria-label="hledger data views" className="w-fit">
               <Tab id="accounts">Accounts</Tab>
               <Tab id="balances">Balances</Tab>
+              <Tab id="balancesheet">Balance Sheet</Tab>
             </TabList>
 
             <TabPanel id="accounts">
@@ -36,6 +38,10 @@ function App() {
 
             <TabPanel id="balances">
               <BalancesTab searchQuery={searchQuery} dateRange={dateRange} />
+            </TabPanel>
+
+            <TabPanel id="balancesheet">
+              <BalanceSheetTab searchQuery={searchQuery} dateRange={dateRange} />
             </TabPanel>
           </Tabs>
         </div>
