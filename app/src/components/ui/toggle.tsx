@@ -1,17 +1,17 @@
-import { cva, type VariantProps } from "class-variance-authority"
+import { cva, type VariantProps } from "class-variance-authority";
 import {
   ToggleButton as AriaToggleButton,
   ToggleButtonGroup as AriaToggleButtonGroup,
   composeRenderProps,
   type ToggleButtonGroupProps as AriaToggleButtonGroupProps,
   type ToggleButtonProps as AriaToggleButtonProps,
-} from "react-aria-components"
+} from "react-aria-components";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const toggleVariants = cva(
   [
-    "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors",
+    "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors text-muted-foreground cursor-pointer",
     /* Disabled */
     "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
     /* Hover */
@@ -32,7 +32,8 @@ const toggleVariants = cva(
       },
       size: {
         default: "h-10 px-3",
-        sm: "h-9 px-2.5",
+        xs: "h-6 px-2.5 text-xs",
+        sm: "h-8 px-2.5",
         lg: "h-11 px-5",
       },
     },
@@ -40,8 +41,8 @@ const toggleVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
-)
+  },
+);
 
 interface ToggleProps
   extends AriaToggleButtonProps,
@@ -56,12 +57,12 @@ const Toggle = ({ className, variant, size, ...props }: ToggleProps) => (
           variant,
           size,
           className,
-        })
-      )
+        }),
+      ),
     )}
     {...props}
   />
-)
+);
 
 const ToggleButtonGroup = ({
   children,
@@ -71,15 +72,15 @@ const ToggleButtonGroup = ({
   <AriaToggleButtonGroup
     className={composeRenderProps(className, (className) =>
       cn(
-        "group/togglegroup flex items-center justify-center gap-1 data-[orientation=vertical]:flex-col",
-        className
-      )
+        "group/togglegroup flex items-center justify-start gap-1 data-[orientation=vertical]:flex-col",
+        className,
+      ),
     )}
     {...props}
   >
     {children}
   </AriaToggleButtonGroup>
-)
+);
 
-export { Toggle, toggleVariants, ToggleButtonGroup }
-export type { ToggleProps }
+export { Toggle, toggleVariants, ToggleButtonGroup };
+export type { ToggleProps };

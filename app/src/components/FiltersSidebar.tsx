@@ -10,18 +10,25 @@ interface FiltersSidebarProps {
   searchQuery: string;
   onSearchQueryChange: (query: string) => void;
   dateRange: { start: DateValue; end: DateValue } | null;
-  onDateRangeChange: (range: { start: DateValue; end: DateValue } | null) => void;
+  onDateRangeChange: (
+    range: { start: DateValue; end: DateValue } | null,
+  ) => void;
 }
 
 // Date range utilities
-function getDateRange(preset: string): { begin: DateValue; end: DateValue } | null {
+function getDateRange(
+  preset: string,
+): { begin: DateValue; end: DateValue } | null {
   const now = today(getLocalTimeZone());
 
   switch (preset) {
     case "this-month": {
       const startOfMonth = now.set({ day: 1 });
       // Get last day of current month
-      const endOfMonth = now.add({ months: 1 }).set({ day: 1 }).subtract({ days: 1 });
+      const endOfMonth = now
+        .add({ months: 1 })
+        .set({ day: 1 })
+        .subtract({ days: 1 });
       return {
         begin: startOfMonth,
         end: endOfMonth,
@@ -45,8 +52,12 @@ function getDateRange(preset: string): { begin: DateValue; end: DateValue } | nu
       };
     }
     case "last-year": {
-      const startOfLastYear = now.subtract({ years: 1 }).set({ month: 1, day: 1 });
-      const endOfLastYear = now.subtract({ years: 1 }).set({ month: 12, day: 31 });
+      const startOfLastYear = now
+        .subtract({ years: 1 })
+        .set({ month: 1, day: 1 });
+      const endOfLastYear = now
+        .subtract({ years: 1 })
+        .set({ month: 12, day: 31 });
       return {
         begin: startOfLastYear,
         end: endOfLastYear,
@@ -81,13 +92,13 @@ export function FiltersSidebar({
     const selected = Array.from(keys)[0] as string;
     if (selected) {
       setSelectedDateRange(selected);
-      
+
       // Convert preset to date range
       const dates = getDateRange(selected);
       if (dates) {
         onDateRangeChange({
           start: dates.begin,
-          end: dates.end
+          end: dates.end,
         });
       }
     }
@@ -105,11 +116,11 @@ export function FiltersSidebar({
     }
   };
   return (
-    <div className="fixed left-0 top-0 w-80 h-screen bg-muted/50 border-r border-border p-6 overflow-y-auto">
+    <div className="fixed left-0 top-0 w-80 h-screen bg-muted/30 border-r border-border p-6 overflow-y-auto">
       <div className="space-y-6">
         <div>
           <h2 className="text-lg font-semibold mb-3">Filters & Options</h2>
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div>
               <label className="text-sm font-medium text-muted-foreground mb-2 block">
                 Search Accounts
@@ -130,7 +141,7 @@ export function FiltersSidebar({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-4 w-4 p-0"
+                    className="h-5 w-5 text-muted-foreground"
                     onClick={clearDateRange}
                   >
                     <X className="h-3 w-3" />
@@ -141,15 +152,26 @@ export function FiltersSidebar({
                 <ToggleButtonGroup
                   selectedKeys={selectedDateRange ? [selectedDateRange] : []}
                   onSelectionChange={handlePresetSelection}
-                  className="-mx-1"
                 >
-                  <Toggle id="this-month" className="text-xs font-normal">
+                  <Toggle
+                    id="this-month"
+                    size="sm"
+                    className="text-xs font-normal"
+                  >
                     This Month
                   </Toggle>
-                  <Toggle id="last-month" className="text-xs font-normal">
+                  <Toggle
+                    id="last-month"
+                    size="sm"
+                    className="text-xs font-normal"
+                  >
                     Last Month
                   </Toggle>
-                  <Toggle id="this-year" className="text-xs font-normal">
+                  <Toggle
+                    id="this-year"
+                    size="sm"
+                    className="text-xs font-normal"
+                  >
                     This Year
                   </Toggle>
                 </ToggleButtonGroup>

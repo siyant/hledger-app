@@ -1,4 +1,4 @@
-import { SearchIcon, XIcon } from "lucide-react"
+import { SearchIcon, XIcon } from "lucide-react";
 import {
   Button as AriaButton,
   ButtonProps as AriaButtonProps,
@@ -11,21 +11,21 @@ import {
   ValidationResult as AriaValidationResult,
   composeRenderProps,
   Text,
-} from "react-aria-components"
+} from "react-aria-components";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-import { FieldError, FieldGroup, Label } from "./field"
+import { FieldError, FieldGroup, Label } from "./field";
 
 function SearchField({ className, ...props }: AriaSearchFieldProps) {
   return (
     <AriaSearchField
       className={composeRenderProps(className, (className) =>
-        cn("group", className)
+        cn("group", className),
       )}
       {...props}
     />
-  )
+  );
 }
 
 function SearchFieldInput({ className, ...props }: AriaInputProps) {
@@ -34,12 +34,12 @@ function SearchFieldInput({ className, ...props }: AriaInputProps) {
       className={composeRenderProps(className, (className) =>
         cn(
           "min-w-0 flex-1 bg-background px-2 py-1.5 outline outline-0 placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden",
-          className
-        )
+          className,
+        ),
       )}
       {...props}
     />
-  )
+  );
 }
 
 function SearchFieldGroup({ className, ...props }: AriaGroupProps) {
@@ -52,12 +52,12 @@ function SearchFieldGroup({ className, ...props }: AriaGroupProps) {
           "data-[focus-within]:outline-none data-[focus-within]:ring-2 data-[focus-within]:ring-ring data-[focus-within]:ring-offset-2",
           /* Disabled */
           "data-[disabled]:opacity-50",
-          className
-        )
+          className,
+        ),
       )}
       {...props}
     />
-  )
+  );
 }
 
 function SearchFieldClear({ className, ...props }: AriaButtonProps) {
@@ -72,18 +72,18 @@ function SearchFieldClear({ className, ...props }: AriaButtonProps) {
           "data-[disabled]:pointer-events-none",
           /* Empty */
           "group-data-[empty]:invisible",
-          className
-        )
+          className,
+        ),
       )}
       {...props}
     />
-  )
+  );
 }
 
 interface JollySearchFieldProps extends AriaSearchFieldProps {
-  label?: string
-  description?: string
-  errorMessage?: string | ((validation: AriaValidationResult) => string)
+  label?: string;
+  description?: string;
+  errorMessage?: string | ((validation: AriaValidationResult) => string);
 }
 
 function JollySearchField({
@@ -96,11 +96,11 @@ function JollySearchField({
   return (
     <SearchField
       className={composeRenderProps(className, (className) =>
-        cn("group flex flex-col gap-2", className)
+        cn("group flex flex-col gap-2", className),
       )}
       {...props}
     >
-      <Label>{label}</Label>
+      {label != undefined && <Label>{label}</Label>}
       <FieldGroup>
         <SearchIcon aria-hidden className="size-4 text-muted-foreground" />
         <SearchFieldInput placeholder="Search..." />
@@ -115,7 +115,7 @@ function JollySearchField({
       )}
       <FieldError>{errorMessage}</FieldError>
     </SearchField>
-  )
+  );
 }
 
 export {
@@ -124,5 +124,5 @@ export {
   SearchFieldInput,
   SearchFieldClear,
   JollySearchField,
-}
-export type { JollySearchFieldProps }
+};
+export type { JollySearchFieldProps };
