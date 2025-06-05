@@ -23,11 +23,19 @@ fn get_balancesheet(options: hledger_lib::BalanceSheetOptions) -> Result<hledger
     }
 }
 
+#[tauri::command]
+fn get_incomestatement(options: hledger_lib::IncomeStatementOptions) -> Result<hledger_lib::IncomeStatementReport, String> {
+    match hledger_lib::get_incomestatement(None, &options) {
+        Ok(incomestatement) => Ok(incomestatement),
+        Err(e) => Err(format!("Failed to get incomestatement: {}", e)),
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get_accounts, get_balance, get_balancesheet])
+        .invoke_handler(tauri::generate_handler![get_accounts, get_balance, get_balancesheet, get_incomestatement])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

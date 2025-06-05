@@ -7,6 +7,9 @@ import type { BalanceReport } from "../../../hledger-lib/bindings/BalanceReport.
 import type { BalanceSheetOptions } from "../../../hledger-lib/bindings/BalanceSheetOptions.ts";
 import type { BalanceSheetReport } from "../../../hledger-lib/bindings/BalanceSheetReport.ts";
 import type { BalanceSheetSubreport } from "../../../hledger-lib/bindings/BalanceSheetSubreport.ts";
+import type { IncomeStatementOptions } from "../../../hledger-lib/bindings/IncomeStatementOptions.ts";
+import type { IncomeStatementReport } from "../../../hledger-lib/bindings/IncomeStatementReport.ts";
+import type { IncomeStatementSubreport } from "../../../hledger-lib/bindings/IncomeStatementSubreport.ts";
 import type { PeriodDate } from "../../../hledger-lib/bindings/PeriodDate.ts";
 import type { PeriodicBalance } from "../../../hledger-lib/bindings/PeriodicBalance.ts";
 import type { PeriodicBalanceRow } from "../../../hledger-lib/bindings/PeriodicBalanceRow.ts";
@@ -20,6 +23,9 @@ export type {
   BalanceSheetOptions,
   BalanceSheetReport,
   BalanceSheetSubreport,
+  IncomeStatementOptions,
+  IncomeStatementReport,
+  IncomeStatementSubreport,
   SimpleBalance,
   PeriodicBalance,
   PeriodicBalanceRow,
@@ -119,6 +125,51 @@ export function createDefaultBalanceSheetOptions(): BalanceSheetOptions {
     change: false,
     cumulative: false,
     historical: true,
+    flat: true,
+    tree: false,
+    drop: null,
+    declared: false,
+    average: false,
+    row_total: false,
+    summary_only: false,
+    no_total: false,
+    no_elide: false,
+    sort_amount: false,
+    percent: false,
+    layout: null,
+    daily: false,
+    weekly: false,
+    monthly: false,
+    quarterly: false,
+    yearly: false,
+    period: null,
+    begin: null,
+    end: null,
+    depth: null,
+    unmarked: false,
+    pending: false,
+    cleared: false,
+    real: false,
+    empty: false,
+    cost: false,
+    market: false,
+    exchange: null,
+    value: null,
+    queries: [],
+  };
+}
+
+/**
+ * Create a new IncomeStatementOptions object with default values
+ */
+export function createDefaultIncomeStatementOptions(): IncomeStatementOptions {
+  return {
+    sum: false,
+    valuechange: false,
+    gain: false,
+    change: true,
+    cumulative: false,
+    historical: false,
     flat: true,
     tree: false,
     drop: null,

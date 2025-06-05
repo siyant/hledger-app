@@ -1,6 +1,7 @@
 import { AccountsTab } from "@/components/AccountsTab";
 import { BalancesTab } from "@/components/BalancesTab";
 import { BalanceSheetTab } from "@/components/BalanceSheetTab";
+import { IncomeStatementTab } from "@/components/IncomeStatementTab";
 import { FiltersSidebar } from "@/components/FiltersSidebar";
 import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/tabs";
 import type { DateValue } from "@internationalized/date";
@@ -30,6 +31,7 @@ function App() {
               <Tab id="accounts">Accounts</Tab>
               <Tab id="balances">Balances</Tab>
               <Tab id="balancesheet">Balance Sheet</Tab>
+              <Tab id="incomestatement">Income Statement</Tab>
             </TabList>
 
             <TabPanel id="accounts">
@@ -42,6 +44,10 @@ function App() {
 
             <TabPanel id="balancesheet">
               <BalanceSheetTab searchQuery={searchQuery} dateRange={dateRange} />
+            </TabPanel>
+
+            <TabPanel id="incomestatement">
+              <IncomeStatementTab searchQuery={searchQuery} dateRange={dateRange} />
             </TabPanel>
           </Tabs>
         </div>
