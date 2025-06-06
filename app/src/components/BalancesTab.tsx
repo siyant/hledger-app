@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Toggle, ToggleButtonGroup } from "@/components/ui/toggle";
 import { cn } from "@/lib/utils";
 import {
@@ -27,20 +21,12 @@ interface BalancesTabProps {
   selectedJournalFile: string;
 }
 
-export function BalancesTab({
-  searchQuery,
-  dateRange,
-  selectedJournalFile,
-}: BalancesTabProps) {
+export function BalancesTab({ searchQuery, dateRange, selectedJournalFile }: BalancesTabProps) {
   const [balances, setBalances] = useState<BalanceAccount[]>([]);
-  const [periodicData, setPeriodicData] = useState<PeriodicBalance | null>(
-    null,
-  );
+  const [periodicData, setPeriodicData] = useState<PeriodicBalance | null>(null);
   const [balanceDisplayMode, setBalanceDisplayMode] = useState<string>("flat");
   const [periodMode, setPeriodMode] = useState<string>("none");
-  const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(
-    new Set(),
-  );
+  const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(new Set());
 
   // Memoized calculation of which accounts have children
   const accountsWithChildren = useMemo(() => {
@@ -53,16 +39,13 @@ export function BalancesTab({
         const indent = (row.account.match(/:/g) || []).length;
         const hasChild =
           index < periodicData.rows.length - 1 &&
-          (periodicData.rows[index + 1].account.match(/:/g) || []).length >
-            indent;
+          (periodicData.rows[index + 1].account.match(/:/g) || []).length > indent;
         childrenMap.set(row.account, hasChild);
       });
     } else {
       // For simple data, use existing logic
       balances.forEach((account, index) => {
-        const hasChild =
-          index < balances.length - 1 &&
-          balances[index + 1].indent > account.indent;
+        const hasChild = index < balances.length - 1 && balances[index + 1].indent > account.indent;
         childrenMap.set(account.name, hasChild);
       });
     }
@@ -96,8 +79,7 @@ export function BalancesTab({
         // Find parent account by looking backwards
         let isVisible = false;
         for (let i = index - 1; i >= 0; i--) {
-          const parentIndent = (periodicData.rows[i].account.match(/:/g) || [])
-            .length;
+          const parentIndent = (periodicData.rows[i].account.match(/:/g) || []).length;
           if (parentIndent === indent - 1) {
             const parent = periodicData.rows[i];
             const parentVisible = visibilityMap.get(parent.account) ?? false;
@@ -172,10 +154,7 @@ export function BalancesTab({
   };
 
   const fetchBalances = useCallback(
-    async (
-      query = "",
-      customRange: { start: DateValue; end: DateValue } | null = null,
-    ) => {
+    async (query = "", customRange: { start: DateValue; end: DateValue } | null = null) => {
       const options = createDefaultBalanceOptions();
 
       // Add the search query if provided
@@ -233,11 +212,8 @@ export function BalancesTab({
         if ("accounts" in balanceReport) {
           const simpleBalance = balanceReport as SimpleBalance;
           // Filter out accounts that have only zero amounts
-          const accountsWithBalances = simpleBalance.accounts.filter(
-            (account) =>
-              account.amounts.some(
-                (amount) => Number.parseFloat(amount.quantity) !== 0,
-              ),
+          const accountsWithBalances = simpleBalance.accounts.filter((account) =>
+            account.amounts.some((amount) => Number.parseFloat(amount.quantity) !== 0),
           );
           setBalances(accountsWithBalances);
         } else if ("dates" in balanceReport && "rows" in balanceReport) {
@@ -245,9 +221,7 @@ export function BalancesTab({
           // Filter out rows that have only zero amounts across all periods
           const filteredRows = periodicBalance.rows.filter((row) =>
             row.amounts.some((periodAmounts) =>
-              periodAmounts.some(
-                (amount) => Number.parseFloat(amount.quantity) !== 0,
-              ),
+              periodAmounts.some((amount) => Number.parseFloat(amount.quantity) !== 0),
             ),
           );
           setPeriodicData({
@@ -292,40 +266,23 @@ export function BalancesTab({
     <Card>
       <CardHeader>
         <CardTitle>Balances</CardTitle>
-        <CardDescription>
-          View balance changes, end balances, budgets, gains..
-        </CardDescription>
+        <CardDescription>View balance changes, end balances, budgets, gains..</CardDescription>
 
         <div className="flex flex-col space-y-2 mt-2">
           <div className="flex flex-row gap-2 items-center">
-            <label className="text-sm font-medium text-muted-foreground block w-16">
-              Display
-            </label>
-            <ToggleButtonGroup
-              selectedKeys={[balanceDisplayMode]}
-              onSelectionChange={handleBalanceDisplayMode}
-            >
-              <Toggle
-                id="flat"
-                size="xs"
-                className="text-xs font-normal text-muted-foreground"
-              >
+            <label className="text-sm font-medium text-muted-foreground block w-16">Display</label>
+            <ToggleButtonGroup selectedKeys={[balanceDisplayMode]} onSelectionChange={handleBalanceDisplayMode}>
+              <Toggle id="flat" size="xs" className="text-xs font-normal text-muted-foreground">
                 Flat
               </Toggle>
-              <Toggle
-                id="tree"
-                size="xs"
-                className="text-xs font-normal text-muted-foreground"
-              >
+              <Toggle id="tree" size="xs" className="text-xs font-normal text-muted-foreground">
                 Tree
               </Toggle>
             </ToggleButtonGroup>
           </div>
 
           <div className="flex flex-row gap-2 items-center">
-            <label className="text-sm font-medium text-muted-foreground block w-16">
-              Period
-            </label>
+            <label className="text-sm font-medium text-muted-foreground block w-16">Period</label>
             <ToggleButtonGroup
               selectedKeys={[periodMode]}
               onSelectionChange={handlePeriodMode}
@@ -361,32 +318,20 @@ export function BalancesTab({
                 <p className="text-sm text-muted-foreground">
                   {periodicData ? (
                     <>
-                      {periodicData.rows.length}{" "}
-                      {periodicData.rows.length !== 1 ? "entries" : "entry"}
+                      {periodicData.rows.length} {periodicData.rows.length !== 1 ? "entries" : "entry"}
                     </>
                   ) : (
                     <>
-                      {balances.length}{" "}
-                      {balances.length !== 1 ? "entries" : "entry"}
+                      {balances.length} {balances.length !== 1 ? "entries" : "entry"}
                     </>
                   )}
                 </p>
                 {balanceDisplayMode === "tree" && (
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={expandAll}
-                      className="text-xs"
-                    >
+                    <Button variant="outline" size="sm" onClick={expandAll} className="text-xs">
                       Expand All
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={collapseAll}
-                      className="text-xs"
-                    >
+                    <Button variant="outline" size="sm" onClick={collapseAll} className="text-xs">
                       Collapse All
                     </Button>
                   </div>
@@ -399,28 +344,14 @@ export function BalancesTab({
                   <div className="min-w-fit">
                     {/* Period headers */}
                     <div className="flex mb-2 border-b border-muted-foreground/20 pb-2">
-                      <div
-                        className={cn(
-                          "flex-1 min-w-[200px] font-medium text-sm px-2",
-                        )}
-                      >
-                        Account
-                      </div>
+                      <div className={cn("flex-1 min-w-[200px] font-medium text-sm px-2")}>Account</div>
                       {periodicData.dates.map((periodDate, index) => (
-                        <div
-                          key={index}
-                          className="w-24 text-right font-medium text-sm px-1"
-                        >
-                          {new Date(periodDate.start).toLocaleDateString(
-                            "en-US",
-                            {
-                              month: "short",
-                              year:
-                                periodMode === "yearly" ? "2-digit" : undefined,
-                              day:
-                                periodMode === "daily" ? "numeric" : undefined,
-                            },
-                          )}
+                        <div key={index} className="w-24 text-right font-medium text-sm px-1">
+                          {new Date(periodDate.start).toLocaleDateString("en-US", {
+                            month: "short",
+                            year: periodMode === "yearly" ? "2-digit" : undefined,
+                            day: periodMode === "daily" ? "numeric" : undefined,
+                          })}
                         </div>
                       ))}
                     </div>
@@ -430,13 +361,8 @@ export function BalancesTab({
                       {periodicData.rows
                         .filter((row) => isAccountVisible(row.account))
                         .map((row, index) => {
-                          const indent =
-                            balanceDisplayMode === "tree"
-                              ? (row.account.match(/:/g) || []).length
-                              : 0;
-                          const hasChildAccounts =
-                            balanceDisplayMode === "tree" &&
-                            hasChildren(row.account);
+                          const indent = balanceDisplayMode === "tree" ? (row.account.match(/:/g) || []).length : 0;
+                          const hasChildAccounts = balanceDisplayMode === "tree" && hasChildren(row.account);
 
                           return (
                             <div
@@ -455,9 +381,7 @@ export function BalancesTab({
                                   <>
                                     {hasChildAccounts ? (
                                       <button
-                                        onClick={() =>
-                                          toggleAccount(row.account)
-                                        }
+                                        onClick={() => toggleAccount(row.account)}
                                         className="mr-1 p-0 hover:bg-muted rounded flex items-center"
                                       >
                                         {expandedAccounts.has(row.account) ? (
@@ -487,20 +411,11 @@ export function BalancesTab({
 
                               {/* Period amounts */}
                               {row.amounts.map((periodAmounts, periodIndex) => (
-                                <div
-                                  key={periodIndex}
-                                  className="w-24 text-right px-1"
-                                >
+                                <div key={periodIndex} className="w-24 text-right px-1">
                                   {periodAmounts
-                                    .filter(
-                                      (amount) =>
-                                        Number.parseFloat(amount.quantity) !==
-                                        0,
-                                    )
+                                    .filter((amount) => Number.parseFloat(amount.quantity) !== 0)
                                     .map((amount, amountIndex) => {
-                                      const isExpandedParent =
-                                        hasChildAccounts &&
-                                        expandedAccounts.has(row.account);
+                                      const isExpandedParent = hasChildAccounts && expandedAccounts.has(row.account);
                                       return (
                                         <div
                                           key={amountIndex}
@@ -526,9 +441,7 @@ export function BalancesTab({
                     {balances
                       .filter((balance) => isAccountVisible(balance.name))
                       .map((balance, index) => {
-                        const hasChildAccounts =
-                          balanceDisplayMode === "tree" &&
-                          hasChildren(balance.name);
+                        const hasChildAccounts = balanceDisplayMode === "tree" && hasChildren(balance.name);
                         return (
                           <li
                             key={index}
@@ -546,9 +459,7 @@ export function BalancesTab({
                                 <>
                                   {hasChildAccounts ? (
                                     <button
-                                      onClick={() =>
-                                        toggleAccount(balance.name)
-                                      }
+                                      onClick={() => toggleAccount(balance.name)}
                                       className="mr-1 p-0 hover:bg-muted rounded flex items-center"
                                     >
                                       {expandedAccounts.has(balance.name) ? (
@@ -577,14 +488,9 @@ export function BalancesTab({
                             </span>
                             <div className="flex flex-col items-end">
                               {balance.amounts
-                                .filter(
-                                  (amount) =>
-                                    Number.parseFloat(amount.quantity) !== 0,
-                                )
+                                .filter((amount) => Number.parseFloat(amount.quantity) !== 0)
                                 .map((amount, amountIndex) => {
-                                  const isExpandedParent =
-                                    hasChildAccounts &&
-                                    expandedAccounts.has(balance.name);
+                                  const isExpandedParent = hasChildAccounts && expandedAccounts.has(balance.name);
                                   return (
                                     <span
                                       key={amountIndex}

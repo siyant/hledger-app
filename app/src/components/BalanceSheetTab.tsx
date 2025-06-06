@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Toggle, ToggleButtonGroup } from "@/components/ui/toggle";
 import { cn } from "@/lib/utils";
 import {
@@ -25,18 +19,11 @@ interface BalanceSheetTabProps {
   selectedJournalFile: string;
 }
 
-export function BalanceSheetTab({
-  searchQuery,
-  dateRange,
-  selectedJournalFile,
-}: BalanceSheetTabProps) {
-  const [balanceSheetData, setBalanceSheetData] =
-    useState<BalanceSheetReport | null>(null);
+export function BalanceSheetTab({ searchQuery, dateRange, selectedJournalFile }: BalanceSheetTabProps) {
+  const [balanceSheetData, setBalanceSheetData] = useState<BalanceSheetReport | null>(null);
   const [balanceDisplayMode, setBalanceDisplayMode] = useState<string>("flat");
   const [periodMode, setPeriodMode] = useState<string>("none");
-  const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(
-    new Set(),
-  );
+  const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(new Set());
 
   // Memoized calculation of which accounts have children
   const accountsWithChildren = useMemo(() => {
@@ -48,9 +35,7 @@ export function BalanceSheetTab({
           // In balance sheet data, we need to compute indent from account name
           const indent = (row.account.match(/:/g) || []).length;
           const hasChild =
-            index < subreport.rows.length - 1 &&
-            (subreport.rows[index + 1].account.match(/:/g) || []).length >
-              indent;
+            index < subreport.rows.length - 1 && (subreport.rows[index + 1].account.match(/:/g) || []).length > indent;
           childrenMap.set(row.account, hasChild);
         });
       });
@@ -86,8 +71,7 @@ export function BalanceSheetTab({
         // Find parent account by looking backwards
         let isVisible = false;
         for (let i = index - 1; i >= 0; i--) {
-          const parentIndent = (subreport.rows[i].account.match(/:/g) || [])
-            .length;
+          const parentIndent = (subreport.rows[i].account.match(/:/g) || []).length;
           if (parentIndent === indent - 1) {
             const parent = subreport.rows[i];
             const parentVisible = visibilityMap.get(parent.account) ?? false;
@@ -139,10 +123,7 @@ export function BalanceSheetTab({
   };
 
   const fetchBalanceSheet = useCallback(
-    async (
-      query = "",
-      customRange: { start: DateValue; end: DateValue } | null = null,
-    ) => {
+    async (query = "", customRange: { start: DateValue; end: DateValue } | null = null) => {
       const options = createDefaultBalanceSheetOptions();
 
       // Add the search query if provided
@@ -186,13 +167,10 @@ export function BalanceSheetTab({
       }
 
       try {
-        const balanceSheetReport = await invoke<BalanceSheetReport>(
-          "get_balancesheet",
-          {
-            journalFile: selectedJournalFile,
-            options,
-          },
-        );
+        const balanceSheetReport = await invoke<BalanceSheetReport>("get_balancesheet", {
+          journalFile: selectedJournalFile,
+          options,
+        });
 
         setBalanceSheetData(balanceSheetReport);
       } catch (error) {
@@ -229,15 +207,11 @@ export function BalanceSheetTab({
   }, [searchQuery, dateRange, fetchBalanceSheet]);
 
   const renderSubreport = (subreport: BalanceSheetSubreport) => {
-    const visibleRows = subreport.rows.filter((row) =>
-      isAccountVisible(row.account),
-    );
+    const visibleRows = subreport.rows.filter((row) => isAccountVisible(row.account));
 
     return (
       <div key={subreport.name} className="mb-6">
-        <h3 className="text-lg font-semibold mb-2 text-primary">
-          {subreport.name}
-        </h3>
+        <h3 className="text-lg font-semibold mb-2 text-primary">{subreport.name}</h3>
         <div className="bg-muted rounded-md p-3 overflow-x-auto">
           {visibleRows.length === 0 ? (
             <div className="flex justify-center items-center py-4">
@@ -249,18 +223,12 @@ export function BalanceSheetTab({
               {subreport.dates.length > 1 && (
                 <div className="flex mb-2 border-b border-muted-foreground/20 pb-2">
                   <div
-                    className={cn(
-                      "flex-1 min-w-[200px] font-medium text-sm",
-                      balanceDisplayMode === "flat" && "px-2",
-                    )}
+                    className={cn("flex-1 min-w-[200px] font-medium text-sm", balanceDisplayMode === "flat" && "px-2")}
                   >
                     Account
                   </div>
                   {subreport.dates.map((periodDate, index) => (
-                    <div
-                      key={index}
-                      className="w-24 text-right font-medium text-sm px-1"
-                    >
+                    <div key={index} className="w-24 text-right font-medium text-sm px-1">
                       {new Date(periodDate.start).toLocaleDateString("en-US", {
                         month: "short",
                         year: periodMode === "yearly" ? "2-digit" : undefined,
@@ -274,12 +242,8 @@ export function BalanceSheetTab({
               {/* Account rows */}
               <div className="space-y-1">
                 {visibleRows.map((row, index) => {
-                  const indent =
-                    balanceDisplayMode === "tree"
-                      ? (row.account.match(/:/g) || []).length
-                      : 0;
-                  const hasChildAccounts =
-                    balanceDisplayMode === "tree" && hasChildren(row.account);
+                  const indent = balanceDisplayMode === "tree" ? (row.account.match(/:/g) || []).length : 0;
+                  const hasChildAccounts = balanceDisplayMode === "tree" && hasChildren(row.account);
 
                   return (
                     <div
@@ -315,10 +279,7 @@ export function BalanceSheetTab({
                           </>
                         )}
                         {hasChildAccounts ? (
-                          <button
-                            onClick={() => toggleAccount(row.account)}
-                            className="hover:underline text-left"
-                          >
+                          <button onClick={() => toggleAccount(row.account)} className="hover:underline text-left">
                             {row.display_name || row.account}
                           </button>
                         ) : (
@@ -330,19 +291,11 @@ export function BalanceSheetTab({
                       {subreport.dates.length > 1 ? (
                         // Periodic amounts
                         row.amounts.map((periodAmounts, periodIndex) => (
-                          <div
-                            key={periodIndex}
-                            className="w-24 text-right px-1"
-                          >
+                          <div key={periodIndex} className="w-24 text-right px-1">
                             {periodAmounts
-                              .filter(
-                                (amount) =>
-                                  Number.parseFloat(amount.quantity) !== 0,
-                              )
+                              .filter((amount) => Number.parseFloat(amount.quantity) !== 0)
                               .map((amount, amountIndex) => {
-                                const isExpandedParent =
-                                  hasChildAccounts &&
-                                  expandedAccounts.has(row.account);
+                                const isExpandedParent = hasChildAccounts && expandedAccounts.has(row.account);
                                 return (
                                   <div
                                     key={amountIndex}
@@ -359,14 +312,9 @@ export function BalanceSheetTab({
                         // Single period amounts
                         <div className="flex flex-col items-end">
                           {row.amounts[0]
-                            ?.filter(
-                              (amount) =>
-                                Number.parseFloat(amount.quantity) !== 0,
-                            )
+                            ?.filter((amount) => Number.parseFloat(amount.quantity) !== 0)
                             .map((amount, amountIndex) => {
-                              const isExpandedParent =
-                                hasChildAccounts &&
-                                expandedAccounts.has(row.account);
+                              const isExpandedParent = hasChildAccounts && expandedAccounts.has(row.account);
                               return (
                                 <span
                                   key={amountIndex}
@@ -388,47 +336,28 @@ export function BalanceSheetTab({
               {subreport.totals && (
                 <div className="mt-2 pt-2 border-t border-muted-foreground/20">
                   <div className="flex items-start text-sm font-semibold px-2">
-                    <div className="flex-1 min-w-[200px] mr-2">
-                      Total {subreport.name}
-                    </div>
+                    <div className="flex-1 min-w-[200px] mr-2">Total {subreport.name}</div>
                     {subreport.dates.length > 1 ? (
                       // Periodic totals
-                      subreport.totals.amounts.map(
-                        (periodAmounts, periodIndex) => (
-                          <div
-                            key={periodIndex}
-                            className="w-24 text-right px-1"
-                          >
-                            {periodAmounts
-                              .filter(
-                                (amount) =>
-                                  Number.parseFloat(amount.quantity) !== 0,
-                              )
-                              .map((amount, amountIndex) => (
-                                <div
-                                  key={amountIndex}
-                                  className="font-mono text-xs"
-                                >
-                                  {amount.commodity}
-                                  {amount.quantity}
-                                </div>
-                              ))}
-                          </div>
-                        ),
-                      )
+                      subreport.totals.amounts.map((periodAmounts, periodIndex) => (
+                        <div key={periodIndex} className="w-24 text-right px-1">
+                          {periodAmounts
+                            .filter((amount) => Number.parseFloat(amount.quantity) !== 0)
+                            .map((amount, amountIndex) => (
+                              <div key={amountIndex} className="font-mono text-xs">
+                                {amount.commodity}
+                                {amount.quantity}
+                              </div>
+                            ))}
+                        </div>
+                      ))
                     ) : (
                       // Single period totals
                       <div className="flex flex-col items-end">
                         {subreport.totals.amounts[0]
-                          ?.filter(
-                            (amount) =>
-                              Number.parseFloat(amount.quantity) !== 0,
-                          )
+                          ?.filter((amount) => Number.parseFloat(amount.quantity) !== 0)
                           .map((amount, amountIndex) => (
-                            <span
-                              key={amountIndex}
-                              className="font-mono text-xs"
-                            >
+                            <span key={amountIndex} className="font-mono text-xs">
                               {amount.commodity}
                               {amount.quantity}
                             </span>
@@ -453,34 +382,19 @@ export function BalanceSheetTab({
 
         <div className="flex flex-col space-y-2 mt-2">
           <div className="flex flex-row gap-2 items-center">
-            <label className="text-sm font-medium text-muted-foreground block w-16">
-              Display
-            </label>
-            <ToggleButtonGroup
-              selectedKeys={[balanceDisplayMode]}
-              onSelectionChange={handleBalanceDisplayMode}
-            >
-              <Toggle
-                id="flat"
-                size="xs"
-                className="text-xs font-normal text-muted-foreground"
-              >
+            <label className="text-sm font-medium text-muted-foreground block w-16">Display</label>
+            <ToggleButtonGroup selectedKeys={[balanceDisplayMode]} onSelectionChange={handleBalanceDisplayMode}>
+              <Toggle id="flat" size="xs" className="text-xs font-normal text-muted-foreground">
                 Flat
               </Toggle>
-              <Toggle
-                id="tree"
-                size="xs"
-                className="text-xs font-normal text-muted-foreground"
-              >
+              <Toggle id="tree" size="xs" className="text-xs font-normal text-muted-foreground">
                 Tree
               </Toggle>
             </ToggleButtonGroup>
           </div>
 
           <div className="flex flex-row gap-2 items-center">
-            <label className="text-sm font-medium text-muted-foreground block w-16">
-              Period
-            </label>
+            <label className="text-sm font-medium text-muted-foreground block w-16">Period</label>
             <ToggleButtonGroup
               selectedKeys={[periodMode]}
               onSelectionChange={handlePeriodMode}
@@ -515,20 +429,10 @@ export function BalanceSheetTab({
               <div className="flex items-center justify-between">
                 {balanceDisplayMode === "tree" && (
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={expandAll}
-                      className="text-xs"
-                    >
+                    <Button variant="outline" size="sm" onClick={expandAll} className="text-xs">
                       Expand All
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={collapseAll}
-                      className="text-xs"
-                    >
+                    <Button variant="outline" size="sm" onClick={collapseAll} className="text-xs">
                       Collapse All
                     </Button>
                   </div>
@@ -536,57 +440,36 @@ export function BalanceSheetTab({
               </div>
 
               {/* Render each subreport */}
-              {balanceSheetData.subreports.map((subreport) =>
-                renderSubreport(subreport),
-              )}
+              {balanceSheetData.subreports.map((subreport) => renderSubreport(subreport))}
 
               {/* Overall totals */}
               {balanceSheetData.totals && (
                 <div className="mt-6 pt-4 border-t border-border">
-                  <h3 className="text-lg font-semibold mb-2 text-primary">
-                    Net Worth
-                  </h3>
+                  <h3 className="text-lg font-semibold mb-2 text-primary">Net Worth</h3>
                   <div className="bg-muted rounded-md p-3">
                     <div className="flex items-start text-sm font-semibold px-2">
                       <div className="flex-1 min-w-[200px] mr-2">Total</div>
                       {balanceSheetData.dates.length > 1 ? (
                         // Periodic totals
-                        balanceSheetData.totals.amounts.map(
-                          (periodAmounts, periodIndex) => (
-                            <div
-                              key={periodIndex}
-                              className="w-24 text-right px-1"
-                            >
-                              {periodAmounts
-                                .filter(
-                                  (amount) =>
-                                    Number.parseFloat(amount.quantity) !== 0,
-                                )
-                                .map((amount, amountIndex) => (
-                                  <div
-                                    key={amountIndex}
-                                    className="font-mono text-xs"
-                                  >
-                                    {amount.commodity}
-                                    {amount.quantity}
-                                  </div>
-                                ))}
-                            </div>
-                          ),
-                        )
+                        balanceSheetData.totals.amounts.map((periodAmounts, periodIndex) => (
+                          <div key={periodIndex} className="w-24 text-right px-1">
+                            {periodAmounts
+                              .filter((amount) => Number.parseFloat(amount.quantity) !== 0)
+                              .map((amount, amountIndex) => (
+                                <div key={amountIndex} className="font-mono text-xs">
+                                  {amount.commodity}
+                                  {amount.quantity}
+                                </div>
+                              ))}
+                          </div>
+                        ))
                       ) : (
                         // Single period totals
                         <div className="flex flex-col items-end">
                           {balanceSheetData.totals.amounts[0]
-                            ?.filter(
-                              (amount) =>
-                                Number.parseFloat(amount.quantity) !== 0,
-                            )
+                            ?.filter((amount) => Number.parseFloat(amount.quantity) !== 0)
                             .map((amount, amountIndex) => (
-                              <span
-                                key={amountIndex}
-                                className="font-mono text-xs"
-                              >
+                              <span key={amountIndex} className="font-mono text-xs">
                                 {amount.commodity}
                                 {amount.quantity}
                               </span>

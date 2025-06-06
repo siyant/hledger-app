@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createDefaultAccountsOptions } from "@/types/hledger.types";
 import type { DateValue } from "@internationalized/date";
 import { invoke } from "@tauri-apps/api/core";
@@ -16,18 +10,11 @@ interface AccountsTabProps {
   selectedJournalFile: string;
 }
 
-export function AccountsTab({
-  searchQuery,
-  dateRange,
-  selectedJournalFile,
-}: AccountsTabProps) {
+export function AccountsTab({ searchQuery, dateRange, selectedJournalFile }: AccountsTabProps) {
   const [accounts, setAccounts] = useState<string[]>([]);
 
   const fetchAccounts = useCallback(
-    async (
-      query = "",
-      customRange: { start: DateValue; end: DateValue } | null = null,
-    ) => {
+    async (query = "", customRange: { start: DateValue; end: DateValue } | null = null) => {
       const options = createDefaultAccountsOptions();
 
       // Add the search query if provided
@@ -75,10 +62,7 @@ export function AccountsTab({
               <div className="bg-muted rounded-md p-3">
                 <ul className="space-y-1">
                   {accounts.map((account, index) => (
-                    <li
-                      key={index}
-                      className="text-sm hover:bg-muted-foreground/10 rounded px-2 py-1"
-                    >
+                    <li key={index} className="text-sm hover:bg-muted-foreground/10 rounded px-2 py-1">
                       {account}
                     </li>
                   ))}
