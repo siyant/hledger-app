@@ -28,6 +28,9 @@ bun run tauri:build
 
 # Run linting
 bun run lint
+
+# Format code with Biome (run after completing tasks)
+bun run format
 ```
 
 ### Testing
@@ -70,6 +73,27 @@ The project uses `ts-rs` to generate TypeScript types from Rust structs:
 2. Run `cargo test export_bindings` to generate TypeScript files
 3. Import and re-export types in `app/src/types/hledger.types.ts`
 
+## Code Quality
+
+### Formatting
+
+This project uses Biome for code formatting with a line width of 120 characters. **ALWAYS run formatting after completing any task that modifies TypeScript/JavaScript/JSON files:**
+
+```bash
+cd app
+bun run format
+```
+
+For Rust code formatting:
+
+```bash
+cd hledger-lib
+cargo fmt
+
+cd app/src-tauri
+cargo fmt
+```
+
 ## Common Tasks
 
 ### Adding New hledger Commands
@@ -92,3 +116,7 @@ bunx shadcn@latest add component-name
 # For example:
 bunx shadcn@latest add button
 ```
+
+## Memories
+
+- **Date Range Handling**: hledger treats begin dates as inclusive but end dates as exclusive (transactions before the end date). However, users expect both start and end dates to be inclusive in the UI. Therefore, when passing date ranges from the frontend to hledger commands, add 1 day to the end date to make it inclusive for users. Example: user selects May 1-5 → send begin=May 1, end=May 6 to hledger
