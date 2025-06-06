@@ -25,7 +25,7 @@ export function AccountsTab({ searchQuery, dateRange, selectedJournalFile }: Acc
       // Add date range if provided (custom always used since presets populate it)
       if (customRange) {
         options.begin = customRange.start.toString();
-        options.end = customRange.end.toString();
+        options.end = customRange.end.add({ days: 1 }).toString();
       }
 
       try {

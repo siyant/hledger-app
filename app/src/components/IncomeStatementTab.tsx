@@ -134,7 +134,7 @@ export function IncomeStatementTab({ searchQuery, dateRange, selectedJournalFile
       // Add date range if provided (custom always used since presets populate it)
       if (customRange) {
         options.begin = customRange.start.toString();
-        options.end = customRange.end.toString();
+        options.end = customRange.end.add({ days: 1 }).toString();
       }
 
       // Set period mode
