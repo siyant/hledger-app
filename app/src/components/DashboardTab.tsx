@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import {
   type BalanceSheetReport,
   type IncomeStatementReport,
@@ -8,6 +9,7 @@ import {
 import type { DateValue } from "@internationalized/date";
 import { invoke } from "@tauri-apps/api/core";
 import { useCallback, useEffect, useState } from "react";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 interface DashboardTabProps {
   searchQuery: string;
@@ -137,11 +139,23 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
   const fetchYearlyMonthlyExpenses = useCallback(async () => {
     const options = createDefaultIncomeStatementOptions();
 
-    // Set date range for current year
-    const currentYear = new Date().getFullYear();
-    options.begin = `${currentYear}-01-01`;
+    // Set date range for last 12 months
+    const today = new Date();
+    const twelveMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 11, 1);
+
+    // Format dates as YYYY-MM-DD
+    const formatDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+    options.begin = formatDate(twelveMonthsAgo);
     // Add 1 day to make end date inclusive for user but exclusive for hledger
-    options.end = `${currentYear + 1}-01-01`;
+    const todayPlusOne = new Date(today);
+    todayPlusOne.setDate(todayPlusOne.getDate() + 1);
+    options.end = formatDate(todayPlusOne);
 
     // Set monthly period to get data for each month
     options.monthly = true;
@@ -161,7 +175,7 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
 
       setYearlyExpensesData(incomeStatementReport);
     } catch (error) {
-      console.error("Failed to fetch yearly monthly expenses:", error);
+      console.error("Failed to fetch last 12 months expenses:", error);
       setYearlyExpensesData(null);
     }
   }, [selectedJournalFile]);
@@ -302,13 +316,84 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
   const yearlyMonthlyExpenses = getYearlyMonthlyExpenses();
   const historicalNetWorth = getHistoricalNetWorth();
 
+  // Chart configuration for monthly expenses
+  const monthlyExpensesChartConfig = {
+    expenses: {
+      label: "Expenses",
+      color: "hsl(var(--chart-1))",
+    },
+  } satisfies ChartConfig;
+
+  // Chart configuration for historical net worth
+  const historicalNetWorthChartConfig = {
+    netWorth: {
+      label: "Net Worth",
+      color: "hsl(var(--chart-2))",
+    },
+  } satisfies ChartConfig;
+
+  // Transform yearly monthly expenses data for the chart
+  const getMonthlyExpensesChartData = () => {
+    return yearlyMonthlyExpenses.map((monthData) => {
+      // Get the primary amount (first non-zero amount, typically USD)
+      const primaryAmount = monthData.amounts[0];
+      const amount = primaryAmount ? Math.abs(Number.parseFloat(primaryAmount.quantity)) : 0;
+
+      // Parse the date to get proper month/year display
+      const monthDate = new Date(monthData.date);
+      const monthName = monthDate.toLocaleDateString("en-US", {
+        month: "short",
+      });
+      const fullMonthName = monthDate.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      });
+
+      return {
+        month: monthName, // Short month name for x-axis
+        expenses: amount,
+        fullMonth: fullMonthName, // Full month name with year for tooltip
+      };
+    });
+  };
+
+  const monthlyExpensesChartData = getMonthlyExpensesChartData();
+
+  // Transform historical net worth data for the chart
+  const getHistoricalNetWorthChartData = () => {
+    return historicalNetWorth.map((monthData) => {
+      // Get the first amount (ignoring additional currencies)
+      const primaryAmount = monthData.amounts[0];
+      const amount = primaryAmount ? Number.parseFloat(primaryAmount.quantity) : 0;
+
+      // Parse the date to get proper month/year display
+      const monthDate = new Date(monthData.date);
+      const monthName = monthDate.toLocaleDateString("en-US", { month: "short" });
+      const fullMonthName = monthDate.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      });
+
+      return {
+        month: monthName, // Short month name for x-axis
+        netWorth: amount,
+        fullMonth: fullMonthName, // Full month name with year for tooltip
+      };
+    });
+  };
+
+  const historicalNetWorthChartData = getHistoricalNetWorthChartData();
+
   // Console logs for charting preparation
   if (yearlyMonthlyExpenses.length > 0) {
-    console.log("Monthly Expenses Data for Charting:", yearlyMonthlyExpenses);
+    console.log(
+      `Last 12 Months Expenses Data for Charting:\n
+      ${JSON.stringify(yearlyMonthlyExpenses, null, 2)}`,
+    );
   }
 
   if (historicalNetWorth.length > 0) {
-    console.log("Historical Net Worth Data for Charting:", historicalNetWorth);
+    console.log(`Historical Net Worth Data for Charting:, ${JSON.stringify(historicalNetWorth, null, 2)}`);
   }
 
   // Get last month name for display
@@ -392,30 +477,31 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
 
         <Card className="md:col-span-2 lg:col-span-3">
           <CardHeader>
-            <CardTitle>Monthly Expenses This Year</CardTitle>
+            <CardTitle>Monthly Expenses (Last 12 Months)</CardTitle>
           </CardHeader>
           <CardContent>
-            {yearlyMonthlyExpenses.length > 0 ? (
-              <div className="space-y-2">
-                {yearlyMonthlyExpenses.map((monthData, index) => (
-                  <div key={index} className="flex justify-between items-center py-2 border-b border-muted">
-                    <div className="font-medium">{monthData.month}</div>
-                    <div className="space-y-1 text-right">
-                      {monthData.amounts.length > 0 ? (
-                        monthData.amounts.map((amount, amountIndex) => (
-                          <div key={amountIndex} className="font-mono text-sm">
-                            {amount.commodity}
-                            {amount.quantity}
-                          </div>
-                        ))
-                      ) : (
-                        <div className="text-sm text-muted-foreground">No expenses</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : null}
+            {monthlyExpensesChartData.length > 0 ? (
+              <ChartContainer config={monthlyExpensesChartConfig} className="min-h-[300px] w-full">
+                <BarChart accessibilityLayer data={monthlyExpensesChartData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        labelFormatter={(value) => {
+                          const item = monthlyExpensesChartData.find((d) => d.month === value);
+                          return item?.fullMonth || value;
+                        }}
+                        formatter={(value) => [`$${Number(value).toLocaleString()}`, "Expenses"]}
+                      />
+                    }
+                  />
+                  <Bar dataKey="expenses" fill="var(--color-expenses)" radius={4} />
+                </BarChart>
+              </ChartContainer>
+            ) : (
+              <div className="text-sm text-muted-foreground">No expense data available</div>
+            )}
           </CardContent>
         </Card>
 
@@ -424,27 +510,28 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
             <CardTitle>Historical Net Worth</CardTitle>
           </CardHeader>
           <CardContent>
-            {historicalNetWorth.length > 0 ? (
-              <div className="space-y-2">
-                {historicalNetWorth.map((monthData, index) => (
-                  <div key={index} className="flex justify-between items-center py-2 border-b border-muted">
-                    <div className="font-medium">{monthData.month}</div>
-                    <div className="space-y-1 text-right">
-                      {monthData.amounts.length > 0 ? (
-                        monthData.amounts.map((amount, amountIndex) => (
-                          <div key={amountIndex} className="font-mono text-sm">
-                            {amount.commodity}
-                            {amount.quantity}
-                          </div>
-                        ))
-                      ) : (
-                        <div className="text-sm text-muted-foreground">No data</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : null}
+            {historicalNetWorthChartData.length > 0 ? (
+              <ChartContainer config={historicalNetWorthChartConfig} className="min-h-[300px] w-full">
+                <BarChart accessibilityLayer data={historicalNetWorthChartData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        labelFormatter={(value) => {
+                          const item = historicalNetWorthChartData.find((d) => d.month === value);
+                          return item?.fullMonth || value;
+                        }}
+                        formatter={(value) => [`$${Number(value).toLocaleString()}`, "Net Worth"]}
+                      />
+                    }
+                  />
+                  <Bar dataKey="netWorth" fill="var(--color-netWorth)" radius={4} />
+                </BarChart>
+              </ChartContainer>
+            ) : (
+              <div className="text-sm text-muted-foreground">No net worth data available</div>
+            )}
           </CardContent>
         </Card>
       </div>
