@@ -25,15 +25,15 @@ new: boolean,
  */
 match_desc: string | null, 
 /**
- * Add file/line number tags to print output
+ * Rounding mode for amounts
  */
-location: boolean, 
+round: string | null, 
 /**
- * Begin date filter
+ * Begin date filter (inclusive: transactions on or after this date)
  */
 begin: string | null, 
 /**
- * End date filter
+ * End date filter (exclusive: transactions before this date)
  */
 end: string | null, 
 /**

@@ -69,9 +69,9 @@ pub struct IncomeStatementOptions {
     pub period: Option<String>,
 
     // Date filters
-    /// Begin date
+    /// Begin date (inclusive: transactions on or after this date)
     pub begin: Option<String>,
-    /// End date
+    /// End date (exclusive: transactions before this date)
     pub end: Option<String>,
 
     // Other filters

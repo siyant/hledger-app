@@ -45,11 +45,11 @@ drop: number | null,
  */
 depth: number | null, 
 /**
- * Begin date filter
+ * Begin date filter (inclusive: transactions on or after this date)
  */
 begin: string | null, 
 /**
- * End date filter
+ * End date filter (exclusive: transactions before this date)
  */
 end: string | null, 
 /**

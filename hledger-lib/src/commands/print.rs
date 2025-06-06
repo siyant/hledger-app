@@ -19,9 +19,9 @@ pub struct PrintOptions {
     pub match_desc: Option<String>,
     /// Rounding mode for amounts
     pub round: Option<String>,
-    /// Begin date filter
+    /// Begin date filter (inclusive: transactions on or after this date)
     pub begin: Option<String>,
-    /// End date filter
+    /// End date filter (exclusive: transactions before this date)
     pub end: Option<String>,
     /// Limit depth of accounts shown
     pub depth: Option<u32>,
@@ -443,14 +443,14 @@ mod tests {
     fn test_print_options_builder() {
         let options = PrintOptions::new()
             .explicit()
-            .location()
+            .round("soft")
             .begin("2024-01-01")
             .end("2024-12-31")
             .depth(2)
             .query("expenses");
 
         assert!(options.explicit);
-        assert!(options.location);
+        assert_eq!(options.round, Some("soft".to_string()));
         assert_eq!(options.begin, Some("2024-01-01".to_string()));
         assert_eq!(options.end, Some("2024-12-31".to_string()));
         assert_eq!(options.depth, Some(2));

@@ -28,9 +28,9 @@ pub struct AccountsOptions {
     pub drop: Option<u32>,
     /// Limit depth of accounts shown
     pub depth: Option<u32>,
-    /// Begin date filter
+    /// Begin date filter (inclusive: transactions on or after this date)
     pub begin: Option<String>,
-    /// End date filter
+    /// End date filter (exclusive: transactions before this date)
     pub end: Option<String>,
     /// Period expression
     pub period: Option<String>,

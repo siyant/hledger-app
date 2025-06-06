@@ -121,11 +121,11 @@ yearly: boolean,
  */
 period: string | null, 
 /**
- * Begin date
+ * Begin date (inclusive: transactions on or after this date)
  */
 begin: string | null, 
 /**
- * End date
+ * End date (exclusive: transactions before this date)
  */
 end: string | null, 
 /**
