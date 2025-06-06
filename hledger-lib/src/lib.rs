@@ -7,6 +7,7 @@ pub use commands::balancesheet::{get_balancesheet, BalanceSheetOptions, BalanceS
 pub use commands::incomestatement::{
     get_incomestatement, IncomeStatementOptions, IncomeStatementReport,
 };
+pub use commands::print::{get_print, PrintOptions, PrintReport};
 pub use error::HLedgerError;
 
 pub type Result<T> = std::result::Result<T, HLedgerError>;
