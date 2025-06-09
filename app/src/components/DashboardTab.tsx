@@ -523,6 +523,7 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
       const monthDate = new Date(monthData.date);
       const monthName = monthDate.toLocaleDateString("en-US", {
         month: "short",
+        year: "2-digit",
       });
       const fullMonthName = monthDate.toLocaleDateString("en-US", {
         month: "long",
@@ -648,7 +649,15 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
                       <ChartTooltipContent
                         labelFormatter={(value) => {
                           const item = monthlyExpensesChartData.find((d) => d.month === value);
-                          return item?.fullMonth || value;
+                          const totalExpense = item?.totalExpense ? Number(item.totalExpense).toLocaleString() : "";
+                          return (
+                            <div className="flex justify-between gap-2">
+                              <span>{item?.fullMonth || value}</span>
+                              {totalExpense && (
+                                <span className="font-mono font-medium tabular-nums">${totalExpense}</span>
+                              )}
+                            </div>
+                          );
                         }}
                         contentClassName="flex flex-col-reverse"
                       />
@@ -707,7 +716,13 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
                       <ChartTooltipContent
                         labelFormatter={(value) => {
                           const item = historicalNetWorthChartData.find((d) => d.month === value);
-                          return item?.fullMonth || value;
+                          const netWorth = item?.netWorth ? Number(item.netWorth).toLocaleString() : "";
+                          return (
+                            <div className="flex justify-between gap-2">
+                              <span>{item?.fullMonth || value}</span>
+                              {netWorth && <span className="font-mono font-medium tabular-nums">${netWorth}</span>}
+                            </div>
+                          );
                         }}
                         contentClassName="flex flex-col-reverse"
                       />
@@ -731,8 +746,8 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
                         stackId="networth"
                         fill={`var(--color-${sanitizedName})`}
                       >
-                        {/* Add label on the first asset category (topmost positive bar) */}
-                        {index === 0 && (
+                        {/* Add label on the first asset category (topmost positive bar) - only if 12 months or less */}
+                        {index === 0 && historicalNetWorthChartData.length <= 12 && (
                           <LabelList
                             position="top"
                             offset={12}
