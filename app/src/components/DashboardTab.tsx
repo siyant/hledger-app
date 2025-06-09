@@ -16,7 +16,7 @@ import {
 import type { DateValue } from "@internationalized/date";
 import { invoke } from "@tauri-apps/api/core";
 import { useCallback, useEffect, useState } from "react";
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, LabelList, ReferenceLine, XAxis } from "recharts";
 
 interface DashboardTabProps {
   searchQuery: string;
@@ -197,8 +197,11 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
     // Set monthly period to get data for each month
     options.monthly = true;
 
-    // Set depth to 1 for summary view
-    options.depth = 1;
+    // Set depth to 2 for assets/liabilities breakdown
+    options.depth = 2;
+
+    // Drop 1 level to remove the "assets" or "liabilities" parent
+    options.drop = 1;
 
     // Keep it flat for simple display
     options.flat = true;
@@ -212,7 +215,6 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
         journalFile: selectedJournalFile,
         options,
       });
-
       setHistoricalNetWorthData(balanceSheetReport);
     } catch (error) {
       console.error("Failed to fetch historical net worth:", error);
@@ -296,20 +298,20 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
 
         // Remove "expenses:" prefix if present
         if (categoryName.startsWith("expenses:")) {
-          categoryName = categoryName.substring(9); // Remove "expenses:" prefix
+          categoryName = categoryName.substring(9);
         }
 
         const amounts = row.amounts[index] || [];
         const primaryAmount = amounts.find((amount) => Number.parseFloat(amount.quantity) !== 0);
         if (primaryAmount) {
-          categories[categoryName] = Math.abs(Number.parseFloat(primaryAmount.quantity));
+          categories[categoryName] = Math.round(Number.parseFloat(primaryAmount.quantity));
         }
       });
 
       // Get total expenses for this month from the subreport totals
       const totalAmounts = expensesSubreport.totals?.amounts?.[index] || [];
       const totalExpenseAmount = totalAmounts.find((amount) => Number.parseFloat(amount.quantity) !== 0);
-      const totalExpense = totalExpenseAmount ? Math.abs(Number.parseFloat(totalExpenseAmount.quantity)) : 0;
+      const totalExpense = totalExpenseAmount ? Math.round(Number.parseFloat(totalExpenseAmount.quantity)) : 0;
 
       return {
         month: monthName,
@@ -320,23 +322,77 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
     });
   };
 
-  // Extract historical net worth from balance sheet data
+  // Extract historical net worth from balance sheet data with assets/liabilities breakdown
   const getHistoricalNetWorth = () => {
-    if (!historicalNetWorthData?.totals?.amounts || !historicalNetWorthData.dates) return [];
+    if (!historicalNetWorthData?.subreports || !historicalNetWorthData.dates) return [];
 
-    // Map each month's data with month name and net worth total
+    // Find assets and liabilities subreports
+    const assetsSubreport = historicalNetWorthData.subreports.find(
+      (subreport) => subreport.name.toLowerCase() === "assets",
+    );
+    const liabilitiesSubreport = historicalNetWorthData.subreports.find(
+      (subreport) => subreport.name.toLowerCase() === "liabilities",
+    );
+
+    if (!assetsSubreport && !liabilitiesSubreport) return [];
+
+    // Map each month's data with month name and account breakdowns
     return historicalNetWorthData.dates.map((date, index) => {
       const monthDate = new Date(date.start);
       const monthName = monthDate.toLocaleDateString("en-US", {
         month: "long",
         year: "numeric",
       });
-      const amounts = historicalNetWorthData.totals.amounts[index] || [];
-      const nonZeroAmounts = amounts.filter((amount) => Number.parseFloat(amount.quantity) !== 0);
+
+      // Extract assets categories and their amounts for this month
+      const assetCategories: { [key: string]: number } = {};
+      if (assetsSubreport?.rows) {
+        assetsSubreport.rows.forEach((row) => {
+          let categoryName = row.display_name || row.account || "Unknown";
+
+          // Remove "assets:" prefix if present
+          if (categoryName.startsWith("assets:")) {
+            categoryName = categoryName.substring(7);
+          }
+
+          const amounts = row.amounts[index] || [];
+          const primaryAmount = amounts.find((amount) => Number.parseFloat(amount.quantity) !== 0);
+          if (primaryAmount) {
+            assetCategories[categoryName] = Math.round(Number.parseFloat(primaryAmount.quantity));
+          }
+        });
+      }
+
+      // Extract liabilities categories and their amounts for this month
+      const liabilityCategories: { [key: string]: number } = {};
+      if (liabilitiesSubreport?.rows) {
+        liabilitiesSubreport.rows.forEach((row) => {
+          let categoryName = row.display_name || row.account || "Unknown";
+
+          // Remove "liabilities:" prefix if present
+          if (categoryName.startsWith("liabilities:")) {
+            categoryName = categoryName.substring(12);
+          }
+
+          const amounts = row.amounts[index] || [];
+          const primaryAmount = amounts.find((amount) => Number.parseFloat(amount.quantity) !== 0);
+          if (primaryAmount) {
+            // Balance sheet shows liabilities as positive, but we need them negative for displaying
+            liabilityCategories[categoryName] = -Math.round(Number.parseFloat(primaryAmount.quantity));
+          }
+        });
+      }
+
+      // Get net worth total
+      const totalAmounts = historicalNetWorthData.totals?.amounts?.[index] || [];
+      const totalAmount = totalAmounts.find((amount) => Number.parseFloat(amount.quantity) !== 0);
+      const netWorth = totalAmount ? Math.round(Number.parseFloat(totalAmount.quantity)) : 0;
 
       return {
         month: monthName,
-        amounts: nonZeroAmounts,
+        assetCategories,
+        liabilityCategories,
+        netWorth,
         date: date.start,
       };
     });
@@ -361,6 +417,30 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
 
   const expenseCategories = getAllExpenseCategories();
 
+  // Get all unique asset and liability categories for chart configuration
+  const getAllAssetCategories = () => {
+    const categories = new Set<string>();
+    historicalNetWorth.forEach((monthData) => {
+      Object.keys(monthData.assetCategories || {}).forEach((category) => {
+        categories.add(category);
+      });
+    });
+    return Array.from(categories).sort();
+  };
+
+  const getAllLiabilityCategories = () => {
+    const categories = new Set<string>();
+    historicalNetWorth.forEach((monthData) => {
+      Object.keys(monthData.liabilityCategories || {}).forEach((category) => {
+        categories.add(category);
+      });
+    });
+    return Array.from(categories).sort();
+  };
+
+  const assetCategories = getAllAssetCategories();
+  const liabilityCategories = getAllLiabilityCategories();
+
   // Sanitize category names for CSS variables
   const sanitizeCategoryName = (category: string) => {
     return category.replace(/[^a-zA-Z0-9]/g, "_");
@@ -377,13 +457,32 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
     return config;
   }, {} as ChartConfig);
 
-  // Chart configuration for historical net worth
-  const historicalNetWorthChartConfig = {
-    netWorth: {
-      label: "Net Worth",
-      color: "hsl(var(--chart-2))",
-    },
-  } satisfies ChartConfig;
+  // Chart configuration for historical net worth with assets and liabilities
+  const historicalNetWorthChartConfig = (() => {
+    const config: ChartConfig = {};
+
+    // Add asset categories (using green-ish colors)
+    assetCategories.forEach((category, index) => {
+      const sanitizedName = `asset_${sanitizeCategoryName(category)}`;
+      const chartNumber = (index % 5) + 1;
+      config[sanitizedName] = {
+        label: category,
+        color: `var(--chart-${chartNumber})`,
+      };
+    });
+
+    // Add liability categories (using red-ish colors)
+    liabilityCategories.forEach((category, index) => {
+      const sanitizedName = `liability_${sanitizeCategoryName(category)}`;
+      const chartNumber = (index % 5) + 1;
+      config[sanitizedName] = {
+        label: `liabilities:${category}`,
+        color: `var(--chart-${chartNumber})`,
+      };
+    });
+
+    return config;
+  })();
 
   // Transform yearly monthly expenses data for stacked chart
   const getMonthlyExpensesChartData = () => {
@@ -417,13 +516,9 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
 
   const monthlyExpensesChartData = getMonthlyExpensesChartData();
 
-  // Transform historical net worth data for the chart
+  // Transform historical net worth data for the stacked chart
   const getHistoricalNetWorthChartData = () => {
     return historicalNetWorth.map((monthData) => {
-      // Get the first amount (ignoring additional currencies)
-      const primaryAmount = monthData.amounts[0];
-      const amount = primaryAmount ? Number.parseFloat(primaryAmount.quantity) : 0;
-
       // Parse the date to get proper month/year display
       const monthDate = new Date(monthData.date);
       const monthName = monthDate.toLocaleDateString("en-US", {
@@ -434,11 +529,26 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
         year: "numeric",
       });
 
-      return {
-        month: monthName, // Short month name for x-axis
-        netWorth: amount,
-        fullMonth: fullMonthName, // Full month name with year for tooltip
+      // Create chart data with all categories
+      const chartData: any = {
+        month: monthName,
+        fullMonth: fullMonthName,
+        netWorth: monthData.netWorth || 0,
       };
+
+      // Add each asset category as a separate property
+      assetCategories.forEach((category) => {
+        const sanitizedName = `asset_${sanitizeCategoryName(category)}`;
+        chartData[sanitizedName] = monthData.assetCategories?.[category] || 0;
+      });
+
+      // Add each liability category as a separate property (as negative values for proper stacking)
+      liabilityCategories.forEach((category) => {
+        const sanitizedName = `liability_${sanitizeCategoryName(category)}`;
+        chartData[sanitizedName] = monthData.liabilityCategories?.[category] || 0;
+      });
+
+      return chartData;
     });
   };
 
@@ -530,7 +640,7 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
           <CardContent>
             {monthlyExpensesChartData.length > 0 && expenseCategories.length > 0 ? (
               <ChartContainer config={monthlyExpensesChartConfig} className="min-h-[300px] w-full">
-                <BarChart accessibilityLayer data={monthlyExpensesChartData}>
+                <BarChart accessibilityLayer data={monthlyExpensesChartData} reverseStackOrder>
                   <CartesianGrid vertical={false} />
                   <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} />
                   <ChartTooltip
@@ -540,12 +650,12 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
                           const item = monthlyExpensesChartData.find((d) => d.month === value);
                           return item?.fullMonth || value;
                         }}
-                        formatter={(value, name) => `${name} $${Number(value).toLocaleString()}`}
+                        contentClassName="flex flex-col-reverse"
                       />
                     }
                   />
                   <ChartLegend
-                    content={<ChartLegendContent className="flex-col items-start gap-1" />}
+                    content={<ChartLegendContent className="flex-col-reverse items-start gap-1" />}
                     verticalAlign="middle"
                     align="right"
                     layout="vertical"
@@ -559,30 +669,15 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
                         dataKey={sanitizedName}
                         stackId="expenses"
                         fill={`var(--color-${sanitizedName})`}
-                        radius={
-                          index === 0
-                            ? [0, 0, 4, 4] // First bar: rounded bottom
-                            : index === expenseCategories.length - 1
-                              ? [4, 4, 0, 0] // Last bar: rounded top
-                              : [0, 0, 0, 0] // Middle bars: no rounding
-                        }
                       >
-                        {index === expenseCategories.length - 1 && (
+                        {index === 0 && (
                           <LabelList
                             position="top"
                             offset={12}
-                            className="fill-foreground"
+                            className="fill-foreground font-mono"
                             fontSize={12}
                             dataKey="totalExpense"
                             formatter={(value) => `$${Number(value).toLocaleString()}`}
-                            // content={(props) => {
-                            //   console.log("props.value :>>", props.);
-                            //   const { payload } = props;
-                            //   if (payload?.totalExpense) {
-                            //     return `$${Math.round(payload.totalExpense).toLocaleString()}`;
-                            //   }
-                            //   return null;
-                            // }}
                           />
                         )}
                       </Bar>
@@ -601,9 +696,10 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
             <CardTitle>Historical Net Worth</CardTitle>
           </CardHeader>
           <CardContent>
-            {historicalNetWorthChartData.length > 0 ? (
+            {historicalNetWorthChartData.length > 0 &&
+            (assetCategories.length > 0 || liabilityCategories.length > 0) ? (
               <ChartContainer config={historicalNetWorthChartConfig} className="min-h-[300px] w-full">
-                <BarChart accessibilityLayer data={historicalNetWorthChartData}>
+                <BarChart accessibilityLayer data={historicalNetWorthChartData} stackOffset="sign" reverseStackOrder>
                   <CartesianGrid vertical={false} />
                   <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} />
                   <ChartTooltip
@@ -613,11 +709,54 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
                           const item = historicalNetWorthChartData.find((d) => d.month === value);
                           return item?.fullMonth || value;
                         }}
-                        formatter={(value) => [`$${Number(value).toLocaleString()}`, "Net Worth"]}
+                        contentClassName="flex flex-col-reverse"
                       />
                     }
                   />
-                  <Bar dataKey="netWorth" fill="var(--color-netWorth)" radius={4} />
+                  <ChartLegend
+                    content={<ChartLegendContent className="flex-col-reverse items-start gap-1" />}
+                    verticalAlign="middle"
+                    align="right"
+                    layout="vertical"
+                    wrapperStyle={{ paddingLeft: "20px" }}
+                  />
+                  <ReferenceLine y={0} stroke="#000" />
+                  {/* Render asset categories */}
+                  {assetCategories.map((category, index) => {
+                    const sanitizedName = `asset_${sanitizeCategoryName(category)}`;
+                    return (
+                      <Bar
+                        key={sanitizedName}
+                        dataKey={sanitizedName}
+                        stackId="networth"
+                        fill={`var(--color-${sanitizedName})`}
+                      >
+                        {/* Add label on the first asset category (topmost positive bar) */}
+                        {index === 0 && (
+                          <LabelList
+                            position="top"
+                            offset={12}
+                            className="fill-foreground font-mono"
+                            fontSize={12}
+                            dataKey="netWorth"
+                            formatter={(value) => `$${Number(value).toLocaleString()}`}
+                          />
+                        )}
+                      </Bar>
+                    );
+                  })}
+                  {/* Render liability categories */}
+                  {liabilityCategories.map((category, index) => {
+                    const sanitizedName = `liability_${sanitizeCategoryName(category)}`;
+                    return (
+                      <Bar
+                        key={sanitizedName}
+                        dataKey={sanitizedName}
+                        stackId="networth"
+                        fill={`var(--color-${sanitizedName})`}
+                      />
+                    );
+                  })}
                 </BarChart>
               </ChartContainer>
             ) : (

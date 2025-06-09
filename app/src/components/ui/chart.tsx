@@ -101,6 +101,7 @@ function ChartTooltipContent({
   label,
   labelFormatter,
   labelClassName,
+  contentClassName,
   formatter,
   color,
   nameKey,
@@ -110,6 +111,7 @@ function ChartTooltipContent({
     hideLabel?: boolean;
     hideIndicator?: boolean;
     indicator?: "line" | "dot" | "dashed";
+    contentClassName?: string | undefined;
     nameKey?: string;
     labelKey?: string;
   }) {
@@ -151,7 +153,7 @@ function ChartTooltipContent({
       )}
     >
       {!nestLabel ? tooltipLabel : null}
-      <div className="grid gap-1.5">
+      <div className={cn("grid gap-1.5", contentClassName)}>
         {payload.map((item, index) => {
           const key = `${nameKey || item.name || item.dataKey || "value"}`;
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
