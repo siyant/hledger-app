@@ -1,5 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import {
   type BalanceSheetReport,
   type IncomeStatementReport,
@@ -9,7 +16,7 @@ import {
 import type { DateValue } from "@internationalized/date";
 import { invoke } from "@tauri-apps/api/core";
 import { useCallback, useEffect, useState } from "react";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
 
 interface DashboardTabProps {
   searchQuery: string;
@@ -160,8 +167,11 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
     // Set monthly period to get data for each month
     options.monthly = true;
 
-    // Set depth to 1 for summary view
-    options.depth = 1;
+    // Set depth to 2 to get expense categories
+    options.depth = 2;
+
+    // Drop 1 level to remove the "expenses" parent
+    options.drop = 1;
 
     // Keep it flat for simple display
     options.flat = true;
@@ -260,7 +270,7 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
     return expensesSubreport.totals.amounts[0].filter((amount) => Number.parseFloat(amount.quantity) !== 0);
   };
 
-  // Extract yearly monthly expenses from income statement data
+  // Extract yearly monthly expenses from income statement data with categories
   const getYearlyMonthlyExpenses = () => {
     if (!yearlyExpensesData?.subreports) return [];
 
@@ -269,20 +279,42 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
       (subreport) => subreport.name.toLowerCase() === "expenses",
     );
 
-    if (!expensesSubreport?.totals?.amounts || !yearlyExpensesData.dates) return [];
+    if (!expensesSubreport?.rows || !yearlyExpensesData.dates) return [];
 
-    // Map each month's data with month name and total
+    // Map each month's data with month name and category breakdowns
     return yearlyExpensesData.dates.map((date, index) => {
       const monthDate = new Date(date.start);
       const monthName = monthDate.toLocaleDateString("en-US", {
         month: "long",
       });
-      const amounts = expensesSubreport.totals.amounts[index] || [];
-      const nonZeroAmounts = amounts.filter((amount) => Number.parseFloat(amount.quantity) !== 0);
+
+      // Extract categories and their amounts for this month
+      const categories: { [key: string]: number } = {};
+
+      expensesSubreport.rows.forEach((row) => {
+        let categoryName = row.display_name || row.account || "Unknown";
+
+        // Remove "expenses:" prefix if present
+        if (categoryName.startsWith("expenses:")) {
+          categoryName = categoryName.substring(9); // Remove "expenses:" prefix
+        }
+
+        const amounts = row.amounts[index] || [];
+        const primaryAmount = amounts.find((amount) => Number.parseFloat(amount.quantity) !== 0);
+        if (primaryAmount) {
+          categories[categoryName] = Math.abs(Number.parseFloat(primaryAmount.quantity));
+        }
+      });
+
+      // Get total expenses for this month from the subreport totals
+      const totalAmounts = expensesSubreport.totals?.amounts?.[index] || [];
+      const totalExpenseAmount = totalAmounts.find((amount) => Number.parseFloat(amount.quantity) !== 0);
+      const totalExpense = totalExpenseAmount ? Math.abs(Number.parseFloat(totalExpenseAmount.quantity)) : 0;
 
       return {
         month: monthName,
-        amounts: nonZeroAmounts,
+        categories,
+        totalExpense,
         date: date.start,
       };
     });
@@ -316,13 +348,34 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
   const yearlyMonthlyExpenses = getYearlyMonthlyExpenses();
   const historicalNetWorth = getHistoricalNetWorth();
 
-  // Chart configuration for monthly expenses
-  const monthlyExpensesChartConfig = {
-    expenses: {
-      label: "Expenses",
-      color: "hsl(var(--chart-1))",
-    },
-  } satisfies ChartConfig;
+  // Get all unique expense categories for chart configuration
+  const getAllExpenseCategories = () => {
+    const categories = new Set<string>();
+    yearlyMonthlyExpenses.forEach((monthData) => {
+      Object.keys(monthData.categories || {}).forEach((category) => {
+        categories.add(category);
+      });
+    });
+    return Array.from(categories);
+  };
+
+  const expenseCategories = getAllExpenseCategories();
+
+  // Sanitize category names for CSS variables
+  const sanitizeCategoryName = (category: string) => {
+    return category.replace(/[^a-zA-Z0-9]/g, "_");
+  };
+
+  // Dynamic chart configuration for expense categories
+  const monthlyExpensesChartConfig = expenseCategories.reduce((config, category, index) => {
+    const chartNumber = (index % 5) + 1;
+    const sanitizedName = sanitizeCategoryName(category);
+    config[sanitizedName] = {
+      label: category,
+      color: `var(--chart-${chartNumber})`,
+    };
+    return config;
+  }, {} as ChartConfig);
 
   // Chart configuration for historical net worth
   const historicalNetWorthChartConfig = {
@@ -332,13 +385,9 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
     },
   } satisfies ChartConfig;
 
-  // Transform yearly monthly expenses data for the chart
+  // Transform yearly monthly expenses data for stacked chart
   const getMonthlyExpensesChartData = () => {
     return yearlyMonthlyExpenses.map((monthData) => {
-      // Get the primary amount (first non-zero amount, typically USD)
-      const primaryAmount = monthData.amounts[0];
-      const amount = primaryAmount ? Math.abs(Number.parseFloat(primaryAmount.quantity)) : 0;
-
       // Parse the date to get proper month/year display
       const monthDate = new Date(monthData.date);
       const monthName = monthDate.toLocaleDateString("en-US", {
@@ -349,11 +398,20 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
         year: "numeric",
       });
 
-      return {
-        month: monthName, // Short month name for x-axis
-        expenses: amount,
-        fullMonth: fullMonthName, // Full month name with year for tooltip
+      // Create chart data with all categories
+      const chartData: any = {
+        month: monthName,
+        fullMonth: fullMonthName,
+        totalExpense: monthData.totalExpense || 0,
       };
+
+      // Add each category as a separate property using sanitized names
+      expenseCategories.forEach((category) => {
+        const sanitizedName = sanitizeCategoryName(category);
+        chartData[sanitizedName] = monthData.categories?.[category] || 0;
+      });
+
+      return chartData;
     });
   };
 
@@ -368,7 +426,9 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
 
       // Parse the date to get proper month/year display
       const monthDate = new Date(monthData.date);
-      const monthName = monthDate.toLocaleDateString("en-US", { month: "short" });
+      const monthName = monthDate.toLocaleDateString("en-US", {
+        month: "short",
+      });
       const fullMonthName = monthDate.toLocaleDateString("en-US", {
         month: "long",
         year: "numeric",
@@ -383,18 +443,6 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
   };
 
   const historicalNetWorthChartData = getHistoricalNetWorthChartData();
-
-  // Console logs for charting preparation
-  if (yearlyMonthlyExpenses.length > 0) {
-    console.log(
-      `Last 12 Months Expenses Data for Charting:\n
-      ${JSON.stringify(yearlyMonthlyExpenses, null, 2)}`,
-    );
-  }
-
-  if (historicalNetWorth.length > 0) {
-    console.log(`Historical Net Worth Data for Charting:, ${JSON.stringify(historicalNetWorth, null, 2)}`);
-  }
 
   // Get last month name for display
   const getLastMonthName = () => {
@@ -480,7 +528,7 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
             <CardTitle>Monthly Expenses (Last 12 Months)</CardTitle>
           </CardHeader>
           <CardContent>
-            {monthlyExpensesChartData.length > 0 ? (
+            {monthlyExpensesChartData.length > 0 && expenseCategories.length > 0 ? (
               <ChartContainer config={monthlyExpensesChartConfig} className="min-h-[300px] w-full">
                 <BarChart accessibilityLayer data={monthlyExpensesChartData}>
                   <CartesianGrid vertical={false} />
@@ -492,11 +540,54 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
                           const item = monthlyExpensesChartData.find((d) => d.month === value);
                           return item?.fullMonth || value;
                         }}
-                        formatter={(value) => [`$${Number(value).toLocaleString()}`, "Expenses"]}
+                        formatter={(value, name) => `${name} $${Number(value).toLocaleString()}`}
                       />
                     }
                   />
-                  <Bar dataKey="expenses" fill="var(--color-expenses)" radius={4} />
+                  <ChartLegend
+                    content={<ChartLegendContent className="flex-col items-start gap-1" />}
+                    verticalAlign="middle"
+                    align="right"
+                    layout="vertical"
+                    wrapperStyle={{ paddingLeft: "20px" }}
+                  />
+                  {expenseCategories.map((category, index) => {
+                    const sanitizedName = sanitizeCategoryName(category);
+                    return (
+                      <Bar
+                        key={category}
+                        dataKey={sanitizedName}
+                        stackId="expenses"
+                        fill={`var(--color-${sanitizedName})`}
+                        radius={
+                          index === 0
+                            ? [0, 0, 4, 4] // First bar: rounded bottom
+                            : index === expenseCategories.length - 1
+                              ? [4, 4, 0, 0] // Last bar: rounded top
+                              : [0, 0, 0, 0] // Middle bars: no rounding
+                        }
+                      >
+                        {index === expenseCategories.length - 1 && (
+                          <LabelList
+                            position="top"
+                            offset={12}
+                            className="fill-foreground"
+                            fontSize={12}
+                            dataKey="totalExpense"
+                            formatter={(value) => `$${Number(value).toLocaleString()}`}
+                            // content={(props) => {
+                            //   console.log("props.value :>>", props.);
+                            //   const { payload } = props;
+                            //   if (payload?.totalExpense) {
+                            //     return `$${Math.round(payload.totalExpense).toLocaleString()}`;
+                            //   }
+                            //   return null;
+                            // }}
+                          />
+                        )}
+                      </Bar>
+                    );
+                  })}
                 </BarChart>
               </ChartContainer>
             ) : (
