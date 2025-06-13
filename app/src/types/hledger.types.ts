@@ -15,8 +15,13 @@ import type { PeriodicBalance } from "../../../hledger-lib/bindings/PeriodicBala
 import type { PeriodicBalanceRow } from "../../../hledger-lib/bindings/PeriodicBalanceRow.ts";
 import type { Price } from "../../../hledger-lib/bindings/Price.ts";
 import type { PrintOptions } from "../../../hledger-lib/bindings/PrintOptions.ts";
-import type { PrintReport } from "../../../hledger-lib/bindings/PrintReport.ts";
+import type { PrintTransaction } from "../../../hledger-lib/bindings/PrintTransaction.ts";
+import type { PrintPosting } from "../../../hledger-lib/bindings/PrintPosting.ts";
+import type { PrintAmount } from "../../../hledger-lib/bindings/PrintAmount.ts";
 import type { SimpleBalance } from "../../../hledger-lib/bindings/SimpleBalance.ts";
+
+// PrintReport is a type alias in Rust, so we define it here
+export type PrintReport = PrintTransaction[];
 
 export type {
   AccountsOptions,
@@ -36,7 +41,9 @@ export type {
   Amount,
   Price,
   PrintOptions,
-  PrintReport,
+  PrintTransaction,
+  PrintPosting,
+  PrintAmount,
 };
 
 // Utility functions for creating default instances
@@ -215,23 +222,16 @@ export function createDefaultPrintOptions(): PrintOptions {
   return {
     explicit: false,
     show_costs: false,
-    invert: false,
+    round: null,
     new: false,
     match_desc: null,
-    round: null,
     begin: null,
     end: null,
-    depth: null,
     unmarked: false,
     pending: false,
     cleared: false,
     real: false,
     empty: false,
-    cost: false,
-    market: false,
-    exchange: null,
-    value: null,
-    period: null,
     queries: [],
   };
 }

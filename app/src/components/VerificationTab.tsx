@@ -114,7 +114,7 @@ export default function VerificationTab({ selectedJournalFile }: VerificationTab
   };
 
   const renderUncategorizedTransactions = () => {
-    if (!uncategorizedTransactions || !uncategorizedTransactions.transactions) {
+    if (!uncategorizedTransactions) {
       return (
         <div className="flex justify-center items-center py-8">
           <p className="text-sm text-muted-foreground">No data found</p>
@@ -122,7 +122,7 @@ export default function VerificationTab({ selectedJournalFile }: VerificationTab
       );
     }
 
-    if (uncategorizedTransactions.transactions.length === 0) {
+    if (uncategorizedTransactions.length === 0) {
       return (
         <div className="flex justify-center items-center py-8">
           <p className="text-sm text-muted-foreground">No uncategorized transactions found</p>
@@ -133,31 +133,33 @@ export default function VerificationTab({ selectedJournalFile }: VerificationTab
     return (
       <div className="bg-muted rounded-md p-3">
         <div className="space-y-3">
-          {uncategorizedTransactions.transactions.map((transaction, index) => (
-            <div key={index} className="border border-muted-foreground/20 rounded p-2 hover:bg-muted-foreground/10">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <div className="font-medium text-sm">{transaction.tdescription}</div>
-                  <div className="text-xs text-muted-foreground">{transaction.tdate}</div>
+          {uncategorizedTransactions.map((transaction, index) => {
+            return (
+              <div key={index} className="rounded p-2 hover:bg-muted-foreground/10">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <div className="font-medium text-sm">{transaction.description}</div>
+                    <div className="text-xs text-muted-foreground">{transaction.date}</div>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  {transaction.postings?.map((posting, postingIndex) => (
+                    <div key={postingIndex} className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">{posting.account}</span>
+                      <span className="font-mono">
+                        {posting.amounts?.map((amount, amountIndex) => (
+                          <span key={amountIndex}>
+                            {amount.commodity}
+                            {amount.quantity}
+                          </span>
+                        ))}
+                      </span>
+                    </div>
+                  )) || <div>No postings found</div>}
                 </div>
               </div>
-              <div className="space-y-1">
-                {transaction.tpostings.map((posting, postingIndex) => (
-                  <div key={postingIndex} className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">{posting.paccount}</span>
-                    <span className="font-mono">
-                      {posting.pamount?.map((amount, amountIndex) => (
-                        <span key={amountIndex}>
-                          {amount.acommodity}
-                          {amount.aquantity.floatingPoint}
-                        </span>
-                      ))}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     );
