@@ -3,6 +3,6 @@ import type { BalanceAssertion } from "./BalanceAssertion";
 import type { PrintAmount } from "./PrintAmount";
 
 /**
- * Posting information in a transaction
+ * Posting structure
  */
-export type PrintPosting = { paccount: string, pamount: Array<PrintAmount>, pbalanceassertion: BalanceAssertion | null, pcomment: string, pdate: string | null, pdate2: string | null, poriginal: string | null, pstatus: string, ptags: Array<string>, ptransaction_: string, ptype: string, };
+export type PrintPosting = { account: string, amounts: Array<PrintAmount>, status: string, comment: string, tags: Array<[string, string]>, posting_type: string, date: string | null, date2: string | null, balance_assertion: BalanceAssertion | null, original: PrintPosting | null, transaction_index: string, };

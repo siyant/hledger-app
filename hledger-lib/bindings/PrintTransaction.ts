@@ -3,6 +3,6 @@ import type { PrintPosting } from "./PrintPosting";
 import type { SourcePosition } from "./SourcePosition";
 
 /**
- * Complete transaction from print command
+ * Transaction structure
  */
-export type PrintTransaction = { tcode: string, tcomment: string, tdate: string, tdate2: string | null, tdescription: string, tindex: number, tpostings: Array<PrintPosting>, tprecedingcomment: string, tsourcepos: Array<SourcePosition>, tstatus: string, ttags: Array<string>, };
+export type PrintTransaction = { index: number, date: string, date2: string | null, status: string, code: string, description: string, comment: string, tags: Array<[string, string]>, postings: Array<PrintPosting>, preceding_comment: string, source_positions: Array<SourcePosition>, };

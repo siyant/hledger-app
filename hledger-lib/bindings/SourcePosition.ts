@@ -3,4 +3,4 @@
 /**
  * Source position information
  */
-export type SourcePosition = { sourceColumn: number, sourceLine: number, sourceName: string, };
+export type SourcePosition = { line: number, column: number, file: string, };

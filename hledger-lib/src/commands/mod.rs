@@ -10,4 +10,4 @@ pub use balance::{get_balance, BalanceOptions, BalanceReport};
 pub use balancesheet::{get_balancesheet, BalanceSheetOptions, BalanceSheetReport};
 pub use cashflow::{get_cashflow, CashflowOptions, CashflowReport};
 pub use incomestatement::{get_incomestatement, IncomeStatementOptions, IncomeStatementReport};
-pub use print::{get_print, PrintOptions, PrintReport};
+pub use print::{get_print, PrintOptions, PrintReport, PrintTransaction};

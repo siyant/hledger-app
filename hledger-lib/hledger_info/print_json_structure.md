@@ -2,64 +2,64 @@
 
 This document explains the JSON structure returned by `hledger print --output-format json`.
 
-The print command returns a simple array of transaction objects, where each transaction represents a complete journal entry with all its postings.
+## Overview
+
+The print command returns an array of transaction objects, each containing full details about a transaction and its postings.
 
 ## Top-Level Structure
 
-The print command returns an array of transaction objects:
-
 ```json
 [
-  {...},  // Transaction 1
-  {...},  // Transaction 2
-  {...}   // Transaction 3
+  { /* transaction 1 */ },
+  { /* transaction 2 */ },
+  ...
 ]
 ```
 
 ## Transaction Structure
 
-Each transaction in the array is an object with the following fields:
+Each transaction in the array has the following structure:
 
 ```json
 {
-  "tcode": "",
-  "tcomment": "",
+  "tcode": "CODE123",
+  "tcomment": "\ntransaction comment\ntype: expense\n",
   "tdate": "2024-01-01",
   "tdate2": null,
-  "tdescription": "income",
+  "tdescription": "Cleared transaction with code",
   "tindex": 1,
   "tpostings": [...],
   "tprecedingcomment": "",
   "tsourcepos": [...],
-  "tstatus": "Unmarked",
-  "ttags": []
+  "tstatus": "Cleared",
+  "ttags": [["type", "expense"]]
 }
 ```
 
-### Transaction Field Descriptions
+### Transaction Fields
 
-- **`tcode`**: Transaction code (string) - Usually empty
-- **`tcomment`**: Transaction comment (string) - Comment on the same line as the transaction
-- **`tdate`**: Primary transaction date (string) - In YYYY-MM-DD format
-- **`tdate2`**: Secondary transaction date (string or null) - Optional secondary date
-- **`tdescription`**: Transaction description/payee (string)
-- **`tindex`**: Transaction index (number) - Position in the journal file
-- **`tpostings`**: Array of posting objects - All postings in this transaction
-- **`tprecedingcomment`**: Comment before the transaction (string)
-- **`tsourcepos`**: Array of source position objects - File location information
-- **`tstatus`**: Transaction status (string) - "Unmarked", "Pending", or "Cleared"
-- **`ttags`**: Array of transaction tags (strings)
+- **`tindex`**: Number - Transaction index (1-based)
+- **`tdate`**: String - Primary date in ISO format (YYYY-MM-DD)
+- **`tdate2`**: String | null - Secondary/auxiliary date (optional)
+- **`tstatus`**: String - Transaction status: "Unmarked", "Pending", or "Cleared"
+- **`tcode`**: String - Transaction code (optional, empty string if none)
+- **`tdescription`**: String - Transaction description/payee
+- **`tcomment`**: String - Transaction comment (includes newlines)
+- **`ttags`**: Array - Transaction tags as [name, value] pairs
+- **`tpostings`**: Array - List of postings (see Posting Structure below)
+- **`tprecedingcomment`**: String - Comment before the transaction
+- **`tsourcepos`**: Array - Source file positions (see Source Position Structure)
 
 ## Posting Structure
 
-Each posting in the `tpostings` array is an object:
+Each posting in the `tpostings` array has this structure:
 
 ```json
 {
   "paccount": "assets:bank:checking",
   "pamount": [...],
   "pbalanceassertion": null,
-  "pcomment": "",
+  "pcomment": "posting comment\n",
   "pdate": null,
   "pdate2": null,
   "poriginal": null,
@@ -70,23 +70,23 @@ Each posting in the `tpostings` array is an object:
 }
 ```
 
-### Posting Field Descriptions
+### Posting Fields
 
-- **`paccount`**: Account name (string)
-- **`pamount`**: Array of amount objects - Can have multiple amounts for multi-commodity postings
-- **`pbalanceassertion`**: Balance assertion (object or null) - If the posting includes a balance assertion
-- **`pcomment`**: Posting comment (string)
-- **`pdate`**: Posting-specific date override (string or null)
-- **`pdate2`**: Posting-specific secondary date override (string or null)
-- **`poriginal`**: Original posting text (string or null) - Preserved from source
-- **`pstatus`**: Posting status (string) - "Unmarked", "Pending", or "Cleared"
-- **`ptags`**: Array of posting tags (strings)
-- **`ptransaction_`**: Transaction reference (string) - Index of parent transaction
-- **`ptype`**: Posting type (string) - "RegularPosting", "VirtualPosting", or "BalancedVirtualPosting"
+- **`paccount`**: String - Account name
+- **`pamount`**: Array - Array of amount objects (see Amount Structure below)
+- **`pstatus`**: String - Posting status (can override transaction status)
+- **`pcomment`**: String - Posting comment
+- **`ptags`**: Array - Posting tags as [name, value] pairs
+- **`ptype`**: String - Posting type: "RegularPosting", "VirtualPosting", or "BalancedVirtualPosting"
+- **`pdate`**: String | null - Posting-specific date (rare)
+- **`pdate2`**: String | null - Posting-specific secondary date (rare)
+- **`pbalanceassertion`**: Object | null - Balance assertion details (see below)
+- **`poriginal`**: Object | null - Original posting for auto postings
+- **`ptransaction_`**: String - Parent transaction index as string
 
 ## Amount Structure
 
-Each amount in the `pamount` array is an object with commodity, quantity, and optional price:
+Each amount in the `pamount` array has this structure:
 
 ```json
 {
@@ -108,375 +108,202 @@ Each amount in the `pamount` array is an object with commodity, quantity, and op
 }
 ```
 
-### Amount Field Descriptions
+### Amount Fields
 
-- **`acommodity`**: Currency/commodity symbol (string) - e.g., "$", "EUR", "GOOG"
-- **`aprice`**: Price information (object or null) - For priced amounts like stocks
-- **`aquantity`**: Numeric quantity (object) - Contains the actual number
-- **`astyle`**: Display style (object) - Formatting information
+- **`acommodity`**: String - Currency/commodity symbol
+- **`aquantity`**: Object - Numeric quantity with decimal representation
+- **`aprice`**: Object | null - Price information for priced commodities
+- **`astyle`**: Object - Display style information
 
-### Quantity Structure
+For detailed documentation of Amount and Price structures, see [Balance JSON Structure Documentation](./balance_json_structure.md).
 
-The `aquantity` object contains:
+## Balance Assertion Structure
 
-- **`decimalMantissa`**: Internal representation (number) - Multiply by 10^-decimalPlaces for actual value
-- **`decimalPlaces`**: Number of decimal places (number)
-- **`floatingPoint`**: Human-readable value (number) - The actual decimal value
-
-### Amount Style Structure
-
-The `astyle` object contains:
-
-- **`ascommodityside`**: Symbol placement (string) - "L" for left, "R" for right
-- **`ascommodityspaced`**: Space between symbol and number (boolean)
-- **`asdecimalmark`**: Decimal separator (string or null) - e.g., "." or ","
-- **`asdigitgroups`**: Digit grouping character (string or null)
-- **`asprecision`**: Display precision (number)
-- **`asrounding`**: Rounding method (string) - e.g., "NoRounding", "HardRounding"
-
-## Price Structure
-
-For priced commodities (using @ or @@ syntax), the `aprice` field contains:
+When a posting includes a balance assertion (e.g., `= $100`), it appears as:
 
 ```json
 {
-  "contents": {
+  "baamount": {
     "acommodity": "$",
     "aprice": null,
-    "aquantity": {
-      "decimalMantissa": 15000,
-      "decimalPlaces": 2,
-      "floatingPoint": 150
-    },
+    "aquantity": {...},
     "astyle": {...}
   },
-  "tag": "UnitPrice"
+  "bainclusive": false,
+  "baposition": {
+    "sourceColumn": 34,
+    "sourceLine": 12,
+    "sourceName": "test.journal"
+  },
+  "batotal": false
 }
 ```
 
-### Price Field Descriptions
+### Balance Assertion Fields
 
-- **`contents`**: An amount object representing the price
-- **`tag`**: Price type (string) - "UnitPrice" (for @) or "TotalPrice" (for @@)
+- **`baamount`**: Object - Expected balance amount
+- **`bainclusive`**: Boolean - Whether assertion includes subaccounts
+- **`batotal`**: Boolean - Whether it's a total assertion
+- **`baposition`**: Object - Source position of the assertion
 
 ## Source Position Structure
 
-Each element in the `tsourcepos` array contains:
+Source positions indicate file locations:
 
 ```json
 {
   "sourceColumn": 1,
   "sourceLine": 1,
-  "sourceName": "/Users/siyan/workspace/test.journal"
+  "sourceName": "/path/to/file.journal"
 }
 ```
-
-### Source Position Field Descriptions
-
-- **`sourceColumn`**: Column number in source file (number)
-- **`sourceLine`**: Line number in source file (number)
-- **`sourceName`**: Full path to source file (string)
 
 ## Parsed Rust Structs
 
 ```rust
-/// Complete transaction from print command
-pub struct PrintTransaction {
-    /// Transaction code
-    pub code: String,
-    /// Transaction comment
-    pub comment: String,
-    /// Primary date (YYYY-MM-DD format)
-    pub date: String,
-    /// Secondary date
-    pub date2: Option<String>,
-    /// Description/payee
-    pub description: String,
-    /// Transaction index in journal
-    pub index: u32,
-    /// List of postings
-    pub postings: Vec<PrintPosting>,
-    /// Comment preceding the transaction
-    pub preceding_comment: String,
-    /// Source file positions
-    pub source_positions: Vec<SourcePosition>,
-    /// Transaction status
-    pub status: String,
-    /// Transaction tags
-    pub tags: Vec<String>,
-}
-
-/// Posting information in a transaction
-pub struct PrintPosting {
-    /// Account name
-    pub account: String,
-    /// List of amounts (multi-commodity support)
-    pub amount: Vec<PrintAmount>,
-    /// Balance assertion if present
-    pub balance_assertion: Option<BalanceAssertion>,
-    /// Posting comment
-    pub comment: String,
-    /// Posting-specific date override
-    pub date: Option<String>,
-    /// Posting-specific secondary date
-    pub date2: Option<String>,
-    /// Original posting text
-    pub original: Option<String>,
-    /// Posting status
-    pub status: String,
-    /// Posting tags
-    pub tags: Vec<String>,
-    /// Reference to parent transaction
-    pub transaction_index: String,
-    /// Posting type
-    pub posting_type: String,
-}
-
-/// Amount representation in print reports
-pub struct PrintAmount {
-    /// Commodity symbol
-    pub commodity: String,
-    /// Optional price information
-    pub price: Option<Box<PrintPrice>>,
-    /// Numeric quantity
-    pub quantity: Quantity,
-    /// Display style information
-    pub style: AmountStyle,
-}
-
-/// Price information for amounts
-pub struct PrintPrice {
-    /// The price as an amount
-    pub contents: Box<PrintAmount>,
-    /// Price type tag
-    pub tag: String,
-}
-
-/// Quantity representation
-pub struct Quantity {
-    /// Internal mantissa representation
-    pub decimal_mantissa: i64,
-    /// Number of decimal places
-    pub decimal_places: u8,
-    /// Floating point value
-    pub floating_point: f64,
-}
-
-/// Amount style information
-pub struct AmountStyle {
-    /// Symbol placement ("L" or "R")
-    pub commodity_side: String,
-    /// Whether symbol is spaced
-    pub commodity_spaced: bool,
-    /// Decimal mark character
-    pub decimal_mark: Option<String>,
-    /// Digit grouping character
-    pub digit_groups: Option<String>,
-    /// Display precision
-    pub precision: u8,
-    /// Rounding method
-    pub rounding: String,
+/// Options for the print command
+pub struct PrintOptions {
+    /// Show all amounts explicitly
+    pub explicit: bool,
+    /// Show transaction prices even with conversion postings
+    pub show_costs: bool,
+    /// Rounding mode
+    pub round: Option<String>,
+    /// Show only newer transactions
+    pub new: bool,
+    /// Fuzzy search for transaction by description
+    pub match_desc: Option<String>,
+    
+    // Date filters
+    pub begin: Option<String>,
+    pub end: Option<String>,
+    
+    // Status filters
+    pub unmarked: bool,
+    pub pending: bool,
+    pub cleared: bool,
+    
+    // Other filters
+    pub real: bool,
+    pub empty: bool,
+    
+    // Query patterns
+    pub queries: Vec<String>,
 }
 
 /// Source position information
 pub struct SourcePosition {
-    /// Column number
-    pub source_column: u32,
-    /// Line number
-    pub source_line: u32,
-    /// Source file path
-    pub source_name: String,
+    pub line: u32,
+    pub column: u32,
+    pub file: String,
 }
 
-/// Print report containing all transactions
-pub struct PrintReport {
-    pub transactions: Vec<PrintTransaction>,
+/// Balance assertion information
+pub struct BalanceAssertion {
+    pub amount: PrintAmount,
+    pub inclusive: bool,
+    pub total: bool,
+    pub position: SourcePosition,
+}
+
+/// Transaction structure
+pub struct PrintTransaction {
+    pub index: u32,
+    pub date: String,
+    pub date2: Option<String>,
+    pub status: String,
+    pub code: String,
+    pub description: String,
+    pub comment: String,
+    pub tags: Vec<(String, String)>,
+    pub postings: Vec<PrintPosting>,
+    pub preceding_comment: String,
+    pub source_positions: Vec<SourcePosition>,
+}
+
+/// Posting structure
+pub struct PrintPosting {
+    pub account: String,
+    pub amounts: Vec<PrintAmount>,
+    pub status: String,
+    pub comment: String,
+    pub tags: Vec<(String, String)>,
+    pub posting_type: String,
+    pub date: Option<String>,
+    pub date2: Option<String>,
+    pub balance_assertion: Option<BalanceAssertion>,
+    pub original: Option<Box<PrintPosting>>,
+    pub transaction_index: String,
+}
+
+/// Amount with inline style information
+pub struct PrintAmount {
+    pub commodity: String,
+    pub quantity: Decimal,
+    pub price: Option<Price>,
+    pub style: AmountStyle,
+}
+
+/// Amount display style
+pub struct AmountStyle {
+    pub commodity_side: String,
+    pub commodity_spaced: bool,
+    pub decimal_mark: Option<String>,
+    pub digit_groups: Option<DigitGroupStyle>,
+    pub precision: u16,
+    pub rounding: String,
 }
 ```
 
 ## Example Commands and Outputs
 
-### 1. Basic Print (All Transactions)
+### 1. Basic Print
 
 ```bash
 hledger -f test.journal print --output-format json
 ```
 
-Output structure:
-```json
-[
-  {
-    "tcode": "",
-    "tcomment": "",
-    "tdate": "2024-01-01",
-    "tdate2": null,
-    "tdescription": "income",
-    "tindex": 1,
-    "tpostings": [
-      {
-        "paccount": "assets:bank:checking",
-        "pamount": [
-          {
-            "acommodity": "$",
-            "aprice": null,
-            "aquantity": {
-              "decimalMantissa": 100,
-              "decimalPlaces": 0,
-              "floatingPoint": 100
-            },
-            "astyle": {
-              "ascommodityside": "L",
-              "ascommodityspaced": false,
-              "asdecimalmark": ".",
-              "asdigitgroups": null,
-              "asprecision": 0,
-              "asrounding": "NoRounding"
-            }
-          }
-        ],
-        "pbalanceassertion": null,
-        "pcomment": "",
-        "pdate": null,
-        "pdate2": null,
-        "poriginal": null,
-        "pstatus": "Unmarked",
-        "ptags": [],
-        "ptransaction_": "1",
-        "ptype": "RegularPosting"
-      },
-      {
-        "paccount": "income:salary",
-        "pamount": [
-          {
-            "acommodity": "$",
-            "aprice": null,
-            "aquantity": {
-              "decimalMantissa": -100,
-              "decimalPlaces": 0,
-              "floatingPoint": -100
-            },
-            "astyle": {
-              "ascommodityside": "L",
-              "ascommodityspaced": false,
-              "asdecimalmark": ".",
-              "asdigitgroups": null,
-              "asprecision": 0,
-              "asrounding": "NoRounding"
-            }
-          }
-        ],
-        "pbalanceassertion": null,
-        "pcomment": "",
-        "pdate": null,
-        "pdate2": null,
-        "poriginal": null,
-        "pstatus": "Unmarked",
-        "ptags": [],
-        "ptransaction_": "1",
-        "ptype": "RegularPosting"
-      }
-    ],
-    "tprecedingcomment": "",
-    "tsourcepos": [
-      {
-        "sourceColumn": 1,
-        "sourceLine": 1,
-        "sourceName": "/Users/siyan/workspace/finance/hledger-app/hledger-lib/tests/fixtures/test.journal"
-      },
-      {
-        "sourceColumn": 1,
-        "sourceLine": 4,
-        "sourceName": "/Users/siyan/workspace/finance/hledger-app/hledger-lib/tests/fixtures/test.journal"
-      }
-    ],
-    "tstatus": "Unmarked",
-    "ttags": []
-  }
-]
-```
+Returns array of all transactions with full details.
 
-### 2. Print with Date Filter
-
-```bash
-hledger -f test.journal print date:2024-01-01 --output-format json
-```
-
-Output contains only transactions matching the date filter.
-
-### 3. Print with Commodity Prices
-
-```bash
-hledger -f test.journal print --output-format json
-```
-
-For transactions with priced commodities:
-```json
-{
-  "tdate": "2024-01-10",
-  "tdescription": "Investment purchase",
-  "tpostings": [
-    {
-      "paccount": "assets:investments:fidelity:goog",
-      "pamount": [
-        {
-          "acommodity": "GOOG",
-          "aprice": {
-            "contents": {
-              "acommodity": "$",
-              "aprice": null,
-              "aquantity": {
-                "decimalMantissa": 15000,
-                "decimalPlaces": 2,
-                "floatingPoint": 150
-              },
-              "astyle": {...}
-            },
-            "tag": "UnitPrice"
-          },
-          "aquantity": {
-            "decimalMantissa": 2,
-            "decimalPlaces": 0,
-            "floatingPoint": 2
-          },
-          "astyle": {
-            "ascommodityside": "R",
-            "ascommodityspaced": true,
-            "asdecimalmark": null,
-            "asdigitgroups": null,
-            "asprecision": 0,
-            "asrounding": "NoRounding"
-          }
-        }
-      ],
-      ...
-    }
-  ],
-  ...
-}
-```
-
-### 4. Print with Explicit Amounts
+### 2. Print with Explicit Amounts
 
 ```bash
 hledger -f test.journal print --explicit --output-format json
 ```
 
-Output shows all amounts explicitly, including those that were implicit in the source journal.
+Shows all amounts explicitly, including those normally inferred.
 
-### 5. Print with Query Filter
+### 3. Print with Date Range
+
+```bash
+hledger -f test.journal print --begin 2024-01-01 --end 2024-02-01 --output-format json
+```
+
+Returns only transactions within the specified date range.
+
+### 4. Print Cleared Transactions Only
+
+```bash
+hledger -f test.journal print --cleared --output-format json
+```
+
+Returns only transactions with cleared status.
+
+### 5. Print with Query
 
 ```bash
 hledger -f test.journal print expenses --output-format json
 ```
 
-Output contains only transactions that match the query (have postings to expense accounts).
+Returns only transactions affecting expense accounts.
 
 ## Key Points
 
-1. The print command returns a simple array of transactions, not an object
-2. Each transaction contains complete information including all postings
-3. The `floatingPoint` field in `aquantity` provides the human-readable value
-4. Multi-commodity postings will have multiple amount objects in the `pamount` array
-5. Source positions track the exact location in the journal file
-6. Prices are represented as nested amount objects with a type tag
-7. All metadata (comments, tags, status) is preserved from the source
+1. The output is always an array of transactions, even if empty
+2. Transaction index (`tindex`) is 1-based
+3. Comments include trailing newlines
+4. Tags are represented as [name, value] pairs, not objects
+5. Status can be "Unmarked", "Pending", or "Cleared"
+6. Posting types indicate regular vs virtual postings
+7. Balance assertions are included when present in the journal
+8. Source positions can help with debugging and navigation

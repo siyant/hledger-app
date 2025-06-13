@@ -785,7 +785,12 @@ fn test_get_cashflow_simple() {
     assert!(cashflows.increases_total); // Cash flows increase the total
 
     // Check for specific cash accounts
-    let cash_accounts: Vec<&str> = cashflows.data.rows.iter().map(|r| r.account.as_str()).collect();
+    let cash_accounts: Vec<&str> = cashflows
+        .data
+        .rows
+        .iter()
+        .map(|r| r.account.as_str())
+        .collect();
     assert!(cash_accounts.contains(&"assets:bank:checking"));
     assert!(cash_accounts.contains(&"assets:investments:fidelity:cash"));
 
@@ -826,8 +831,13 @@ fn test_get_cashflow_tree_mode() {
 
     // In tree mode with depth 2, should have parent accounts
     let cashflows = &report.subreports[0];
-    let account_names: Vec<&str> = cashflows.data.rows.iter().map(|r| r.account.as_str()).collect();
-    
+    let account_names: Vec<&str> = cashflows
+        .data
+        .rows
+        .iter()
+        .map(|r| r.account.as_str())
+        .collect();
+
     // Should have aggregated accounts like "assets"
     assert!(account_names.iter().any(|&name| name == "assets"));
 }
@@ -854,9 +864,7 @@ fn test_get_cashflow_with_query() {
 
 #[test]
 fn test_get_cashflow_with_dates() {
-    let options = CashflowOptions::new()
-        .begin("2024-01-01")
-        .end("2024-01-06");
+    let options = CashflowOptions::new().begin("2024-01-01").end("2024-01-06");
 
     let report = get_cashflow(
         Some(std::path::Path::new("tests/fixtures/test.journal")),
@@ -869,8 +877,13 @@ fn test_get_cashflow_with_dates() {
 
     // With date filter, should only include transactions up to 2024-01-06
     let cashflows = &report.subreports[0];
-    let account_names: Vec<&str> = cashflows.data.rows.iter().map(|r| r.account.as_str()).collect();
-    
+    let account_names: Vec<&str> = cashflows
+        .data
+        .rows
+        .iter()
+        .map(|r| r.account.as_str())
+        .collect();
+
     // Should include checking account
     assert!(account_names.contains(&"assets:bank:checking"));
     // Should NOT include investment cash (transaction is on 2024-01-10)
@@ -1053,4 +1066,162 @@ fn test_get_cashflow_sort_amount() {
 
     // Note: Verifying sort order would require comparing amounts,
     // which is complex with multi-commodity support
+}
+
+// ================================
+// Print Command Tests
+// ================================
+
+#[test]
+fn test_get_print_basic() {
+    use hledger_lib::{get_print, PrintOptions};
+    
+    let options = PrintOptions::new();
+    let result = get_print(Some("tests/fixtures/test.journal"), &options);
+    assert!(result.is_ok());
+
+    let transactions = result.unwrap();
+    assert_eq!(transactions.len(), 3);
+    
+    // Check first transaction
+    let first = &transactions[0];
+    assert_eq!(first.date, "2024-01-01");
+    assert_eq!(first.description, "income");
+    assert_eq!(first.status, "Unmarked");
+    assert_eq!(first.postings.len(), 2);
+}
+
+#[test]
+fn test_get_print_with_date_filter() {
+    use hledger_lib::{get_print, PrintOptions};
+    
+    let options = PrintOptions::new()
+        .begin("2024-01-01")
+        .end("2024-01-06");
+    
+    let result = get_print(Some("tests/fixtures/test.journal"), &options);
+    assert!(result.is_ok());
+
+    let transactions = result.unwrap();
+    assert_eq!(transactions.len(), 2);
+}
+
+#[test]
+fn test_get_print_with_query() {
+    use hledger_lib::{get_print, PrintOptions};
+    
+    let options = PrintOptions::new().query("expenses");
+    
+    let result = get_print(Some("tests/fixtures/test.journal"), &options);
+    assert!(result.is_ok());
+
+    let transactions = result.unwrap();
+    assert_eq!(transactions.len(), 2);
+    
+    // All transactions should involve expense accounts
+    for txn in &transactions {
+        let has_expense = txn.postings.iter()
+            .any(|p| p.account.starts_with("expenses"));
+        assert!(has_expense);
+    }
+}
+
+#[test]
+fn test_get_print_transaction_details() {
+    use hledger_lib::{get_print, PrintOptions};
+    
+    let options = PrintOptions::new();
+    let result = get_print(Some("tests/fixtures/test.journal"), &options);
+    assert!(result.is_ok());
+
+    let transactions = result.unwrap();
+    let investment_txn = &transactions[2]; // Investment purchase
+    
+    assert_eq!(investment_txn.description, "Investment purchase");
+    assert_eq!(investment_txn.postings.len(), 3);
+    
+    // Check the GOOG posting with price
+    let goog_posting = investment_txn.postings.iter()
+        .find(|p| p.account == "assets:investments:fidelity:goog")
+        .unwrap();
+    
+    assert_eq!(goog_posting.amounts.len(), 1);
+    let goog_amount = &goog_posting.amounts[0];
+    assert_eq!(goog_amount.commodity, "GOOG");
+    assert_eq!(goog_amount.quantity.to_string(), "2");
+    assert!(goog_amount.price.is_some());
+    
+    let price = goog_amount.price.as_ref().unwrap();
+    assert_eq!(price.commodity, "$");
+    assert_eq!(price.quantity.to_string(), "150.00");
+}
+
+#[test]
+fn test_get_print_posting_types() {
+    use hledger_lib::{get_print, PrintOptions};
+    
+    let options = PrintOptions::new();
+    let result = get_print(Some("tests/fixtures/test.journal"), &options);
+    assert!(result.is_ok());
+
+    let transactions = result.unwrap();
+    for txn in &transactions {
+        for posting in &txn.postings {
+            // Default posting type should be RegularPosting
+            assert_eq!(posting.posting_type, "RegularPosting");
+        }
+    }
+}
+
+#[test]
+fn test_get_print_empty_journal() {
+    use hledger_lib::{get_print, PrintOptions};
+    use std::fs;
+    use std::io::Write;
+    
+    // Create a temporary empty journal
+    let temp_file = "tests/fixtures/empty_test.journal";
+    let mut file = fs::File::create(temp_file).unwrap();
+    writeln!(file, "; Empty journal").unwrap();
+    
+    let options = PrintOptions::new();
+    let result = get_print(Some(temp_file), &options);
+    assert!(result.is_ok());
+    
+    let transactions = result.unwrap();
+    assert_eq!(transactions.len(), 0);
+    
+    // Clean up
+    fs::remove_file(temp_file).ok();
+}
+
+#[test]
+fn test_get_print_error_nonexistent_file() {
+    use hledger_lib::{get_print, PrintOptions};
+    
+    let options = PrintOptions::new();
+    let result = get_print(Some("nonexistent.journal"), &options);
+    assert!(result.is_err());
+}
+
+#[test]
+fn test_get_print_options_builder() {
+    use hledger_lib::{get_print, PrintOptions};
+    
+    let options = PrintOptions::new()
+        .explicit()
+        .show_costs()
+        .cleared()
+        .real()
+        .begin("2024-01-01")
+        .end("2024-12-31")
+        .query("assets");
+    
+    assert!(options.explicit);
+    assert!(options.show_costs);
+    assert!(options.cleared);
+    assert!(options.real);
+    assert_eq!(options.begin, Some("2024-01-01".to_string()));
+    assert_eq!(options.end, Some("2024-12-31".to_string()));
+    assert_eq!(options.queries, vec!["assets"]);
 }

@@ -1,123 +1,139 @@
 use hledger_lib::{get_print, PrintOptions};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("=== Print Command Examples ===\n");
+    println!("Testing print command with hledger-lib");
 
-    // Example 1: Basic print
-    println!("1. Basic print (all transactions):");
+    // Test basic print
+    println!("\n=== Basic Print ===");
     let options = PrintOptions::new();
+
     match get_print(Some("tests/fixtures/test.journal"), &options) {
-        Ok(report) => {
-            println!("Found {} transactions", report.transactions.len());
-            for tx in &report.transactions {
-                println!("  {} - {} ({})", tx.date, tx.description, tx.index);
-                for posting in &tx.postings {
-                    println!("    {} -> {} amounts", posting.account, posting.amount.len());
-                    for amount in &posting.amount {
-                        println!("      {} {} (mantissa: {}, places: {})", 
-                                amount.quantity.floating_point, 
-                                amount.commodity,
-                                amount.quantity.decimal_mantissa,
-                                amount.quantity.decimal_places);
-                    }
+        Ok(transactions) => {
+            println!("Found {} transactions:", transactions.len());
+            for txn in &transactions {
+                println!(
+                    "  [{}] {} - {} ({})",
+                    txn.index, txn.date, txn.description, txn.status
+                );
+                if !txn.code.is_empty() {
+                    println!("    Code: {}", txn.code);
                 }
-            }
-        }
-        Err(e) => println!("Error: {}", e),
-    }
-
-    println!("\n{}\n", "=".repeat(50));
-
-    // Example 2: Print with date filter
-    println!("2. Print with date filter (2024-01-01):");
-    let options = PrintOptions::new()
-        .query("date:2024-01-01");
-    match get_print(Some("tests/fixtures/test.journal"), &options) {
-        Ok(report) => {
-            println!("Found {} transactions", report.transactions.len());
-            for tx in &report.transactions {
-                println!("  {} - {}", tx.date, tx.description);
-                println!("    Status: {}, Code: '{}'", tx.status, tx.code);
-                println!("    Source: {} lines", tx.source_positions.len());
-                if !tx.tags.is_empty() {
-                    println!("    Tags: {:?}", tx.tags);
-                }
-                for posting in &tx.postings {
-                    println!("    Account: {}", posting.account);
-                    println!("      Type: {}, Status: {}", posting.posting_type, posting.status);
-                    if !posting.comment.is_empty() {
-                        println!("      Comment: {}", posting.comment);
-                    }
-                }
-            }
-        }
-        Err(e) => println!("Error: {}", e),
-    }
-
-    println!("\n{}\n", "=".repeat(50));
-
-    // Example 3: Print with query filter
-    println!("3. Print with query filter (expenses):");
-    let options = PrintOptions::new().query("expenses");
-    match get_print(Some("tests/fixtures/test.journal"), &options) {
-        Ok(report) => {
-            println!("Found {} transactions", report.transactions.len());
-            for tx in &report.transactions {
-                println!("  {} - {}", tx.date, tx.description);
-                for posting in &tx.postings {
-                    if posting.account.contains("expenses") {
-                        println!("    * {} (expense account)", posting.account);
-                    } else {
-                        println!("      {}", posting.account);
-                    }
-                    for amount in &posting.amount {
+                for posting in &txn.postings {
+                    print!("    {} ", posting.account);
+                    for amount in &posting.amounts {
+                        println!(
+                            "{}{} {}",
+                            if amount.style.commodity_side == "L" {
+                                &amount.commodity
+                            } else {
+                                ""
+                            },
+                            amount.quantity,
+                            if amount.style.commodity_side == "R" {
+                                &amount.commodity
+                            } else {
+                                ""
+                            }
+                        );
                         if let Some(price) = &amount.price {
-                            println!("        {} {} @ {} {}", 
-                                    amount.quantity.floating_point,
-                                    amount.commodity,
-                                    price.contents.quantity.floating_point,
-                                    price.contents.commodity);
-                        } else {
-                            println!("        {} {}", 
-                                    amount.quantity.floating_point,
-                                    amount.commodity);
+                            println!("      @ {}{}", price.commodity, price.quantity);
                         }
                     }
+                    if let Some(assertion) = &posting.balance_assertion {
+                        println!(
+                            "      = {}{}",
+                            assertion.amount.commodity, assertion.amount.quantity
+                        );
+                    }
                 }
             }
         }
         Err(e) => println!("Error: {}", e),
     }
 
-    println!("\n{}\n", "=".repeat(50));
-
-    // Example 4: Print with explicit amounts and rounding
-    println!("4. Print with explicit amounts and soft rounding:");
+    // Test with filters
+    println!("\n=== Print with Date Range ===");
     let options = PrintOptions::new()
-        .explicit()
-        .round("soft");
+        .begin("2024-01-01")
+        .end("2024-01-06");
+
     match get_print(Some("tests/fixtures/test.journal"), &options) {
-        Ok(report) => {
-            println!("Found {} transactions", report.transactions.len());
-            for tx in &report.transactions[..1] {  // Just show first transaction
-                println!("  {} - {}", tx.date, tx.description);
-                println!("    Transaction index: {}", tx.index);
-                for (i, pos) in tx.source_positions.iter().enumerate() {
-                    println!("    Source position {}: {}:{}", 
-                            i + 1, pos.source_line, pos.source_column);
-                }
-                for posting in &tx.postings {
-                    println!("    {}", posting.account);
-                    println!("      Transaction ref: {}", posting.transaction_index);
-                    for amount in &posting.amount {
-                        println!("        Amount: {} {}", 
-                                amount.quantity.floating_point,
-                                amount.commodity);
-                        println!("        Style: side={}, spaced={}, precision={}", 
-                                amount.style.commodity_side,
-                                amount.style.commodity_spaced,
-                                amount.style.precision);
+        Ok(transactions) => {
+            println!("Found {} transactions in date range:", transactions.len());
+            for txn in &transactions {
+                println!("  {} - {}", txn.date, txn.description);
+            }
+        }
+        Err(e) => println!("Error: {}", e),
+    }
+
+    // Test with query
+    println!("\n=== Print Expense Transactions ===");
+    let options = PrintOptions::new().query("expenses");
+
+    match get_print(Some("tests/fixtures/test.journal"), &options) {
+        Ok(transactions) => {
+            println!("Found {} expense transactions:", transactions.len());
+            for txn in &transactions {
+                println!("  {} - {}", txn.date, txn.description);
+                for posting in &txn.postings {
+                    if posting.account.starts_with("expenses") {
+                        println!("    {} {:?}", posting.account, 
+                            posting.amounts.iter()
+                                .map(|a| format!("{}{}", a.commodity, a.quantity))
+                                .collect::<Vec<_>>()
+                        );
                     }
+                }
+            }
+        }
+        Err(e) => println!("Error: {}", e),
+    }
+
+    // Test explicit mode
+    println!("\n=== Print with Explicit Amounts ===");
+    let options = PrintOptions::new().explicit();
+
+    match get_print(Some("tests/fixtures/test.journal"), &options) {
+        Ok(transactions) => {
+            if let Some(txn) = transactions.first() {
+                println!("First transaction with explicit amounts:");
+                println!("  {} - {}", txn.date, txn.description);
+                for posting in &txn.postings {
+                    println!(
+                        "    {} - {} amount(s)",
+                        posting.account,
+                        posting.amounts.len()
+                    );
+                }
+            }
+        }
+        Err(e) => println!("Error: {}", e),
+    }
+
+    // Test transaction details
+    println!("\n=== Transaction Details ===");
+    let options = PrintOptions::new();
+
+    match get_print(Some("tests/fixtures/test.journal"), &options) {
+        Ok(transactions) => {
+            for txn in transactions.iter().take(1) {
+                println!("Transaction #{}", txn.index);
+                println!("  Date: {}", txn.date);
+                if let Some(date2) = &txn.date2 {
+                    println!("  Date2: {}", date2);
+                }
+                println!("  Status: {}", txn.status);
+                println!("  Description: {}", txn.description);
+                if !txn.comment.is_empty() {
+                    println!("  Comment: {:?}", txn.comment.trim());
+                }
+                if !txn.tags.is_empty() {
+                    println!("  Tags: {:?}", txn.tags);
+                }
+                println!("  Source positions: {} entries", txn.source_positions.len());
+                for pos in &txn.source_positions {
+                    println!("    {}:{}:{}", pos.file, pos.line, pos.column);
                 }
             }
         }

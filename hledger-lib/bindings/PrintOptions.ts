@@ -13,43 +13,35 @@ explicit: boolean,
  */
 show_costs: boolean, 
 /**
- * Display all amounts with reversed sign
- */
-invert: boolean, 
-/**
- * Show only newer-dated transactions added in each file since last run
- */
-new: boolean, 
-/**
- * Fuzzy search for one recent transaction with description closest to DESC
- */
-match_desc: string | null, 
-/**
- * Rounding mode for amounts
+ * Rounding mode: none, soft, hard, all
  */
 round: string | null, 
 /**
- * Begin date filter (inclusive: transactions on or after this date)
+ * Show only newer transactions
+ */
+new: boolean, 
+/**
+ * Fuzzy search for transaction by description
+ */
+match_desc: string | null, 
+/**
+ * Begin date (inclusive)
  */
 begin: string | null, 
 /**
- * End date filter (exclusive: transactions before this date)
+ * End date (exclusive)
  */
 end: string | null, 
 /**
- * Limit depth of accounts shown
- */
-depth: number | null, 
-/**
- * Include only unmarked postings
+ * Include only unmarked transactions
  */
 unmarked: boolean, 
 /**
- * Include only pending postings
+ * Include only pending transactions
  */
 pending: boolean, 
 /**
- * Include only cleared postings
+ * Include only cleared transactions
  */
 cleared: boolean, 
 /**
@@ -57,30 +49,6 @@ cleared: boolean,
  */
 real: boolean, 
 /**
- * Show zero items
+ * Show empty accounts
  */
-empty: boolean, 
-/**
- * Convert to cost basis
- */
-cost: boolean, 
-/**
- * Convert to market value
- */
-market: boolean, 
-/**
- * Convert to specific commodity
- */
-exchange: string | null, 
-/**
- * Detailed value conversion
- */
-value: string | null, 
-/**
- * Period filter
- */
-period: string | null, 
-/**
- * Query patterns
- */
-queries: Array<string>, };
+empty: boolean, queries: Array<string>, };

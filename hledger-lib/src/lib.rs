@@ -8,7 +8,10 @@ pub use commands::cashflow::{get_cashflow, CashflowOptions, CashflowReport};
 pub use commands::incomestatement::{
     get_incomestatement, IncomeStatementOptions, IncomeStatementReport,
 };
-pub use commands::print::{get_print, PrintOptions, PrintReport};
+pub use commands::print::{
+    get_print, AmountStyle, BalanceAssertion, Price, PrintAmount, PrintOptions, PrintPosting,
+    PrintReport, PrintTransaction, SourcePosition,
+};
 pub use error::HLedgerError;
 
 pub type Result<T> = std::result::Result<T, HLedgerError>;

@@ -1,7 +1,29 @@
 use crate::{HLedgerError, Result};
-use serde::{Deserialize, Serialize};
+use rust_decimal::Decimal;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::process::Command;
 use ts_rs::TS;
+
+/// Custom serde module for Decimal to/from string
+mod decimal_string_serde {
+    use super::*;
+    use serde::de::Error;
+
+    pub fn serialize<S>(decimal: &Decimal, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(&decimal.to_string())
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> std::result::Result<Decimal, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        s.parse().map_err(D::Error::custom)
+    }
+}
 
 /// Options for the print command
 #[derive(Debug, Default, Clone, Serialize, Deserialize, TS)]
@@ -11,41 +33,34 @@ pub struct PrintOptions {
     pub explicit: bool,
     /// Show transaction prices even with conversion postings
     pub show_costs: bool,
-    /// Display all amounts with reversed sign
-    pub invert: bool,
-    /// Show only newer-dated transactions added in each file since last run
-    pub new: bool,
-    /// Fuzzy search for one recent transaction with description closest to DESC
-    pub match_desc: Option<String>,
-    /// Rounding mode for amounts
+    /// Rounding mode: none, soft, hard, all
     pub round: Option<String>,
-    /// Begin date filter (inclusive: transactions on or after this date)
+    /// Show only newer transactions
+    pub new: bool,
+    /// Fuzzy search for transaction by description
+    pub match_desc: Option<String>,
+
+    // Date filters
+    /// Begin date (inclusive)
     pub begin: Option<String>,
-    /// End date filter (exclusive: transactions before this date)
+    /// End date (exclusive)
     pub end: Option<String>,
-    /// Limit depth of accounts shown
-    pub depth: Option<u32>,
-    /// Include only unmarked postings
+
+    // Status filters
+    /// Include only unmarked transactions
     pub unmarked: bool,
-    /// Include only pending postings
+    /// Include only pending transactions
     pub pending: bool,
-    /// Include only cleared postings
+    /// Include only cleared transactions
     pub cleared: bool,
+
+    // Other filters
     /// Include only non-virtual postings
     pub real: bool,
-    /// Show zero items
+    /// Show empty accounts
     pub empty: bool,
-    /// Convert to cost basis
-    pub cost: bool,
-    /// Convert to market value
-    pub market: bool,
-    /// Convert to specific commodity
-    pub exchange: Option<String>,
-    /// Detailed value conversion
-    pub value: Option<String>,
-    /// Period filter
-    pub period: Option<String>,
-    /// Query patterns
+
+    // Query patterns
     pub queries: Vec<String>,
 }
 
@@ -53,63 +68,44 @@ pub struct PrintOptions {
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct SourcePosition {
-    #[serde(rename = "sourceColumn")]
-    pub source_column: u32,
-    #[serde(rename = "sourceLine")]
-    pub source_line: u32,
-    #[serde(rename = "sourceName")]
-    pub source_name: String,
+    pub line: u32,
+    pub column: u32,
+    pub file: String,
 }
 
-/// Quantity representation with mantissa and decimal places
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
-pub struct Quantity {
-    #[serde(rename = "decimalMantissa")]
-    pub decimal_mantissa: i64,
-    #[serde(rename = "decimalPlaces")]
-    pub decimal_places: u8,
-    #[serde(rename = "floatingPoint")]
-    pub floating_point: f64,
-}
-
-/// Amount style information
+/// Amount display style
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct AmountStyle {
-    #[serde(rename = "ascommodityside")]
     pub commodity_side: String,
-    #[serde(rename = "ascommodityspaced")]
     pub commodity_spaced: bool,
-    #[serde(rename = "asdecimalmark")]
     pub decimal_mark: Option<String>,
-    #[serde(rename = "asdigitgroups")]
     pub digit_groups: Option<String>,
-    #[serde(rename = "asprecision")]
-    pub precision: u8,
-    #[serde(rename = "asrounding")]
+    pub precision: u16,
     pub rounding: String,
 }
 
-/// Price information for amounts
+/// Price information (reused from balance module)
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
-pub struct PrintPrice {
-    pub contents: Box<PrintAmount>,
-    pub tag: String,
+pub struct Price {
+    /// Price commodity
+    pub commodity: String,
+    /// Price quantity
+    #[serde(with = "decimal_string_serde")]
+    #[ts(type = "string")]
+    pub quantity: Decimal,
 }
 
-/// Amount representation in print reports
+/// Amount with inline style information
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct PrintAmount {
-    #[serde(rename = "acommodity")]
     pub commodity: String,
-    #[serde(rename = "aprice")]
-    pub price: Option<Box<PrintPrice>>,
-    #[serde(rename = "aquantity")]
-    pub quantity: Quantity,
-    #[serde(rename = "astyle")]
+    #[serde(with = "decimal_string_serde")]
+    #[ts(type = "string")]
+    pub quantity: Decimal,
+    pub price: Option<Price>,
     pub style: AmountStyle,
 }
 
@@ -117,197 +113,122 @@ pub struct PrintAmount {
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct BalanceAssertion {
-    // The exact structure depends on hledger's implementation
-    // This is a placeholder for future implementation
-    pub assertion_type: String,
-    pub amount: Option<PrintAmount>,
+    pub amount: PrintAmount,
+    pub inclusive: bool,
+    pub total: bool,
+    pub position: SourcePosition,
 }
 
-/// Posting information in a transaction
+/// Posting structure
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct PrintPosting {
-    #[serde(rename = "paccount")]
     pub account: String,
-    #[serde(rename = "pamount")]
-    pub amount: Vec<PrintAmount>,
-    #[serde(rename = "pbalanceassertion")]
-    pub balance_assertion: Option<BalanceAssertion>,
-    #[serde(rename = "pcomment")]
-    pub comment: String,
-    #[serde(rename = "pdate")]
-    pub date: Option<String>,
-    #[serde(rename = "pdate2")]
-    pub date2: Option<String>,
-    #[serde(rename = "poriginal")]
-    pub original: Option<String>,
-    #[serde(rename = "pstatus")]
+    pub amounts: Vec<PrintAmount>,
     pub status: String,
-    #[serde(rename = "ptags")]
-    pub tags: Vec<String>,
-    #[serde(rename = "ptransaction_")]
-    pub transaction_index: String,
-    #[serde(rename = "ptype")]
+    pub comment: String,
+    pub tags: Vec<(String, String)>,
     pub posting_type: String,
+    pub date: Option<String>,
+    pub date2: Option<String>,
+    pub balance_assertion: Option<BalanceAssertion>,
+    pub original: Option<Box<PrintPosting>>,
+    pub transaction_index: String,
 }
 
-/// Complete transaction from print command
+/// Transaction structure
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct PrintTransaction {
-    #[serde(rename = "tcode")]
-    pub code: String,
-    #[serde(rename = "tcomment")]
-    pub comment: String,
-    #[serde(rename = "tdate")]
-    pub date: String,
-    #[serde(rename = "tdate2")]
-    pub date2: Option<String>,
-    #[serde(rename = "tdescription")]
-    pub description: String,
-    #[serde(rename = "tindex")]
     pub index: u32,
-    #[serde(rename = "tpostings")]
-    pub postings: Vec<PrintPosting>,
-    #[serde(rename = "tprecedingcomment")]
-    pub preceding_comment: String,
-    #[serde(rename = "tsourcepos")]
-    pub source_positions: Vec<SourcePosition>,
-    #[serde(rename = "tstatus")]
+    pub date: String,
+    pub date2: Option<String>,
     pub status: String,
-    #[serde(rename = "ttags")]
-    pub tags: Vec<String>,
+    pub code: String,
+    pub description: String,
+    pub comment: String,
+    pub tags: Vec<(String, String)>,
+    pub postings: Vec<PrintPosting>,
+    pub preceding_comment: String,
+    pub source_positions: Vec<SourcePosition>,
 }
 
-/// Print report containing all transactions
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
-pub struct PrintReport {
-    pub transactions: Vec<PrintTransaction>,
-}
+/// Print report - array of transactions
+pub type PrintReport = Vec<PrintTransaction>;
 
+// Implementation for builder pattern
 impl PrintOptions {
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Show all amounts explicitly
     pub fn explicit(mut self) -> Self {
         self.explicit = true;
         self
     }
 
-    /// Show transaction prices even with conversion postings
     pub fn show_costs(mut self) -> Self {
         self.show_costs = true;
         self
     }
 
-    /// Display all amounts with reversed sign
-    pub fn invert(mut self) -> Self {
-        self.invert = true;
-        self
-    }
-
-    /// Show only newer-dated transactions
-    pub fn new_transactions(mut self) -> Self {
-        self.new = true;
-        self
-    }
-
-    /// Fuzzy search for transaction by description
-    pub fn match_desc(mut self, desc: impl Into<String>) -> Self {
-        self.match_desc = Some(desc.into());
-        self
-    }
-
-    /// Set rounding mode
     pub fn round(mut self, mode: impl Into<String>) -> Self {
         self.round = Some(mode.into());
         self
     }
 
-    /// Set begin date filter
+    pub fn new_only(mut self) -> Self {
+        self.new = true;
+        self
+    }
+
+    pub fn match_desc(mut self, desc: impl Into<String>) -> Self {
+        self.match_desc = Some(desc.into());
+        self
+    }
+
     pub fn begin(mut self, date: impl Into<String>) -> Self {
         self.begin = Some(date.into());
         self
     }
 
-    /// Set end date filter
     pub fn end(mut self, date: impl Into<String>) -> Self {
         self.end = Some(date.into());
         self
     }
 
-    /// Set depth filter
-    pub fn depth(mut self, n: u32) -> Self {
-        self.depth = Some(n);
-        self
-    }
-
-    /// Show empty items
-    pub fn empty(mut self) -> Self {
-        self.empty = true;
-        self
-    }
-
-    /// Convert to cost basis
-    pub fn cost(mut self) -> Self {
-        self.cost = true;
-        self
-    }
-
-    /// Convert to market value
-    pub fn market(mut self) -> Self {
-        self.market = true;
-        self
-    }
-
-    /// Convert to specific commodity
-    pub fn exchange(mut self, commodity: impl Into<String>) -> Self {
-        self.exchange = Some(commodity.into());
-        self
-    }
-
-    /// Add query filter
-    pub fn query(mut self, query: impl Into<String>) -> Self {
-        self.queries.push(query.into());
-        self
-    }
-
-    /// Set multiple queries
-    pub fn queries(mut self, queries: Vec<String>) -> Self {
-        self.queries = queries;
-        self
-    }
-
-    /// Set period filter
-    pub fn period(mut self, period: impl Into<String>) -> Self {
-        self.period = Some(period.into());
-        self
-    }
-
-    /// Include only unmarked postings
     pub fn unmarked(mut self) -> Self {
         self.unmarked = true;
         self
     }
 
-    /// Include only pending postings
     pub fn pending(mut self) -> Self {
         self.pending = true;
         self
     }
 
-    /// Include only cleared postings
     pub fn cleared(mut self) -> Self {
         self.cleared = true;
         self
     }
 
-    /// Include only non-virtual postings
     pub fn real(mut self) -> Self {
         self.real = true;
+        self
+    }
+
+    pub fn empty(mut self) -> Self {
+        self.empty = true;
+        self
+    }
+
+    pub fn query(mut self, query: impl Into<String>) -> Self {
+        self.queries.push(query.into());
+        self
+    }
+
+    pub fn queries(mut self, queries: Vec<String>) -> Self {
+        self.queries = queries;
         self
     }
 }
@@ -325,24 +246,21 @@ pub fn get_print(journal_file: Option<&str>, options: &PrintOptions) -> Result<P
     // Always output JSON
     cmd.arg("--output-format").arg("json");
 
-    // Add options
+    // Add option flags
     if options.explicit {
         cmd.arg("--explicit");
     }
     if options.show_costs {
         cmd.arg("--show-costs");
     }
-    if options.invert {
-        cmd.arg("--invert");
+    if let Some(round) = &options.round {
+        cmd.arg(format!("--round={}", round));
     }
     if options.new {
         cmd.arg("--new");
     }
     if let Some(desc) = &options.match_desc {
         cmd.arg("--match").arg(desc);
-    }
-    if let Some(mode) = &options.round {
-        cmd.arg("--round").arg(mode);
     }
 
     // Date filters
@@ -351,17 +269,6 @@ pub fn get_print(journal_file: Option<&str>, options: &PrintOptions) -> Result<P
     }
     if let Some(end) = &options.end {
         cmd.arg("--end").arg(end);
-    }
-    if let Some(period) = &options.period {
-        cmd.arg("--period").arg(period);
-    }
-
-    // Other filters
-    if let Some(depth) = options.depth {
-        cmd.arg("--depth").arg(depth.to_string());
-    }
-    if options.empty {
-        cmd.arg("--empty");
     }
 
     // Status filters
@@ -374,22 +281,13 @@ pub fn get_print(journal_file: Option<&str>, options: &PrintOptions) -> Result<P
     if options.cleared {
         cmd.arg("--cleared");
     }
+
+    // Other filters
     if options.real {
         cmd.arg("--real");
     }
-
-    // Valuation options
-    if options.cost {
-        cmd.arg("--cost");
-    }
-    if options.market {
-        cmd.arg("--market");
-    }
-    if let Some(commodity) = &options.exchange {
-        cmd.arg("--exchange").arg(commodity);
-    }
-    if let Some(value) = &options.value {
-        cmd.arg("--value").arg(value);
+    if options.empty {
+        cmd.arg("--empty");
     }
 
     // Query patterns
@@ -416,9 +314,496 @@ pub fn get_print(journal_file: Option<&str>, options: &PrintOptions) -> Result<P
     let stdout = String::from_utf8(output.stdout)?;
 
     // Parse the JSON output
-    let transactions: Vec<PrintTransaction> = serde_json::from_str(&stdout)?;
+    let json_value: serde_json::Value = serde_json::from_str(&stdout)?;
 
-    Ok(PrintReport { transactions })
+    parse_print_output(&json_value)
+}
+
+/// Parse print output from JSON
+fn parse_print_output(value: &serde_json::Value) -> Result<PrintReport> {
+    let array = value
+        .as_array()
+        .ok_or_else(|| HLedgerError::ParseError("Expected array for print output".to_string()))?;
+
+    let mut transactions = Vec::new();
+    for transaction_json in array {
+        let transaction = parse_transaction(transaction_json)?;
+        transactions.push(transaction);
+    }
+
+    Ok(transactions)
+}
+
+/// Parse a transaction from JSON
+fn parse_transaction(value: &serde_json::Value) -> Result<PrintTransaction> {
+    let obj = value
+        .as_object()
+        .ok_or_else(|| HLedgerError::ParseError("Transaction should be an object".to_string()))?;
+
+    let index = obj
+        .get("tindex")
+        .and_then(|i| i.as_u64())
+        .unwrap_or(0) as u32;
+
+    let date = obj
+        .get("tdate")
+        .and_then(|d| d.as_str())
+        .unwrap_or("")
+        .to_string();
+
+    let date2 = obj
+        .get("tdate2")
+        .and_then(|d| d.as_str())
+        .map(|s| s.to_string());
+
+    let status = obj
+        .get("tstatus")
+        .and_then(|s| s.as_str())
+        .unwrap_or("Unmarked")
+        .to_string();
+
+    let code = obj
+        .get("tcode")
+        .and_then(|c| c.as_str())
+        .unwrap_or("")
+        .to_string();
+
+    let description = obj
+        .get("tdescription")
+        .and_then(|d| d.as_str())
+        .unwrap_or("")
+        .to_string();
+
+    let comment = obj
+        .get("tcomment")
+        .and_then(|c| c.as_str())
+        .unwrap_or("")
+        .to_string();
+
+    let preceding_comment = obj
+        .get("tprecedingcomment")
+        .and_then(|c| c.as_str())
+        .unwrap_or("")
+        .to_string();
+
+    // Parse tags
+    let mut tags = Vec::new();
+    if let Some(tags_array) = obj.get("ttags").and_then(|t| t.as_array()) {
+        for tag in tags_array {
+            if let Some(tag_pair) = tag.as_array() {
+                if tag_pair.len() == 2 {
+                    let name = tag_pair[0].as_str().unwrap_or("").to_string();
+                    let value = tag_pair[1].as_str().unwrap_or("").to_string();
+                    tags.push((name, value));
+                }
+            }
+        }
+    }
+
+    // Parse postings
+    let mut postings = Vec::new();
+    if let Some(postings_array) = obj.get("tpostings").and_then(|p| p.as_array()) {
+        for posting_json in postings_array {
+            let posting = parse_posting(posting_json)?;
+            postings.push(posting);
+        }
+    }
+
+    // Parse source positions
+    let mut source_positions = Vec::new();
+    if let Some(positions_array) = obj.get("tsourcepos").and_then(|s| s.as_array()) {
+        for pos_json in positions_array {
+            if let Some(pos) = parse_source_position(pos_json) {
+                source_positions.push(pos);
+            }
+        }
+    }
+
+    Ok(PrintTransaction {
+        index,
+        date,
+        date2,
+        status,
+        code,
+        description,
+        comment,
+        tags,
+        postings,
+        preceding_comment,
+        source_positions,
+    })
+}
+
+/// Parse a posting from JSON
+fn parse_posting(value: &serde_json::Value) -> Result<PrintPosting> {
+    let obj = value
+        .as_object()
+        .ok_or_else(|| HLedgerError::ParseError("Posting should be an object".to_string()))?;
+
+    let account = obj
+        .get("paccount")
+        .and_then(|a| a.as_str())
+        .unwrap_or("")
+        .to_string();
+
+    let status = obj
+        .get("pstatus")
+        .and_then(|s| s.as_str())
+        .unwrap_or("Unmarked")
+        .to_string();
+
+    let comment = obj
+        .get("pcomment")
+        .and_then(|c| c.as_str())
+        .unwrap_or("")
+        .to_string();
+
+    let posting_type = obj
+        .get("ptype")
+        .and_then(|t| t.as_str())
+        .unwrap_or("RegularPosting")
+        .to_string();
+
+    let date = obj
+        .get("pdate")
+        .and_then(|d| d.as_str())
+        .map(|s| s.to_string());
+
+    let date2 = obj
+        .get("pdate2")
+        .and_then(|d| d.as_str())
+        .map(|s| s.to_string());
+
+    let transaction_index = obj
+        .get("ptransaction_")
+        .and_then(|t| t.as_str())
+        .unwrap_or("")
+        .to_string();
+
+    // Parse tags
+    let mut tags = Vec::new();
+    if let Some(tags_array) = obj.get("ptags").and_then(|t| t.as_array()) {
+        for tag in tags_array {
+            if let Some(tag_pair) = tag.as_array() {
+                if tag_pair.len() == 2 {
+                    let name = tag_pair[0].as_str().unwrap_or("").to_string();
+                    let value = tag_pair[1].as_str().unwrap_or("").to_string();
+                    tags.push((name, value));
+                }
+            }
+        }
+    }
+
+    // Parse amounts
+    let amounts = if let Some(amounts_json) = obj.get("pamount") {
+        parse_print_amounts(amounts_json)?
+    } else {
+        Vec::new()
+    };
+
+    // Parse balance assertion
+    let balance_assertion = if let Some(ba_json) = obj.get("pbalanceassertion") {
+        parse_balance_assertion(ba_json)?
+    } else {
+        None
+    };
+
+    // Parse original posting (for auto postings)
+    let original = if let Some(orig_json) = obj.get("poriginal") {
+        if !orig_json.is_null() {
+            Some(Box::new(parse_posting(orig_json)?))
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
+    Ok(PrintPosting {
+        account,
+        amounts,
+        status,
+        comment,
+        tags,
+        posting_type,
+        date,
+        date2,
+        balance_assertion,
+        original,
+        transaction_index,
+    })
+}
+
+/// Parse print amounts from JSON
+fn parse_print_amounts(value: &serde_json::Value) -> Result<Vec<PrintAmount>> {
+    let mut amounts = Vec::new();
+
+    if let Some(amounts_array) = value.as_array() {
+        for amount_json in amounts_array {
+            if let Some(amount_obj) = amount_json.as_object() {
+                let commodity = amount_obj
+                    .get("acommodity")
+                    .and_then(|c| c.as_str())
+                    .unwrap_or("")
+                    .to_string();
+
+                let quantity = if let Some(q) = amount_obj.get("aquantity") {
+                    parse_decimal_from_json(q)?
+                } else {
+                    Decimal::ZERO
+                };
+
+                let price = if let Some(price_obj) = amount_obj.get("aprice") {
+                    parse_price(price_obj)?
+                } else {
+                    None
+                };
+
+                let style = if let Some(style_obj) = amount_obj.get("astyle") {
+                    parse_amount_style(style_obj)?
+                } else {
+                    AmountStyle::default()
+                };
+
+                amounts.push(PrintAmount {
+                    commodity,
+                    quantity,
+                    price,
+                    style,
+                });
+            }
+        }
+    }
+
+    Ok(amounts)
+}
+
+/// Parse amount style from JSON
+fn parse_amount_style(value: &serde_json::Value) -> Result<AmountStyle> {
+    let obj = value
+        .as_object()
+        .ok_or_else(|| HLedgerError::ParseError("Amount style should be an object".to_string()))?;
+
+    let commodity_side = obj
+        .get("ascommodityside")
+        .and_then(|s| s.as_str())
+        .unwrap_or("L")
+        .to_string();
+
+    let commodity_spaced = obj
+        .get("ascommodityspaced")
+        .and_then(|s| s.as_bool())
+        .unwrap_or(false);
+
+    let decimal_mark = obj
+        .get("asdecimalmark")
+        .and_then(|d| d.as_str())
+        .map(|s| s.to_string());
+
+    let digit_groups = obj
+        .get("asdigitgroups")
+        .and_then(|d| d.as_str())
+        .map(|s| s.to_string());
+
+    let precision = obj
+        .get("asprecision")
+        .and_then(|p| p.as_u64())
+        .unwrap_or(2) as u16;
+
+    let rounding = obj
+        .get("asrounding")
+        .and_then(|r| r.as_str())
+        .unwrap_or("NoRounding")
+        .to_string();
+
+    Ok(AmountStyle {
+        commodity_side,
+        commodity_spaced,
+        decimal_mark,
+        digit_groups,
+        precision,
+        rounding,
+    })
+}
+
+/// Default implementation for AmountStyle
+impl Default for AmountStyle {
+    fn default() -> Self {
+        AmountStyle {
+            commodity_side: "L".to_string(),
+            commodity_spaced: false,
+            decimal_mark: Some(".".to_string()),
+            digit_groups: None,
+            precision: 2,
+            rounding: "NoRounding".to_string(),
+        }
+    }
+}
+
+/// Parse balance assertion from JSON
+fn parse_balance_assertion(value: &serde_json::Value) -> Result<Option<BalanceAssertion>> {
+    if value.is_null() {
+        return Ok(None);
+    }
+
+    let obj = value
+        .as_object()
+        .ok_or_else(|| HLedgerError::ParseError("Balance assertion should be an object".to_string()))?;
+
+    let amount = if let Some(amount_json) = obj.get("baamount") {
+        parse_single_print_amount(amount_json)?
+    } else {
+        return Ok(None);
+    };
+
+    let inclusive = obj
+        .get("bainclusive")
+        .and_then(|i| i.as_bool())
+        .unwrap_or(false);
+
+    let total = obj
+        .get("batotal")
+        .and_then(|t| t.as_bool())
+        .unwrap_or(false);
+
+    let position = if let Some(pos_json) = obj.get("baposition") {
+        parse_source_position(pos_json).unwrap_or_else(|| SourcePosition {
+            line: 0,
+            column: 0,
+            file: String::new(),
+        })
+    } else {
+        SourcePosition {
+            line: 0,
+            column: 0,
+            file: String::new(),
+        }
+    };
+
+    Ok(Some(BalanceAssertion {
+        amount,
+        inclusive,
+        total,
+        position,
+    }))
+}
+
+/// Parse a single print amount from JSON
+fn parse_single_print_amount(value: &serde_json::Value) -> Result<PrintAmount> {
+    let obj = value
+        .as_object()
+        .ok_or_else(|| HLedgerError::ParseError("Amount should be an object".to_string()))?;
+
+    let commodity = obj
+        .get("acommodity")
+        .and_then(|c| c.as_str())
+        .unwrap_or("")
+        .to_string();
+
+    let quantity = if let Some(q) = obj.get("aquantity") {
+        parse_decimal_from_json(q)?
+    } else {
+        Decimal::ZERO
+    };
+
+    let price = if let Some(price_obj) = obj.get("aprice") {
+        parse_price(price_obj)?
+    } else {
+        None
+    };
+
+    let style = if let Some(style_obj) = obj.get("astyle") {
+        parse_amount_style(style_obj)?
+    } else {
+        AmountStyle::default()
+    };
+
+    Ok(PrintAmount {
+        commodity,
+        quantity,
+        price,
+        style,
+    })
+}
+
+/// Parse source position from JSON
+fn parse_source_position(value: &serde_json::Value) -> Option<SourcePosition> {
+    let obj = value.as_object()?;
+
+    let line = obj
+        .get("sourceLine")
+        .and_then(|l| l.as_u64())
+        .unwrap_or(0) as u32;
+
+    let column = obj
+        .get("sourceColumn")
+        .and_then(|c| c.as_u64())
+        .unwrap_or(0) as u32;
+
+    let file = obj
+        .get("sourceName")
+        .and_then(|n| n.as_str())
+        .unwrap_or("")
+        .to_string();
+
+    Some(SourcePosition { line, column, file })
+}
+
+/// Parse price from JSON (reused from balance module pattern)
+fn parse_price(value: &serde_json::Value) -> Result<Option<Price>> {
+    if value.is_null() {
+        return Ok(None);
+    }
+
+    if let Some(price_obj) = value.as_object() {
+        // Handle the tagged price format with "contents" field
+        if let Some(amount_obj) = price_obj.get("contents").and_then(|a| a.as_object()) {
+            let commodity = amount_obj
+                .get("acommodity")
+                .and_then(|c| c.as_str())
+                .unwrap_or("")
+                .to_string();
+
+            let quantity = if let Some(q) = amount_obj.get("aquantity") {
+                parse_decimal_from_json(q)?
+            } else {
+                Decimal::ZERO
+            };
+
+            return Ok(Some(Price {
+                commodity,
+                quantity,
+            }));
+        }
+    }
+    Ok(None)
+}
+
+/// Parse decimal from JSON value (reused from balance module)
+fn parse_decimal_from_json(value: &serde_json::Value) -> Result<Decimal> {
+    if let Some(obj) = value.as_object() {
+        // Handle decimal object format
+        if let Some(mantissa) = obj.get("decimalMantissa").and_then(|m| m.as_i64()) {
+            let places = obj
+                .get("decimalPlaces")
+                .and_then(|p| p.as_u64())
+                .unwrap_or(0) as u32;
+            return Ok(Decimal::new(mantissa, places));
+        }
+    } else if let Some(num) = value.as_f64() {
+        // Handle simple number
+        return Decimal::from_f64_retain(num)
+            .ok_or_else(|| HLedgerError::ParseError("Invalid decimal number".to_string()));
+    } else if let Some(s) = value.as_str() {
+        // Handle string number
+        return s
+            .parse()
+            .map_err(|_| HLedgerError::ParseError("Invalid decimal string".to_string()));
+    }
+
+    Err(HLedgerError::ParseError(
+        "Unknown decimal format".to_string(),
+    ))
 }
 
 #[cfg(test)]
@@ -429,108 +814,79 @@ mod tests {
     fn export_bindings() {
         PrintOptions::export_all().unwrap();
         SourcePosition::export_all().unwrap();
-        Quantity::export_all().unwrap();
         AmountStyle::export_all().unwrap();
-        PrintPrice::export_all().unwrap();
+        Price::export_all().unwrap();
         PrintAmount::export_all().unwrap();
         BalanceAssertion::export_all().unwrap();
         PrintPosting::export_all().unwrap();
         PrintTransaction::export_all().unwrap();
-        PrintReport::export_all().unwrap();
     }
 
     #[test]
     fn test_print_options_builder() {
         let options = PrintOptions::new()
             .explicit()
+            .show_costs()
             .round("soft")
             .begin("2024-01-01")
             .end("2024-12-31")
-            .depth(2)
+            .cleared()
             .query("expenses");
 
         assert!(options.explicit);
+        assert!(options.show_costs);
         assert_eq!(options.round, Some("soft".to_string()));
         assert_eq!(options.begin, Some("2024-01-01".to_string()));
         assert_eq!(options.end, Some("2024-12-31".to_string()));
-        assert_eq!(options.depth, Some(2));
+        assert!(options.cleared);
         assert_eq!(options.queries, vec!["expenses"]);
     }
 
     #[test]
-    fn test_parse_print_transaction() {
-        let json = r#"
-        [
-          {
-            "tcode": "",
-            "tcomment": "",
-            "tdate": "2024-01-01",
-            "tdate2": null,
-            "tdescription": "income",
-            "tindex": 1,
-            "tpostings": [
-              {
-                "paccount": "assets:bank:checking",
-                "pamount": [
-                  {
-                    "acommodity": "$",
-                    "aprice": null,
-                    "aquantity": {
-                      "decimalMantissa": 100,
-                      "decimalPlaces": 0,
-                      "floatingPoint": 100
-                    },
-                    "astyle": {
-                      "ascommodityside": "L",
-                      "ascommodityspaced": false,
-                      "asdecimalmark": ".",
-                      "asdigitgroups": null,
-                      "asprecision": 0,
-                      "asrounding": "NoRounding"
-                    }
-                  }
-                ],
-                "pbalanceassertion": null,
-                "pcomment": "",
-                "pdate": null,
-                "pdate2": null,
-                "poriginal": null,
-                "pstatus": "Unmarked",
-                "ptags": [],
-                "ptransaction_": "1",
-                "ptype": "RegularPosting"
-              }
-            ],
-            "tprecedingcomment": "",
-            "tsourcepos": [
-              {
-                "sourceColumn": 1,
-                "sourceLine": 1,
-                "sourceName": "/path/to/test.journal"
-              }
-            ],
-            "tstatus": "Unmarked",
-            "ttags": []
-          }
-        ]
-        "#;
+    fn test_parse_decimal() {
+        // Test decimal object format
+        let json = serde_json::json!({
+            "decimalMantissa": 2000,
+            "decimalPlaces": 2
+        });
+        let decimal = parse_decimal_from_json(&json).unwrap();
+        assert_eq!(decimal, Decimal::new(2000, 2));
 
-        let transactions: Vec<PrintTransaction> = serde_json::from_str(json).unwrap();
-        assert_eq!(transactions.len(), 1);
-        
-        let tx = &transactions[0];
-        assert_eq!(tx.description, "income");
-        assert_eq!(tx.date, "2024-01-01");
-        assert_eq!(tx.index, 1);
-        assert_eq!(tx.postings.len(), 1);
-        
-        let posting = &tx.postings[0];
-        assert_eq!(posting.account, "assets:bank:checking");
-        assert_eq!(posting.amount.len(), 1);
-        
-        let amount = &posting.amount[0];
-        assert_eq!(amount.commodity, "$");
-        assert_eq!(amount.quantity.decimal_mantissa, 100);
-        assert_eq!(amount.quantity.decimal_places, 0);
+        // Test floating point format
+        let json = serde_json::json!(20.5);
+        let decimal = parse_decimal_from_json(&json).unwrap();
+        assert_eq!(decimal.to_string(), "20.5");
+    }
+
+    #[test]
+    fn test_parse_source_position() {
+        let json = serde_json::json!({
+            "sourceLine": 10,
+            "sourceColumn": 5,
+            "sourceName": "test.journal"
+        });
+        let pos = parse_source_position(&json).unwrap();
+        assert_eq!(pos.line, 10);
+        assert_eq!(pos.column, 5);
+        assert_eq!(pos.file, "test.journal");
+    }
+
+    #[test]
+    fn test_parse_amount_style() {
+        let json = serde_json::json!({
+            "ascommodityside": "R",
+            "ascommodityspaced": true,
+            "asdecimalmark": ",",
+            "asdigitgroups": "3",
+            "asprecision": 2,
+            "asrounding": "HardRounding"
+        });
+        let style = parse_amount_style(&json).unwrap();
+        assert_eq!(style.commodity_side, "R");
+        assert!(style.commodity_spaced);
+        assert_eq!(style.decimal_mark, Some(",".to_string()));
+        assert_eq!(style.digit_groups, Some("3".to_string()));
+        assert_eq!(style.precision, 2);
+        assert_eq!(style.rounding, "HardRounding");
     }
 }
