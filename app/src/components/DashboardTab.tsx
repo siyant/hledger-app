@@ -24,7 +24,7 @@ interface DashboardTabProps {
   selectedJournalFile: string;
 }
 
-export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: DashboardTabProps) {
+export function DashboardTab({ selectedJournalFile }: DashboardTabProps) {
   const [balanceSheetData, setBalanceSheetData] = useState<BalanceSheetReport | null>(null);
   const [incomeStatementData, setIncomeStatementData] = useState<IncomeStatementReport | null>(null);
   const [prevIncomeStatementData, setPrevIncomeStatementData] = useState<IncomeStatementReport | null>(null);
@@ -284,7 +284,7 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
     if (!expensesSubreport?.rows || !yearlyExpensesData.dates) return [];
 
     // Map each month's data with month name and category breakdowns
-    return yearlyExpensesData.dates.map((date, index) => {
+    return yearlyExpensesData.dates.map((date, _index) => {
       const monthDate = new Date(date.start);
       const monthName = monthDate.toLocaleDateString("en-US", {
         month: "long",
@@ -301,7 +301,7 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
           categoryName = categoryName.substring(9);
         }
 
-        const amounts = row.amounts[index] || [];
+        const amounts = row.amounts[_index] || [];
         const primaryAmount = amounts.find((amount) => Number.parseFloat(amount.quantity) !== 0);
         if (primaryAmount) {
           categories[categoryName] = Math.round(Number.parseFloat(primaryAmount.quantity));
@@ -309,7 +309,7 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
       });
 
       // Get total expenses for this month from the subreport totals
-      const totalAmounts = expensesSubreport.totals?.amounts?.[index] || [];
+      const totalAmounts = expensesSubreport.totals?.amounts?.[_index] || [];
       const totalExpenseAmount = totalAmounts.find((amount) => Number.parseFloat(amount.quantity) !== 0);
       const totalExpense = totalExpenseAmount ? Math.round(Number.parseFloat(totalExpenseAmount.quantity)) : 0;
 
@@ -498,7 +498,7 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
       });
 
       // Create chart data with all categories
-      const chartData: any = {
+      const chartData: Record<string, unknown> = {
         month: monthName,
         fullMonth: fullMonthName,
         totalExpense: monthData.totalExpense || 0,
@@ -531,7 +531,7 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
       });
 
       // Create chart data with all categories
-      const chartData: any = {
+      const chartData: Record<string, unknown> = {
         month: monthName,
         fullMonth: fullMonthName,
         netWorth: monthData.netWorth || 0,
@@ -686,7 +686,7 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
                             className="fill-foreground font-mono"
                             fontSize={12}
                             dataKey="totalExpense"
-                            formatter={(value) => `$${Number(value).toLocaleString()}`}
+                            formatter={(value: unknown) => `$${Number(value).toLocaleString()}`}
                           />
                         )}
                       </Bar>
@@ -754,14 +754,14 @@ export function DashboardTab({ searchQuery, dateRange, selectedJournalFile }: Da
                             className="fill-foreground font-mono"
                             fontSize={12}
                             dataKey="netWorth"
-                            formatter={(value) => `$${Number(value).toLocaleString()}`}
+                            formatter={(value: unknown) => `$${Number(value).toLocaleString()}`}
                           />
                         )}
                       </Bar>
                     );
                   })}
                   {/* Render liability categories */}
-                  {liabilityCategories.map((category, index) => {
+                  {liabilityCategories.map((category, _index) => {
                     const sanitizedName = `liability_${sanitizeCategoryName(category)}`;
                     return (
                       <Bar

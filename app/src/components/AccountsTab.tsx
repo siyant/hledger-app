@@ -45,7 +45,8 @@ export function AccountsTab({ searchQuery, dateRange, selectedJournalFile }: Acc
   // Fetch accounts when searchQuery, dateRange, or selectedJournalFile changes
   useEffect(() => {
     fetchAccounts(searchQuery, dateRange);
-  }, [searchQuery, dateRange, selectedJournalFile]);
+  }, [searchQuery, dateRange, fetchAccounts]);
+
   return (
     <Card>
       <CardHeader>
