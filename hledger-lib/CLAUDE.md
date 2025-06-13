@@ -59,6 +59,10 @@ You will approach this task iteratively, command by command:
             *   Optional fields (fields that might not always be present).
             *   Date formats (likely `YYYY-MM-DD`).
             *   Amount/Commodity representation.
+        *   Record the JSON structure in a file `hledger_info/<command>_json_structure.md`
+            *   Capture the top-level and sub-fields JSON structure and field descriptions
+            *   If any fields are non-obvious, include more notes on it
+            *   Document 1-5 example hledger commands with different options, showing their outputs (truncate repetitive parts) on a test journal
     *   **d. Define Rust Structs:**
         *   Create Rust structs that mirror the JSON structure.
         *   Use `#[derive(Debug, serde::Deserialize)]`.
@@ -67,6 +71,7 @@ You will approach this task iteratively, command by command:
         *   Use `Vec<T>` for JSON arrays.
         *   Use appropriate types: `String`, `i64`, `f64`, `bool`, `time::Date` (with custom deserializer if needed, though `YYYY-MM-DD` usually works by default with the `time/serde` feature), `rust_decimal::Decimal`.
         *   For amounts (e.g., "$10.00", "10 EUR"), consider a dedicated struct like `HledgerAmount { quantity: rust_decimal::Decimal, commodity: String }`. You'll need to determine how `hledger` formats this in JSON. If it's a single string like "USD10.00", you'll need a custom deserializer.
+        *   Record the higher-level Rust struct(s) in the file `hledger_info/<command>_json_structure.md`, before the example commands and output
     *   **e. Implement Parsing Function:**
         *   Write a Rust function that:
             1.  Takes necessary arguments (e.g., hledger file path, query arguments for the command).
