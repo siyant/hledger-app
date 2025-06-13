@@ -62,6 +62,18 @@ fn get_incomestatement(
     }
 }
 
+#[tauri::command]
+fn get_print(
+    journal_file: String,
+    options: hledger_lib::PrintOptions,
+) -> Result<hledger_lib::PrintReport, String> {
+    let file_ref = Some(journal_file.as_str());
+    match hledger_lib::get_print(file_ref, &options) {
+        Ok(print_report) => Ok(print_report),
+        Err(e) => Err(format!("Failed to get print: {}", e)),
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -71,7 +83,8 @@ pub fn run() {
             get_accounts,
             get_balance,
             get_balancesheet,
-            get_incomestatement
+            get_incomestatement,
+            get_print
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

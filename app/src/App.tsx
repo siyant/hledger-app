@@ -1,4 +1,5 @@
 import { DashboardTab } from "@/components/DashboardTab";
+import VerificationTab from "@/components/VerificationTab";
 import { AccountsTab } from "@/components/AccountsTab";
 import { BalancesTab } from "@/components/BalancesTab";
 import { BalanceSheetTab } from "@/components/BalanceSheetTab";
@@ -33,14 +34,29 @@ function App() {
           <Tabs>
             <TabList aria-label="hledger data views" className="w-fit">
               <Tab id="dashboard">Dashboard</Tab>
-              <Tab id="accounts">Accounts</Tab>
-              <Tab id="balances">Balances</Tab>
-              <Tab id="balancesheet">Balance Sheet</Tab>
+              <Tab id="verification">Verification</Tab>
+              <Tab
+                id="balancesheet"
+                className="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-px before:h-6 before:bg-border"
+              >
+                Balance Sheet
+              </Tab>
               <Tab id="incomestatement">Income Statement</Tab>
+              <Tab
+                id="accounts"
+                className="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-px before:h-6 before:bg-border"
+              >
+                Accounts
+              </Tab>
+              <Tab id="balances">Balances</Tab>
             </TabList>
 
             <TabPanel id="dashboard">
               <DashboardTab searchQuery={searchQuery} dateRange={dateRange} selectedJournalFile={selectedJournalFile} />
+            </TabPanel>
+
+            <TabPanel id="verification">
+              <VerificationTab selectedJournalFile={selectedJournalFile} />
             </TabPanel>
 
             <TabPanel id="accounts">

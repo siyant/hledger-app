@@ -14,6 +14,8 @@ import type { PeriodDate } from "../../../hledger-lib/bindings/PeriodDate.ts";
 import type { PeriodicBalance } from "../../../hledger-lib/bindings/PeriodicBalance.ts";
 import type { PeriodicBalanceRow } from "../../../hledger-lib/bindings/PeriodicBalanceRow.ts";
 import type { Price } from "../../../hledger-lib/bindings/Price.ts";
+import type { PrintOptions } from "../../../hledger-lib/bindings/PrintOptions.ts";
+import type { PrintReport } from "../../../hledger-lib/bindings/PrintReport.ts";
 import type { SimpleBalance } from "../../../hledger-lib/bindings/SimpleBalance.ts";
 
 export type {
@@ -33,6 +35,8 @@ export type {
   BalanceAccount,
   Amount,
   Price,
+  PrintOptions,
+  PrintReport,
 };
 
 // Utility functions for creating default instances
@@ -200,6 +204,34 @@ export function createDefaultIncomeStatementOptions(): IncomeStatementOptions {
     market: false,
     exchange: null,
     value: null,
+    queries: [],
+  };
+}
+
+/**
+ * Create a new PrintOptions object with default values
+ */
+export function createDefaultPrintOptions(): PrintOptions {
+  return {
+    explicit: false,
+    show_costs: false,
+    invert: false,
+    new: false,
+    match_desc: null,
+    round: null,
+    begin: null,
+    end: null,
+    depth: null,
+    unmarked: false,
+    pending: false,
+    cleared: false,
+    real: false,
+    empty: false,
+    cost: false,
+    market: false,
+    exchange: null,
+    value: null,
+    period: null,
     queries: [],
   };
 }
