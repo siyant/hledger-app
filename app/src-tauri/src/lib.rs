@@ -1,17 +1,26 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn get_journal_files() -> Result<Vec<String>, String> {
-    match std::env::var("HLEDGER_JOURNAL_FILES") {
-        Ok(files_str) => {
-            let files: Vec<String> = files_str
-                .split(',')
-                .map(|s| s.trim().to_string())
-                .filter(|s| !s.is_empty())
-                .collect();
-            Ok(files)
-        }
-        Err(_) => Ok(vec![]), // Return empty list if environment variable is not set
+    // First try HLEDGER_JOURNAL_FILES (comma-separated list)
+    if let Ok(files_str) = std::env::var("HLEDGER_JOURNAL_FILES") {
+        let files: Vec<String> = files_str
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect();
+        return Ok(files);
     }
+
+    // Fall back to LEDGER_FILE (single file)
+    if let Ok(ledger_file) = std::env::var("LEDGER_FILE") {
+        let file = ledger_file.trim().to_string();
+        if !file.is_empty() {
+            return Ok(vec![file]);
+        }
+    }
+
+    // Return empty list if neither environment variable is set
+    Ok(vec![])
 }
 
 #[tauri::command]

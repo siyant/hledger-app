@@ -143,7 +143,7 @@ export function FiltersSidebar({
               <label className="text-sm font-medium text-muted-foreground mb-2 block">Journal File</label>
               {journalFiles.length === 0 && (
                 <div className="mb-2">
-                  <p className="text-sm text-red-500">Please set HLEDGER_JOURNAL_FILES</p>
+                  <p className="text-sm text-red-500">Please set HLEDGER_JOURNAL_FILES or LEDGER_FILE</p>
                 </div>
               )}
               <Select value={selectedJournalFile} onValueChange={onJournalFileChange}>
