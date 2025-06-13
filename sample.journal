@@ -1,0 +1,2174 @@
+; Personal Finance Journal - January 2024 to May 2025
+; Complete data with DBS and Citibank credit cards
+
+; Opening Balances - January 1, 2024
+2024-01-01 Opening Balances
+    assets:checking:dbs                    $15,000.00
+    assets:savings:dbs                     $45,000.00
+    assets:investments:stocks              $85,000.00
+    equity:opening-balances
+
+; January 2024 Transactions
+2024-01-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,500.00
+    income:salary
+
+2024-01-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2024-01-03 Grocery Shopping - Cold Storage
+    liabilities:creditcard:dbs              $-95.40
+    expenses:food:groceries                  $95.40
+
+2024-01-03 MRT/Bus Transport
+    liabilities:creditcard:citibank          $-3.20
+    expenses:transport:public                 $3.20
+
+2024-01-04 Coffee - Starbucks Raffles
+    liabilities:creditcard:dbs              $-12.80
+    expenses:food:eatingout                  $12.80
+
+2024-01-05 Utilities - SP Group
+    expenses:housing:utilities              $185.60
+    assets:checking:dbs
+
+2024-01-06 Lunch - Ya Kun Kaya Toast
+    liabilities:creditcard:citibank          $-8.90
+    expenses:food:eatingout                   $8.90
+
+2024-01-07 Gym Membership - Fitness First
+    expenses:health:fitness                 $160.00
+    assets:checking:dbs
+
+2024-01-08 Internet - Singtel
+    expenses:housing:internet                $49.90
+    assets:checking:dbs
+
+2024-01-09 Grab Ride
+    liabilities:creditcard:dbs              $-18.50
+    expenses:transport:rideshare             $18.50
+
+2024-01-10 Grocery Shopping - NTUC FairPrice
+    liabilities:creditcard:citibank         $-78.30
+    expenses:food:groceries                  $78.30
+
+2024-01-11 Movie Tickets - Shaw Theatres
+    liabilities:creditcard:dbs              $-32.00
+    expenses:entertainment:movies            $32.00
+
+2024-01-12 Phone Bill - Singtel
+    expenses:personal:phone                  $65.00
+    assets:checking:dbs
+
+2024-01-13 Dinner - Din Tai Fung
+    liabilities:creditcard:citibank         $-85.60
+    expenses:food:eatingout                  $85.60
+
+2024-01-14 Petrol - Shell
+    liabilities:creditcard:dbs              $-72.00
+    expenses:transport:fuel                  $72.00
+
+2024-01-15 Amazon Purchase - Books
+    liabilities:creditcard:citibank         $-45.90
+    expenses:education:books                 $45.90
+
+2024-01-16 Medical Checkup - Raffles Medical
+    expenses:health:medical                 $180.00
+    assets:checking:dbs
+
+2024-01-17 Clothing - Uniqlo
+    liabilities:creditcard:dbs              $-120.50
+    expenses:shopping:clothes               $120.50
+
+2024-01-18 Netflix Subscription
+    liabilities:creditcard:citibank         $-16.98
+    expenses:entertainment:streaming         $16.98
+
+2024-01-19 Haircut - EC House
+    liabilities:creditcard:dbs              $-35.00
+    expenses:personal:grooming               $35.00
+
+2024-01-20 Weekend Market - Groceries
+    liabilities:creditcard:citibank         $-42.80
+    expenses:food:groceries                  $42.80
+
+2024-01-21 Stock Dividend - Apple Inc
+    assets:checking:dbs                     $145.00
+    income:dividends
+
+2024-01-22 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $400.00
+    assets:checking:dbs
+
+2024-01-23 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $320.00
+    assets:checking:dbs
+
+2024-01-25 Insurance Premium - Great Eastern
+    expenses:insurance:health               $280.00
+    assets:checking:dbs
+
+2024-01-26 Lunch Meeting - Raffles Hotel
+    liabilities:creditcard:dbs              $-95.00
+    expenses:food:eatingout                  $95.00
+
+2024-01-27 Weekend Shopping - ION Orchard
+    liabilities:creditcard:citibank         $-156.70
+    expenses:shopping:misc                  $156.70
+
+2024-01-28 Dinner Out - Clarke Quay
+    liabilities:creditcard:dbs              $-78.90
+    expenses:food:eatingout                  $78.90
+
+2024-01-30 Monthly Savings Transfer
+    assets:savings:dbs                      $2,000.00
+    assets:checking:dbs
+
+; February 2024 Transactions
+2024-02-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,500.00
+    income:salary
+
+2024-02-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2024-02-03 CNY Shopping - ION Orchard
+    liabilities:creditcard:dbs              $-380.00
+    expenses:shopping:gifts                 $380.00
+
+2024-02-04 CNY Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-120.50
+    expenses:food:groceries                 $120.50
+
+2024-02-05 CNY Dinner - Imperial Treasure
+    liabilities:creditcard:dbs              $-250.00
+    expenses:food:eatingout                 $250.00
+
+2024-02-06 Red Packets - Cash Withdrawal
+    expenses:shopping:gifts                 $500.00
+    assets:checking:dbs
+
+2024-02-07 Transport - Multiple Grab Rides
+    liabilities:creditcard:citibank         $-45.60
+    expenses:transport:rideshare             $45.60
+
+2024-02-08 Car Service - Cycle & Carriage
+    expenses:transport:maintenance          $420.00
+    assets:checking:dbs
+
+2024-02-09 CNY Cookies - Bengawan Solo
+    liabilities:creditcard:dbs              $-89.90
+    expenses:food:groceries                  $89.90
+
+2024-02-10 Utilities - SP Group
+    expenses:housing:utilities              $195.80
+    assets:checking:dbs
+
+2024-02-11 Weekend Market - Chinatown
+    liabilities:creditcard:citibank         $-38.70
+    expenses:food:groceries                  $38.70
+
+2024-02-12 Lunch Meeting - Marina Bay Sands
+    liabilities:creditcard:dbs              $-145.00
+    expenses:food:eatingout                 $145.00
+
+2024-02-13 Beauty Treatment - Sephora
+    liabilities:creditcard:citibank         $-180.00
+    expenses:personal:beauty                $180.00
+
+2024-02-14 Valentine's Dinner - Shangri-La
+    liabilities:creditcard:dbs              $-320.00
+    expenses:food:eatingout                 $320.00
+
+2024-02-15 Spotify Premium
+    liabilities:creditcard:citibank         $-12.98
+    expenses:entertainment:music             $12.98
+
+2024-02-16 Grab Food Delivery
+    liabilities:creditcard:dbs              $-28.90
+    expenses:food:eatingout                  $28.90
+
+2024-02-17 Books - Kinokuniya
+    liabilities:creditcard:citibank         $-67.90
+    expenses:education:books                 $67.90
+
+2024-02-18 Weekend Activities - Sentosa
+    liabilities:creditcard:dbs              $-95.00
+    expenses:entertainment:activities        $95.00
+
+2024-02-19 Pharmacy - Guardian
+    liabilities:creditcard:citibank         $-38.50
+    expenses:health:pharmacy                 $38.50
+
+2024-02-20 Coffee Subscription - Nespresso
+    liabilities:creditcard:dbs              $-89.00
+    expenses:food:groceries                  $89.00
+
+2024-02-21 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $850.00
+    assets:checking:dbs
+
+2024-02-22 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $650.00
+    assets:checking:dbs
+
+2024-02-23 Dental Cleaning - Q&M Dental
+    expenses:health:dental                  $120.00
+    assets:checking:dbs
+
+2024-02-24 Weekend Groceries - NTUC
+    liabilities:creditcard:citibank         $-75.40
+    expenses:food:groceries                  $75.40
+
+2024-02-25 Online Course - Udemy
+    liabilities:creditcard:dbs              $-79.99
+    expenses:education:courses               $79.99
+
+2024-02-26 Stock Dividend - Microsoft
+    assets:checking:dbs                     $98.50
+    income:dividends
+
+2024-02-27 Dinner - Boat Quay
+    liabilities:creditcard:citibank         $-68.90
+    expenses:food:eatingout                  $68.90
+
+2024-02-28 Monthly Savings Transfer
+    assets:savings:dbs                      $2,000.00
+    assets:checking:dbs
+
+; March 2024 Transactions
+2024-03-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,500.00
+    income:salary
+
+2024-03-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2024-03-03 Weekend Groceries - Cold Storage
+    liabilities:creditcard:dbs              $-92.30
+    expenses:food:groceries                  $92.30
+
+2024-03-04 Transport - EZ-Link Top Up
+    liabilities:creditcard:citibank         $-20.00
+    expenses:transport:public                $20.00
+
+2024-03-05 Coffee Break - Starbucks
+    liabilities:creditcard:dbs              $-15.80
+    expenses:food:eatingout                  $15.80
+
+2024-03-06 Team Lunch - Lau Pa Sat
+    liabilities:creditcard:citibank         $-35.80
+    expenses:food:eatingout                  $35.80
+
+2024-03-07 Grab Multiple Rides
+    liabilities:creditcard:dbs              $-42.60
+    expenses:transport:rideshare             $42.60
+
+2024-03-08 International Women's Day Gift
+    liabilities:creditcard:citibank         $-180.00
+    expenses:shopping:gifts                 $180.00
+
+2024-03-09 Weekend Market Shopping
+    liabilities:creditcard:dbs              $-58.40
+    expenses:food:groceries                  $58.40
+
+2024-03-10 Utilities - SP Group
+    expenses:housing:utilities              $178.90
+    assets:checking:dbs
+
+2024-03-11 Adobe Creative Suite
+    liabilities:creditcard:citibank         $-29.98
+    expenses:tech:software                   $29.98
+
+2024-03-12 Lunch - Hawker Centre
+    liabilities:creditcard:dbs              $-12.50
+    expenses:food:eatingout                  $12.50
+
+2024-03-13 Massage Therapy - Spa Esprit
+    liabilities:creditcard:citibank         $-120.00
+    expenses:health:wellness                $120.00
+
+2024-03-14 Clothing - Zara
+    liabilities:creditcard:dbs              $-156.00
+    expenses:shopping:clothes               $156.00
+
+2024-03-15 Grab Food Delivery
+    liabilities:creditcard:citibank         $-32.50
+    expenses:food:eatingout                  $32.50
+
+2024-03-16 Home Supplies - IKEA
+    liabilities:creditcard:dbs              $-230.00
+    expenses:house:furniture                $230.00
+
+2024-03-17 Weekend Dinner - Boat Quay
+    liabilities:creditcard:citibank         $-95.60
+    expenses:food:eatingout                  $95.60
+
+2024-03-18 Stock Purchase - Tech ETF
+    assets:investments:stocks               $1,500.00
+    assets:checking:dbs
+
+2024-03-19 Pharmacy Visit - Watsons
+    liabilities:creditcard:dbs              $-25.90
+    expenses:health:pharmacy                 $25.90
+
+2024-03-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $720.00
+    assets:checking:dbs
+
+2024-03-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $580.00
+    assets:checking:dbs
+
+2024-03-22 Course Registration - Coursera
+    liabilities:creditcard:dbs              $-89.00
+    expenses:education:courses               $89.00
+
+2024-03-23 Grocery Shopping - Sheng Siong
+    liabilities:creditcard:citibank         $-48.90
+    expenses:food:groceries                  $48.90
+
+2024-03-24 Stock Dividend - Singapore Airlines
+    assets:checking:dbs                     $67.20
+    income:dividends
+
+2024-03-25 Weekend Activities - Gardens by the Bay
+    liabilities:creditcard:dbs              $-45.00
+    expenses:entertainment:activities        $45.00
+
+2024-03-26 Dinner Date - Crystal Jade
+    liabilities:creditcard:citibank         $-125.80
+    expenses:food:eatingout                 $125.80
+
+2024-03-27 Tech Purchase - Apple Store
+    liabilities:creditcard:dbs              $-299.00
+    expenses:tech:accessories               $299.00
+
+2024-03-28 Coffee Meeting - Dean & DeLuca
+    liabilities:creditcard:citibank         $-18.90
+    expenses:food:eatingout                  $18.90
+
+2024-03-30 Monthly Savings Transfer
+    assets:savings:dbs                      $2,000.00
+    assets:checking:dbs
+
+; April 2024 Transactions
+2024-04-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,500.00
+    income:salary
+
+2024-04-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2024-04-03 Good Friday Shopping - Vivocity
+    liabilities:creditcard:dbs              $-180.50
+    expenses:shopping:misc                  $180.50
+
+2024-04-04 Easter Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-95.60
+    expenses:food:groceries                  $95.60
+
+2024-04-05 Family Dinner - Crystal Jade
+    liabilities:creditcard:dbs              $-195.00
+    expenses:food:eatingout                 $195.00
+
+2024-04-06 Transport - Weekend Grab Rides
+    liabilities:creditcard:citibank         $-38.70
+    expenses:transport:rideshare             $38.70
+
+2024-04-07 Coffee Supplies - Nespresso
+    liabilities:creditcard:dbs              $-67.90
+    expenses:food:groceries                  $67.90
+
+2024-04-08 Lunch - Food Republic
+    liabilities:creditcard:citibank         $-15.80
+    expenses:food:eatingout                  $15.80
+
+2024-04-09 Health Supplements - GNC
+    liabilities:creditcard:dbs              $-120.00
+    expenses:health:supplements             $120.00
+
+2024-04-10 Utilities - SP Group
+    expenses:housing:utilities              $188.50
+    assets:checking:dbs
+
+2024-04-11 Annual Health Insurance
+    expenses:insurance:health               $1,200.00
+    assets:checking:dbs
+
+2024-04-12 Weekend Market - Tekka Centre
+    liabilities:creditcard:citibank         $-28.90
+    expenses:food:groceries                  $28.90
+
+2024-04-13 Movie Night - Golden Village
+    liabilities:creditcard:dbs              $-45.00
+    expenses:entertainment:movies            $45.00
+
+2024-04-14 Easter Brunch - Fullerton Hotel
+    liabilities:creditcard:citibank         $-280.00
+    expenses:food:eatingout                 $280.00
+
+2024-04-15 Car Insurance - NTUC Income
+    expenses:insurance:vehicle              $680.00
+    assets:checking:dbs
+
+2024-04-16 Laptop Repair - Apple Store
+    expenses:tech:repairs                   $320.00
+    assets:checking:dbs
+
+2024-04-17 Clothing - H&M
+    liabilities:creditcard:dbs              $-89.90
+    expenses:shopping:clothes                $89.90
+
+2024-04-18 Weekend Activities - Gardens by the Bay
+    liabilities:creditcard:citibank         $-45.00
+    expenses:entertainment:activities        $45.00
+
+2024-04-19 Grab Food Multiple Orders
+    liabilities:creditcard:dbs              $-52.40
+    expenses:food:eatingout                  $52.40
+
+2024-04-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $850.00
+    assets:checking:dbs
+
+2024-04-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $720.00
+    assets:checking:dbs
+
+2024-04-22 Bonus - Performance Bonus
+    assets:checking:dbs                     $2,000.00
+    income:bonus
+
+2024-04-23 Celebration Dinner - Morton's
+    liabilities:creditcard:dbs              $-420.00
+    expenses:food:eatingout                 $420.00
+
+2024-04-24 Beauty Treatment - SK-II
+    liabilities:creditcard:citibank         $-250.00
+    expenses:personal:beauty                $250.00
+
+2024-04-25 Stock Dividend - DBS Bank
+    assets:checking:dbs                     $156.80
+    income:dividends
+
+2024-04-26 Weekend Groceries - NTUC
+    liabilities:creditcard:dbs              $-72.60
+    expenses:food:groceries                  $72.60
+
+2024-04-27 Online Shopping - Amazon
+    liabilities:creditcard:citibank         $-134.90
+    expenses:shopping:misc                  $134.90
+
+2024-04-28 Mother's Day Gift - Tiffany & Co
+    liabilities:creditcard:dbs              $-580.00
+    expenses:shopping:gifts                 $580.00
+
+2024-04-29 Coffee Meeting - TWG Tea
+    liabilities:creditcard:citibank         $-22.80
+    expenses:food:eatingout                  $22.80
+
+2024-04-30 Monthly Savings Transfer
+    assets:savings:dbs                      $2,500.00
+    assets:checking:dbs
+
+; May 2024 Transactions
+2024-05-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,500.00
+    income:salary
+
+2024-05-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2024-05-03 Labour Day Shopping - Orchard Road
+    liabilities:creditcard:dbs              $-250.00
+    expenses:shopping:clothes               $250.00
+
+2024-05-04 Weekend Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-88.70
+    expenses:food:groceries                  $88.70
+
+2024-05-05 Vesak Day Vegetarian Restaurant
+    liabilities:creditcard:dbs              $-85.60
+    expenses:food:eatingout                  $85.60
+
+2024-05-06 Transport - Multiple Grab Rides
+    liabilities:creditcard:citibank         $-45.80
+    expenses:transport:rideshare             $45.80
+
+2024-05-07 Coffee Shop - Kopi & Teh
+    liabilities:creditcard:dbs              $-18.50
+    expenses:food:eatingout                  $18.50
+
+2024-05-08 Spa Day - Mandarin Oriental
+    liabilities:creditcard:citibank         $-380.00
+    expenses:health:wellness                $380.00
+
+2024-05-09 Lunch Meeting - Raffles Hotel
+    liabilities:creditcard:dbs              $-95.00
+    expenses:food:eatingout                  $95.00
+
+2024-05-10 Utilities - SP Group
+    expenses:housing:utilities              $192.30
+    assets:checking:dbs
+
+2024-05-11 Weekend Market - Chinatown
+    liabilities:creditcard:citibank         $-32.60
+    expenses:food:groceries                  $32.60
+
+2024-05-12 Mother's Day Brunch - Ritz Carlton
+    liabilities:creditcard:dbs              $-320.00
+    expenses:food:eatingout                 $320.00
+
+2024-05-13 Online Shopping - Lazada
+    liabilities:creditcard:citibank         $-125.90
+    expenses:shopping:misc                  $125.90
+
+2024-05-14 Professional Development Course
+    expenses:education:courses              $450.00
+    assets:checking:dbs
+
+2024-05-15 Grab Food Multiple Orders
+    liabilities:creditcard:dbs              $-68.40
+    expenses:food:eatingout                  $68.40
+
+2024-05-16 Clothing Shopping - Uniqlo
+    liabilities:creditcard:citibank         $-145.60
+    expenses:shopping:clothes               $145.60
+
+2024-05-17 Weekend Dinner - Clarke Quay
+    liabilities:creditcard:dbs              $-78.90
+    expenses:food:eatingout                  $78.90
+
+2024-05-18 Weekend Activities - Universal Studios
+    liabilities:creditcard:citibank         $-150.00
+    expenses:entertainment:activities       $150.00
+
+2024-05-19 Coffee Subscription - Blue Bottle
+    liabilities:creditcard:dbs              $-56.00
+    expenses:food:groceries                  $56.00
+
+2024-05-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $950.00
+    assets:checking:dbs
+
+2024-05-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $780.00
+    assets:checking:dbs
+
+2024-05-22 Investment - Additional Stocks
+    assets:investments:stocks               $2,000.00
+    assets:checking:dbs
+
+2024-05-23 Pharmacy - Guardian
+    liabilities:creditcard:dbs              $-35.60
+    expenses:health:pharmacy                 $35.60
+
+2024-05-24 Grocery Shopping - Sheng Siong
+    liabilities:creditcard:citibank         $-52.80
+    expenses:food:groceries                  $52.80
+
+2024-05-25 Stock Dividend - OCBC Bank
+    assets:checking:dbs                     $89.60
+    income:dividends
+
+2024-05-26 Weekend Brunch - Bacchanalia
+    liabilities:creditcard:dbs              $-125.00
+    expenses:food:eatingout                 $125.00
+
+2024-05-27 Memorial Day BBQ Supplies
+    liabilities:creditcard:citibank         $-156.70
+    expenses:food:groceries                 $156.70
+
+2024-05-28 Tech Accessories - Apple Store
+    liabilities:creditcard:dbs              $-89.00
+    expenses:tech:accessories                $89.00
+
+2024-05-29 Phone Upgrade - Apple Store
+    liabilities:creditcard:citibank         $-1,299.00
+    expenses:tech:devices                   $1,299.00
+
+2024-05-30 Coffee Meeting - Starbucks Reserve
+    liabilities:creditcard:dbs              $-25.80
+    expenses:food:eatingout                  $25.80
+
+2024-05-31 Monthly Savings Transfer
+    assets:savings:dbs                      $2,000.00
+    assets:checking:dbs
+
+; June 2024 Transactions
+2024-06-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,500.00
+    income:salary
+
+2024-06-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2024-06-03 Dragon Boat Festival Celebration
+    liabilities:creditcard:dbs              $-180.00
+    expenses:food:eatingout                 $180.00
+
+2024-06-04 Weekend Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-95.40
+    expenses:food:groceries                  $95.40
+
+2024-06-05 Mid-Year Bonus
+    assets:checking:dbs                     $3,000.00
+    income:bonus
+
+2024-06-06 Vacation Planning - Travel Agent
+    expenses:travel:planning                $250.00
+    assets:checking:dbs
+
+2024-06-07 Coffee Break - Ya Kun
+    liabilities:creditcard:dbs              $-12.80
+    expenses:food:eatingout                  $12.80
+
+2024-06-08 Transport - Multiple Rides
+    liabilities:creditcard:citibank         $-42.60
+    expenses:transport:rideshare             $42.60
+
+2024-06-09 Weekend Market - Tekka Centre
+    liabilities:creditcard:dbs              $-35.70
+    expenses:food:groceries                  $35.70
+
+2024-06-10 Utilities - SP Group
+    expenses:housing:utilities              $205.80
+    assets:checking:dbs
+
+2024-06-11 Online Course - LinkedIn Learning
+    liabilities:creditcard:citibank         $-39.99
+    expenses:education:courses               $39.99
+
+2024-06-12 Father's Day Gift - Watches.com
+    liabilities:creditcard:dbs              $-450.00
+    expenses:shopping:gifts                 $450.00
+
+2024-06-13 Lunch - Marina Bay Food Court
+    liabilities:creditcard:citibank         $-18.50
+    expenses:food:eatingout                  $18.50
+
+2024-06-14 Weekend Staycation - Marina Bay Sands
+    liabilities:creditcard:dbs              $-680.00
+    expenses:entertainment:activities       $680.00
+
+2024-06-15 Car Servicing - Authorized Dealer
+    expenses:transport:maintenance          $520.00
+    assets:checking:dbs
+
+2024-06-16 Father's Day Dinner - Cut by Wolfgang Puck
+    liabilities:creditcard:citibank         $-380.00
+    expenses:food:eatingout                 $380.00
+
+2024-06-17 Health Checkup - Mount Elizabeth
+    expenses:health:medical                 $350.00
+    assets:checking:dbs
+
+2024-06-18 Coffee Supplies - Nespresso
+    liabilities:creditcard:dbs              $-79.99
+    expenses:food:groceries                  $79.99
+
+2024-06-19 Grab Food Delivery
+    liabilities:creditcard:citibank         $-32.80
+    expenses:food:eatingout                  $32.80
+
+2024-06-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $1,200.00
+    assets:checking:dbs
+
+2024-06-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $890.00
+    assets:checking:dbs
+
+2024-06-22 Summer Clothing - H&M
+    liabilities:creditcard:dbs              $-189.90
+    expenses:shopping:clothes               $189.90
+
+2024-06-23 Stock Dividend - Mapletree REIT
+    assets:checking:dbs                     $134.50
+    income:dividends
+
+2024-06-24 Weekend Groceries - NTUC
+    liabilities:creditcard:citibank         $-76.30
+    expenses:food:groceries                  $76.30
+
+2024-06-25 Dental Checkup - Private Clinic
+    expenses:health:dental                  $180.00
+    assets:checking:dbs
+
+2024-06-26 Beauty Treatment - Sephora
+    liabilities:creditcard:dbs              $-156.80
+    expenses:personal:beauty                $156.80
+
+2024-06-27 Weekend Market - Chinatown
+    liabilities:creditcard:citibank         $-45.60
+    expenses:food:groceries                  $45.60
+
+2024-06-28 Streaming Services Bundle
+    liabilities:creditcard:dbs              $-39.97
+    expenses:entertainment:streaming         $39.97
+
+2024-06-29 Dinner Date - Boat Quay
+    liabilities:creditcard:citibank         $-85.90
+    expenses:food:eatingout                  $85.90
+
+2024-06-30 Monthly Savings Transfer
+    assets:savings:dbs                      $2,500.00
+    assets:checking:dbs
+
+; July 2024 Transactions
+2024-07-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,500.00
+    income:salary
+
+2024-07-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2024-07-03 Summer Shopping - ION Orchard
+    liabilities:creditcard:dbs              $-275.60
+    expenses:shopping:clothes               $275.60
+
+2024-07-04 Weekend Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-89.40
+    expenses:food:groceries                  $89.40
+
+2024-07-05 Coffee Meeting - Starbucks
+    liabilities:creditcard:dbs              $-16.80
+    expenses:food:eatingout                  $16.80
+
+2024-07-06 Transport - Weekend Rides
+    liabilities:creditcard:citibank         $-38.90
+    expenses:transport:rideshare             $38.90
+
+2024-07-07 Weekend Market - Bugis Street
+    liabilities:creditcard:dbs              $-42.50
+    expenses:food:groceries                  $42.50
+
+2024-07-08 Movie Night - Cathay Cineleisure
+    liabilities:creditcard:citibank         $-35.00
+    expenses:entertainment:movies            $35.00
+
+2024-07-09 Lunch Meeting - Raffles City
+    liabilities:creditcard:dbs              $-68.90
+    expenses:food:eatingout                  $68.90
+
+2024-07-10 Utilities - SP Group
+    expenses:housing:utilities              $215.70
+    assets:checking:dbs
+
+2024-07-11 Grab Food Multiple Orders
+    liabilities:creditcard:citibank         $-54.80
+    expenses:food:eatingout                  $54.80
+
+2024-07-12 Tech Purchase - Best Denki
+    liabilities:creditcard:dbs              $-189.00
+    expenses:tech:accessories               $189.00
+
+2024-07-13 Weekend Dinner - Clarke Quay
+    liabilities:creditcard:citibank         $-95.60
+    expenses:food:eatingout                  $95.60
+
+2024-07-14 Pharmacy Visit - Guardian
+    liabilities:creditcard:dbs              $-28.70
+    expenses:health:pharmacy                 $28.70
+
+2024-07-15 Online Course - Udemy
+    liabilities:creditcard:citibank         $-119.99
+    expenses:education:courses              $119.99
+
+2024-07-16 Coffee Subscription - Blue Bottle
+    liabilities:creditcard:dbs              $-56.00
+    expenses:food:groceries                  $56.00
+
+2024-07-17 Beauty Treatment - Sulwhasoo
+    liabilities:creditcard:citibank         $-320.00
+    expenses:personal:beauty                $320.00
+
+2024-07-18 Weekend Activities - Sentosa
+    liabilities:creditcard:dbs              $-125.00
+    expenses:entertainment:activities       $125.00
+
+2024-07-19 Grocery Shopping - Sheng Siong
+    liabilities:creditcard:citibank         $-58.90
+    expenses:food:groceries                  $58.90
+
+2024-07-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $980.00
+    assets:checking:dbs
+
+2024-07-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $850.00
+    assets:checking:dbs
+
+2024-07-22 Stock Purchase - Singapore ETF
+    assets:investments:stocks               $1,800.00
+    assets:checking:dbs
+
+2024-07-23 Dinner Out - Marina Bay
+    liabilities:creditcard:dbs              $-156.80
+    expenses:food:eatingout                 $156.80
+
+2024-07-24 Clothing - Zara
+    liabilities:creditcard:citibank         $-189.90
+    expenses:shopping:clothes               $189.90
+
+2024-07-25 Stock Dividend - CapitaLand REIT
+    assets:checking:dbs                     $98.40
+    income:dividends
+
+2024-07-26 Weekend Brunch - Fullerton Bay
+    liabilities:creditcard:dbs              $-125.60
+    expenses:food:eatingout                 $125.60
+
+2024-07-27 Online Shopping - Shopee
+    liabilities:creditcard:citibank         $-89.50
+    expenses:shopping:misc                   $89.50
+
+2024-07-28 Coffee Break - TWG Tea
+    liabilities:creditcard:dbs              $-22.80
+    expenses:food:eatingout                  $22.80
+
+2024-07-29 Health Supplements - Blackmores
+    liabilities:creditcard:citibank         $-145.60
+    expenses:health:supplements             $145.60
+
+2024-07-31 Monthly Savings Transfer
+    assets:savings:dbs                      $2,200.00
+    assets:checking:dbs
+
+; August 2024 Transactions
+2024-08-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,500.00
+    income:salary
+
+2024-08-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2024-08-03 National Day Shopping - Marina Bay
+    liabilities:creditcard:dbs              $-195.80
+    expenses:shopping:gifts                 $195.80
+
+2024-08-04 Weekend Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-92.50
+    expenses:food:groceries                  $92.50
+
+2024-08-05 Coffee Meeting - Dean & DeLuca
+    liabilities:creditcard:dbs              $-18.90
+    expenses:food:eatingout                  $18.90
+
+2024-08-06 Transport - Multiple Grab Rides
+    liabilities:creditcard:citibank         $-45.60
+    expenses:transport:rideshare             $45.60
+
+2024-08-07 Lunch - Hawker Centre
+    liabilities:creditcard:dbs              $-12.50
+    expenses:food:eatingout                  $12.50
+
+2024-08-08 National Day Celebration Dinner
+    liabilities:creditcard:citibank         $-156.80
+    expenses:food:eatingout                 $156.80
+
+2024-08-09 National Day Fireworks - Marina Bay
+    liabilities:creditcard:dbs              $-45.00
+    expenses:entertainment:activities        $45.00
+
+2024-08-10 Utilities - SP Group
+    expenses:housing:utilities              $198.90
+    assets:checking:dbs
+
+2024-08-11 Weekend Market - Chinatown
+    liabilities:creditcard:citibank         $-38.70
+    expenses:food:groceries                  $38.70
+
+2024-08-12 Movie Date - Golden Village
+    liabilities:creditcard:dbs              $-42.00
+    expenses:entertainment:movies            $42.00
+
+2024-08-13 Online Shopping - Amazon
+    liabilities:creditcard:citibank         $-134.90
+    expenses:shopping:misc                  $134.90
+
+2024-08-14 Grab Food Delivery
+    liabilities:creditcard:dbs              $-28.60
+    expenses:food:eatingout                  $28.60
+
+2024-08-15 Health Checkup - Raffles Medical
+    expenses:health:medical                 $280.00
+    assets:checking:dbs
+
+2024-08-16 Beauty Treatment - SK-II
+    liabilities:creditcard:citibank         $-250.00
+    expenses:personal:beauty                $250.00
+
+2024-08-17 Weekend Dinner - Boat Quay
+    liabilities:creditcard:dbs              $-95.60
+    expenses:food:eatingout                  $95.60
+
+2024-08-18 Clothing - Uniqlo
+    liabilities:creditcard:citibank         $-125.80
+    expenses:shopping:clothes               $125.80
+
+2024-08-19 Coffee Subscription - Nespresso
+    liabilities:creditcard:dbs              $-67.90
+    expenses:food:groceries                  $67.90
+
+2024-08-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $890.00
+    assets:checking:dbs
+
+2024-08-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $780.00
+    assets:checking:dbs
+
+2024-08-22 Professional Course - Coursera
+    liabilities:creditcard:dbs              $-99.00
+    expenses:education:courses               $99.00
+
+2024-08-23 Weekend Groceries - NTUC
+    liabilities:creditcard:citibank         $-76.40
+    expenses:food:groceries                  $76.40
+
+2024-08-24 Stock Dividend - Singapore Airlines
+    assets:checking:dbs                     $112.30
+    income:dividends
+
+2024-08-25 Spa Treatment - Mandarin Oriental
+    liabilities:creditcard:dbs              $-320.00
+    expenses:health:wellness                $320.00
+
+2024-08-26 Tech Accessories - Apple Store
+    liabilities:creditcard:citibank         $-189.00
+    expenses:tech:accessories               $189.00
+
+2024-08-27 Weekend Brunch - Shangri-La
+    liabilities:creditcard:dbs              $-145.60
+    expenses:food:eatingout                 $145.60
+
+2024-08-28 Online Course - LinkedIn Learning
+    liabilities:creditcard:citibank         $-59.99
+    expenses:education:courses               $59.99
+
+2024-08-29 Pharmacy - Watsons
+    liabilities:creditcard:dbs              $-35.80
+    expenses:health:pharmacy                 $35.80
+
+2024-08-30 Dinner Date - Clarke Quay
+    liabilities:creditcard:citibank         $-89.50
+    expenses:food:eatingout                  $89.50
+
+2024-08-31 Monthly Savings Transfer
+    assets:savings:dbs                      $2,100.00
+    assets:checking:dbs
+
+; September 2024 Transactions
+2024-09-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,500.00
+    income:salary
+
+2024-09-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2024-09-03 Back to School Shopping - ION Orchard
+    liabilities:creditcard:dbs              $-189.90
+    expenses:shopping:misc                  $189.90
+
+2024-09-04 Weekend Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-88.60
+    expenses:food:groceries                  $88.60
+
+2024-09-05 Coffee Break - Starbucks Reserve
+    liabilities:creditcard:dbs              $-25.80
+    expenses:food:eatingout                  $25.80
+
+2024-09-06 Transport - Weekend Rides
+    liabilities:creditcard:citibank         $-42.90
+    expenses:transport:rideshare             $42.90
+
+2024-09-07 Weekend Market - Tekka Centre
+    liabilities:creditcard:dbs              $-35.40
+    expenses:food:groceries                  $35.40
+
+2024-09-08 Movie Night - Shaw Theatres
+    liabilities:creditcard:citibank         $-38.00
+    expenses:entertainment:movies            $38.00
+
+2024-09-09 Lunch Meeting - Marina Bay Sands
+    liabilities:creditcard:dbs              $-125.00
+    expenses:food:eatingout                 $125.00
+
+2024-09-10 Utilities - SP Group
+    expenses:housing:utilities              $185.40
+    assets:checking:dbs
+
+2024-09-11 Grab Food Multiple Orders
+    liabilities:creditcard:citibank         $-58.70
+    expenses:food:eatingout                  $58.70
+
+2024-09-12 Clothing - Zara
+    liabilities:creditcard:dbs              $-156.80
+    expenses:shopping:clothes               $156.80
+
+2024-09-13 Weekend Dinner - Raffles City
+    liabilities:creditcard:citibank         $-89.60
+    expenses:food:eatingout                  $89.60
+
+2024-09-14 Health Supplements - GNC
+    liabilities:creditcard:dbs              $-134.90
+    expenses:health:supplements             $134.90
+
+2024-09-15 Online Shopping - Lazada
+    liabilities:creditcard:citibank         $-95.40
+    expenses:shopping:misc                   $95.40
+
+2024-09-16 Coffee Meeting - TWG Tea
+    liabilities:creditcard:dbs              $-22.80
+    expenses:food:eatingout                  $22.80
+
+2024-09-17 Beauty Treatment - Sulwhasoo
+    liabilities:creditcard:citibank         $-280.00
+    expenses:personal:beauty                $280.00
+
+2024-09-18 Weekend Activities - Universal Studios
+    liabilities:creditcard:dbs              $-150.00
+    expenses:entertainment:activities       $150.00
+
+2024-09-19 Grocery Shopping - Sheng Siong
+    liabilities:creditcard:citibank         $-52.80
+    expenses:food:groceries                  $52.80
+
+2024-09-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $920.00
+    assets:checking:dbs
+
+2024-09-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $810.00
+    assets:checking:dbs
+
+2024-09-22 Investment - Tech Stocks
+    assets:investments:stocks               $1,500.00
+    assets:checking:dbs
+
+2024-09-23 Pharmacy Visit - Guardian
+    liabilities:creditcard:dbs              $-38.50
+    expenses:health:pharmacy                 $38.50
+
+2024-09-24 Weekend Brunch - Fullerton Hotel
+    liabilities:creditcard:citibank         $-168.90
+    expenses:food:eatingout                 $168.90
+
+2024-09-25 Stock Dividend - DBS Bank
+    assets:checking:dbs                     $134.70
+    income:dividends
+
+2024-09-26 Tech Purchase - Best Denki
+    liabilities:creditcard:dbs              $-245.00
+    expenses:tech:accessories               $245.00
+
+2024-09-27 Online Course - Udemy
+    liabilities:creditcard:citibank         $-89.99
+    expenses:education:courses               $89.99
+
+2024-09-28 Coffee Supplies - Blue Bottle
+    liabilities:creditcard:dbs              $-56.00
+    expenses:food:groceries                  $56.00
+
+2024-09-29 Weekend Dinner - Marina Bay
+    liabilities:creditcard:citibank         $-125.80
+    expenses:food:eatingout                 $125.80
+
+2024-09-30 Monthly Savings Transfer
+    assets:savings:dbs                      $2,000.00
+    assets:checking:dbs
+
+; October 2024 Transactions
+2024-10-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,500.00
+    income:salary
+
+2024-10-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2024-10-03 Halloween Shopping - Vivocity
+    liabilities:creditcard:dbs              $-145.60
+    expenses:shopping:misc                  $145.60
+
+2024-10-04 Weekend Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-92.40
+    expenses:food:groceries                  $92.40
+
+2024-10-05 Coffee Meeting - Starbucks
+    liabilities:creditcard:dbs              $-16.80
+    expenses:food:eatingout                  $16.80
+
+2024-10-06 Transport - Multiple Rides
+    liabilities:creditcard:citibank         $-45.60
+    expenses:transport:rideshare             $45.60
+
+2024-10-07 Weekend Market - Bugis Street
+    liabilities:creditcard:dbs              $-38.90
+    expenses:food:groceries                  $38.90
+
+2024-10-08 Movie Date - Cathay Cineleisure
+    liabilities:creditcard:citibank         $-42.00
+    expenses:entertainment:movies            $42.00
+
+2024-10-09 Lunch Meeting - Raffles Hotel
+    liabilities:creditcard:dbs              $-95.00
+    expenses:food:eatingout                  $95.00
+
+2024-10-10 Utilities - SP Group
+    expenses:housing:utilities              $189.70
+    assets:checking:dbs
+
+2024-10-11 Grab Food Delivery
+    liabilities:creditcard:citibank         $-32.80
+    expenses:food:eatingout                  $32.80
+
+2024-10-12 Clothing - H&M
+    liabilities:creditcard:dbs              $-125.90
+    expenses:shopping:clothes               $125.90
+
+2024-10-13 Weekend Dinner - Boat Quay
+    liabilities:creditcard:citibank         $-89.60
+    expenses:food:eatingout                  $89.60
+
+2024-10-14 Health Checkup - Mount Elizabeth
+    expenses:health:medical                 $320.00
+    assets:checking:dbs
+
+2024-10-15 Online Shopping - Amazon
+    liabilities:creditcard:dbs              $-156.70
+    expenses:shopping:misc                  $156.70
+
+2024-10-16 Beauty Treatment - Sephora
+    liabilities:creditcard:citibank         $-189.00
+    expenses:personal:beauty                $189.00
+
+2024-10-17 Weekend Activities - Gardens by the Bay
+    liabilities:creditcard:dbs              $-85.00
+    expenses:entertainment:activities        $85.00
+
+2024-10-18 Professional Course - Coursera
+    liabilities:creditcard:citibank         $-129.00
+    expenses:education:courses              $129.00
+
+2024-10-19 Coffee Subscription - Nespresso
+    liabilities:creditcard:dbs              $-67.90
+    expenses:food:groceries                  $67.90
+
+2024-10-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $850.00
+    assets:checking:dbs
+
+2024-10-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $760.00
+    assets:checking:dbs
+
+2024-10-22 Halloween Costume - Party Shop
+    liabilities:creditcard:dbs              $-89.90
+    expenses:shopping:misc                   $89.90
+
+2024-10-23 Weekend Groceries - NTUC
+    liabilities:creditcard:citibank         $-76.50
+    expenses:food:groceries                  $76.50
+
+2024-10-24 Stock Dividend - OCBC Bank
+    assets:checking:dbs                     $98.60
+    income:dividends
+
+2024-10-25 Tech Accessories - Apple Store
+    liabilities:creditcard:dbs              $-199.00
+    expenses:tech:accessories               $199.00
+
+2024-10-26 Weekend Brunch - Shangri-La
+    liabilities:creditcard:citibank         $-145.80
+    expenses:food:eatingout                 $145.80
+
+2024-10-27 Pharmacy Visit - Watsons
+    liabilities:creditcard:dbs              $-28.70
+    expenses:health:pharmacy                 $28.70
+
+2024-10-28 Online Course - LinkedIn Learning
+    liabilities:creditcard:citibank         $-79.99
+    expenses:education:courses               $79.99
+
+2024-10-29 Spa Treatment - Mandarin Oriental
+    liabilities:creditcard:dbs              $-350.00
+    expenses:health:wellness                $350.00
+
+2024-10-30 Halloween Party - Clarke Quay
+    liabilities:creditcard:citibank         $-156.90
+    expenses:entertainment:activities       $156.90
+
+2024-10-31 Monthly Savings Transfer
+    assets:savings:dbs                      $2,200.00
+    assets:checking:dbs
+
+; November 2024 Transactions
+2024-11-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,500.00
+    income:salary
+
+2024-11-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2024-11-03 Deepavali Shopping - Little India
+    liabilities:creditcard:dbs              $-189.60
+    expenses:shopping:gifts                 $189.60
+
+2024-11-04 Weekend Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-88.90
+    expenses:food:groceries                  $88.90
+
+2024-11-05 Coffee Break - Ya Kun
+    liabilities:creditcard:dbs              $-12.80
+    expenses:food:eatingout                  $12.80
+
+2024-11-06 Transport - Weekend Rides
+    liabilities:creditcard:citibank         $-38.70
+    expenses:transport:rideshare             $38.70
+
+2024-11-07 Deepavali Celebration Dinner
+    liabilities:creditcard:dbs              $-156.80
+    expenses:food:eatingout                 $156.80
+
+2024-11-08 Weekend Market - Tekka Centre
+    liabilities:creditcard:citibank         $-42.60
+    expenses:food:groceries                  $42.60
+
+2024-11-09 Movie Night - Golden Village
+    liabilities:creditcard:dbs              $-38.00
+    expenses:entertainment:movies            $38.00
+
+2024-11-10 Utilities - SP Group
+    expenses:housing:utilities              $195.80
+    assets:checking:dbs
+
+2024-11-11 Singles Day Shopping - Lazada
+    liabilities:creditcard:citibank         $-234.90
+    expenses:shopping:misc                  $234.90
+
+2024-11-12 Lunch Meeting - Marina Bay Sands
+    liabilities:creditcard:dbs              $-125.00
+    expenses:food:eatingout                 $125.00
+
+2024-11-13 Grab Food Multiple Orders
+    liabilities:creditcard:citibank         $-54.80
+    expenses:food:eatingout                  $54.80
+
+2024-11-14 Clothing - Uniqlo
+    liabilities:creditcard:dbs              $-145.60
+    expenses:shopping:clothes               $145.60
+
+2024-11-15 Health Supplements - Blackmores
+    liabilities:creditcard:citibank         $-98.50
+    expenses:health:supplements              $98.50
+
+2024-11-16 Weekend Dinner - Raffles City
+    liabilities:creditcard:dbs              $-89.60
+    expenses:food:eatingout                  $89.60
+
+2024-11-17 Beauty Treatment - SK-II
+    liabilities:creditcard:citibank         $-280.00
+    expenses:personal:beauty                $280.00
+
+2024-11-18 Coffee Meeting - TWG Tea
+    liabilities:creditcard:dbs              $-22.80
+    expenses:food:eatingout                  $22.80
+
+2024-11-19 Online Course - Udemy
+    liabilities:creditcard:citibank         $-109.99
+    expenses:education:courses              $109.99
+
+2024-11-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $920.00
+    assets:checking:dbs
+
+2024-11-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $850.00
+    assets:checking:dbs
+
+2024-11-22 Investment - Additional Stocks
+    assets:investments:stocks               $2,000.00
+    assets:checking:dbs
+
+2024-11-23 Weekend Activities - Universal Studios
+    liabilities:creditcard:dbs              $-150.00
+    expenses:entertainment:activities       $150.00
+
+2024-11-24 Grocery Shopping - Sheng Siong
+    liabilities:creditcard:citibank         $-58.90
+    expenses:food:groceries                  $58.90
+
+2024-11-25 Stock Dividend - CapitaLand REIT
+    assets:checking:dbs                     $112.40
+    income:dividends
+
+2024-11-26 Tech Purchase - Best Denki
+    liabilities:creditcard:dbs              $-289.00
+    expenses:tech:accessories               $289.00
+
+2024-11-27 Weekend Brunch - Fullerton Bay
+    liabilities:creditcard:citibank         $-168.90
+    expenses:food:eatingout                 $168.90
+
+2024-11-28 Pharmacy Visit - Guardian
+    liabilities:creditcard:dbs              $-35.60
+    expenses:health:pharmacy                 $35.60
+
+2024-11-29 Black Friday Shopping - Online
+    liabilities:creditcard:citibank         $-456.80
+    expenses:shopping:misc                  $456.80
+
+2024-11-30 Monthly Savings Transfer
+    assets:savings:dbs                      $2,100.00
+    assets:checking:dbs
+
+; December 2024 Transactions
+2024-12-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,500.00
+    income:salary
+
+2024-12-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2024-12-03 Christmas Shopping - Orchard Road
+    liabilities:creditcard:dbs              $-450.00
+    expenses:shopping:gifts                 $450.00
+
+2024-12-04 Weekend Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-95.60
+    expenses:food:groceries                  $95.60
+
+2024-12-05 Coffee Meeting - Starbucks Reserve
+    liabilities:creditcard:dbs              $-25.80
+    expenses:food:eatingout                  $25.80
+
+2024-12-06 Transport - Multiple Rides
+    liabilities:creditcard:citibank         $-48.90
+    expenses:transport:rideshare             $48.90
+
+2024-12-07 Christmas Party Outfit - Zara
+    liabilities:creditcard:dbs              $-189.90
+    expenses:shopping:clothes               $189.90
+
+2024-12-08 Weekend Market - Chinatown
+    liabilities:creditcard:citibank         $-42.80
+    expenses:food:groceries                  $42.80
+
+2024-12-09 Movie Date - Shaw Theatres
+    liabilities:creditcard:dbs              $-38.00
+    expenses:entertainment:movies            $38.00
+
+2024-12-10 Utilities - SP Group
+    expenses:housing:utilities              $205.90
+    assets:checking:dbs
+
+2024-12-11 Year End Bonus
+    assets:checking:dbs                     $5,000.00
+    income:bonus
+
+2024-12-12 Christmas Dinner Booking - Marina Bay Sands
+    liabilities:creditcard:citibank         $-380.00
+    expenses:food:eatingout                 $380.00
+
+2024-12-13 Grab Food Delivery
+    liabilities:creditcard:dbs              $-32.80
+    expenses:food:eatingout                  $32.80
+
+2024-12-14 Gift Shopping - Tiffany & Co
+    liabilities:creditcard:citibank         $-680.00
+    expenses:shopping:gifts                 $680.00
+
+2024-12-15 Health Checkup - Raffles Medical
+    expenses:health:medical                 $280.00
+    assets:checking:dbs
+
+2024-12-16 Christmas Party - Shangri-La
+    liabilities:creditcard:dbs              $-195.00
+    expenses:entertainment:activities       $195.00
+
+2024-12-17 Beauty Treatment - Sulwhasoo
+    liabilities:creditcard:citibank         $-320.00
+    expenses:personal:beauty                $320.00
+
+2024-12-18 Coffee Supplies - Nespresso
+    liabilities:creditcard:dbs              $-89.00
+    expenses:food:groceries                  $89.00
+
+2024-12-19 Online Shopping - Amazon
+    liabilities:creditcard:citibank         $-234.50
+    expenses:shopping:misc                  $234.50
+
+2024-12-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $1,200.00
+    assets:checking:dbs
+
+2024-12-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $1,100.00
+    assets:checking:dbs
+
+2024-12-22 Christmas Eve Dinner - Cut by Wolfgang Puck
+    liabilities:creditcard:dbs              $-420.00
+    expenses:food:eatingout                 $420.00
+
+2024-12-23 Last Minute Gifts - ION Orchard
+    liabilities:creditcard:citibank         $-189.90
+    expenses:shopping:gifts                 $189.90
+
+2024-12-24 Stock Dividend - Singapore Airlines
+    assets:checking:dbs                     $145.80
+    income:dividends
+
+2024-12-25 Christmas Day Brunch - Ritz Carlton
+    liabilities:creditcard:dbs              $-280.00
+    expenses:food:eatingout                 $280.00
+
+2024-12-26 Boxing Day Shopping - Vivocity
+    liabilities:creditcard:citibank         $-345.60
+    expenses:shopping:misc                  $345.60
+
+2024-12-27 Spa Treatment - Mandarin Oriental
+    liabilities:creditcard:dbs              $-380.00
+    expenses:health:wellness                $380.00
+
+2024-12-28 New Year Party Outfit - H&M
+    liabilities:creditcard:citibank         $-156.80
+    expenses:shopping:clothes               $156.80
+
+2024-12-29 Grocery Shopping - NTUC
+    liabilities:creditcard:dbs              $-82.60
+    expenses:food:groceries                  $82.60
+
+2024-12-30 Investment - Year End Stock Purchase
+    assets:investments:stocks               $3,000.00
+    assets:checking:dbs
+
+2024-12-31 Monthly Savings Transfer
+    assets:savings:dbs                      $2,500.00
+    assets:checking:dbs
+
+; January 2025 Transactions
+2025-01-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,800.00
+    income:salary
+
+2025-01-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2025-01-03 New Year Shopping - Marina Bay
+    liabilities:creditcard:dbs              $-189.60
+    expenses:shopping:misc                  $189.60
+
+2025-01-04 Weekend Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-88.70
+    expenses:food:groceries                  $88.70
+
+2025-01-05 Coffee Meeting - Dean & DeLuca
+    liabilities:creditcard:dbs              $-18.90
+    expenses:food:eatingout                  $18.90
+
+2025-01-06 Transport - Weekend Rides
+    liabilities:creditcard:citibank         $-42.60
+    expenses:transport:rideshare             $42.60
+
+2025-01-07 Resolution Gym Membership
+    expenses:health:fitness                 $180.00
+    assets:checking:dbs
+
+2025-01-08 Weekend Market - Tekka Centre
+    liabilities:creditcard:dbs              $-35.80
+    expenses:food:groceries                  $35.80
+
+2025-01-09 Movie Night - Cathay Cineleisure
+    liabilities:creditcard:citibank         $-42.00
+    expenses:entertainment:movies            $42.00
+
+2025-01-10 Utilities - SP Group
+    expenses:housing:utilities              $208.60
+    assets:checking:dbs
+
+2025-01-11 Lunch Meeting - Raffles Hotel
+    liabilities:creditcard:dbs              $-125.00
+    expenses:food:eatingout                 $125.00
+
+2025-01-12 Online Course - Coursera
+    liabilities:creditcard:citibank         $-149.00
+    expenses:education:courses              $149.00
+
+2025-01-13 Grab Food Multiple Orders
+    liabilities:creditcard:dbs              $-58.70
+    expenses:food:eatingout                  $58.70
+
+2025-01-14 Clothing - Uniqlo
+    liabilities:creditcard:citibank         $-145.60
+    expenses:shopping:clothes               $145.60
+
+2025-01-15 Health Supplements - GNC
+    liabilities:creditcard:dbs              $-124.90
+    expenses:health:supplements             $124.90
+
+2025-01-16 Weekend Dinner - Clarke Quay
+    liabilities:creditcard:citibank         $-89.60
+    expenses:food:eatingout                  $89.60
+
+2025-01-17 Beauty Treatment - Sephora
+    liabilities:creditcard:dbs              $-189.00
+    expenses:personal:beauty                $189.00
+
+2025-01-18 Coffee Subscription - Blue Bottle
+    liabilities:creditcard:citibank         $-56.00
+    expenses:food:groceries                  $56.00
+
+2025-01-19 Weekend Activities - Sentosa
+    liabilities:creditcard:dbs              $-125.00
+    expenses:entertainment:activities       $125.00
+
+2025-01-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $950.00
+    assets:checking:dbs
+
+2025-01-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $820.00
+    assets:checking:dbs
+
+2025-01-22 Tech Purchase - Apple Store
+    liabilities:creditcard:dbs              $-399.00
+    expenses:tech:accessories               $399.00
+
+2025-01-23 Grocery Shopping - Sheng Siong
+    liabilities:creditcard:citibank         $-58.90
+    expenses:food:groceries                  $58.90
+
+2025-01-24 Stock Dividend - DBS Bank
+    assets:checking:dbs                     $156.90
+    income:dividends
+
+2025-01-25 Weekend Brunch - Fullerton Hotel
+    liabilities:creditcard:dbs              $-168.90
+    expenses:food:eatingout                 $168.90
+
+2025-01-26 Online Shopping - Shopee
+    liabilities:creditcard:citibank         $-89.50
+    expenses:shopping:misc                   $89.50
+
+2025-01-27 Pharmacy Visit - Guardian
+    liabilities:creditcard:dbs              $-38.60
+    expenses:health:pharmacy                 $38.60
+
+2025-01-28 Professional Course - LinkedIn Learning
+    liabilities:creditcard:citibank         $-79.99
+    expenses:education:courses               $79.99
+
+2025-01-29 Spa Treatment - Mandarin Oriental
+    liabilities:creditcard:dbs              $-380.00
+    expenses:health:wellness                $380.00
+
+2025-01-30 Chinese New Year Preparations
+    liabilities:creditcard:citibank         $-234.80
+    expenses:shopping:gifts                 $234.80
+
+2025-01-31 Monthly Savings Transfer
+    assets:savings:dbs                      $2,300.00
+    assets:checking:dbs
+
+; February 2025 Transactions
+2025-02-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,800.00
+    income:salary
+
+2025-02-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2025-02-03 Chinese New Year Shopping - Chinatown
+    liabilities:creditcard:dbs              $-345.60
+    expenses:shopping:gifts                 $345.60
+
+2025-02-04 CNY Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-156.80
+    expenses:food:groceries                 $156.80
+
+2025-02-05 CNY Reunion Dinner - Imperial Treasure
+    liabilities:creditcard:dbs              $-480.00
+    expenses:food:eatingout                 $480.00
+
+2025-02-06 Red Packets - Cash Withdrawal
+    expenses:shopping:gifts                 $800.00
+    assets:checking:dbs
+
+2025-02-07 Transport - CNY Visits
+    liabilities:creditcard:citibank         $-68.90
+    expenses:transport:rideshare             $68.90
+
+2025-02-08 CNY Temple Visit Donations
+    expenses:personal:donations             $200.00
+    assets:checking:dbs
+
+2025-02-09 CNY Cookies - Bengawan Solo
+    liabilities:creditcard:dbs              $-125.90
+    expenses:food:groceries                 $125.90
+
+2025-02-10 Utilities - SP Group
+    expenses:housing:utilities              $195.80
+    assets:checking:dbs
+
+2025-02-11 CNY Visiting - Grab Rides
+    liabilities:creditcard:citibank         $-45.60
+    expenses:transport:rideshare             $45.60
+
+2025-02-12 CNY Lunch - Crystal Jade
+    liabilities:creditcard:dbs              $-189.00
+    expenses:food:eatingout                 $189.00
+
+2025-02-13 Beauty Treatment - SK-II
+    liabilities:creditcard:citibank         $-280.00
+    expenses:personal:beauty                $280.00
+
+2025-02-14 Valentine's Dinner - Cut by Wolfgang Puck
+    liabilities:creditcard:dbs              $-420.00
+    expenses:food:eatingout                 $420.00
+
+2025-02-15 Streaming Services - Annual
+    liabilities:creditcard:citibank         $-159.88
+    expenses:entertainment:streaming        $159.88
+
+2025-02-16 Coffee Meeting - TWG Tea
+    liabilities:creditcard:dbs              $-22.80
+    expenses:food:eatingout                  $22.80
+
+2025-02-17 Online Course - Udemy
+    liabilities:creditcard:citibank         $-119.99
+    expenses:education:courses              $119.99
+
+2025-02-18 Weekend Activities - Universal Studios
+    liabilities:creditcard:dbs              $-150.00
+    expenses:entertainment:activities       $150.00
+
+2025-02-19 Pharmacy Visit - Watsons
+    liabilities:creditcard:citibank         $-38.50
+    expenses:health:pharmacy                 $38.50
+
+2025-02-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $1,200.00
+    assets:checking:dbs
+
+2025-02-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $950.00
+    assets:checking:dbs
+
+2025-02-22 Investment - Additional ETF
+    assets:investments:stocks               $2,200.00
+    assets:checking:dbs
+
+2025-02-23 Weekend Groceries - NTUC
+    liabilities:creditcard:dbs              $-76.40
+    expenses:food:groceries                  $76.40
+
+2025-02-24 Stock Dividend - OCBC Bank
+    assets:checking:dbs                     $98.70
+    income:dividends
+
+2025-02-25 Tech Accessories - Best Denki
+    liabilities:creditcard:citibank         $-189.00
+    expenses:tech:accessories               $189.00
+
+2025-02-26 Weekend Brunch - Marina Bay Sands
+    liabilities:creditcard:dbs              $-145.60
+    expenses:food:eatingout                 $145.60
+
+2025-02-27 Health Checkup - Mount Elizabeth
+    expenses:health:medical                 $350.00
+    assets:checking:dbs
+
+2025-02-28 Monthly Savings Transfer
+    assets:savings:dbs                      $2,400.00
+    assets:checking:dbs
+
+; March 2025 Transactions
+2025-03-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $8,800.00
+    income:salary
+
+2025-03-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2025-03-03 Spring Shopping - ION Orchard
+    liabilities:creditcard:dbs              $-234.80
+    expenses:shopping:clothes               $234.80
+
+2025-03-04 Weekend Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-92.50
+    expenses:food:groceries                  $92.50
+
+2025-03-05 Coffee Break - Starbucks Reserve
+    liabilities:creditcard:dbs              $-25.80
+    expenses:food:eatingout                  $25.80
+
+2025-03-06 Transport - Multiple Rides
+    liabilities:creditcard:citibank         $-48.90
+    expenses:transport:rideshare             $48.90
+
+2025-03-07 Weekend Market - Bugis Street
+    liabilities:creditcard:dbs              $-42.60
+    expenses:food:groceries                  $42.60
+
+2025-03-08 International Women's Day Gift
+    liabilities:creditcard:citibank         $-289.00
+    expenses:shopping:gifts                 $289.00
+
+2025-03-09 Movie Date - Golden Village
+    liabilities:creditcard:dbs              $-42.00
+    expenses:entertainment:movies            $42.00
+
+2025-03-10 Utilities - SP Group
+    expenses:housing:utilities              $198.90
+    assets:checking:dbs
+
+2025-03-11 Lunch Meeting - Raffles City
+    liabilities:creditcard:citibank         $-89.60
+    expenses:food:eatingout                  $89.60
+
+2025-03-12 Professional Course - Coursera
+    liabilities:creditcard:dbs              $-169.00
+    expenses:education:courses              $169.00
+
+2025-03-13 Grab Food Delivery
+    liabilities:creditcard:citibank         $-58.70
+    expenses:food:eatingout                  $58.70
+
+2025-03-14 Beauty Treatment - Sulwhasoo
+    liabilities:creditcard:dbs              $-350.00
+    expenses:personal:beauty                $350.00
+
+2025-03-15 Online Shopping - Amazon
+    liabilities:creditcard:citibank         $-156.90
+    expenses:shopping:misc                  $156.90
+
+2025-03-16 Coffee Supplies - Nespresso
+    liabilities:creditcard:dbs              $-89.00
+    expenses:food:groceries                  $89.00
+
+2025-03-17 Weekend Dinner - Marina Bay
+    liabilities:creditcard:citibank         $-125.80
+    expenses:food:eatingout                 $125.80
+
+2025-03-18 Tech Purchase - Apple Store
+    liabilities:creditcard:dbs              $-599.00
+    expenses:tech:devices                   $599.00
+
+2025-03-19 Health Supplements - Blackmores
+    liabilities:creditcard:citibank         $-134.90
+    expenses:health:supplements             $134.90
+
+2025-03-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $1,100.00
+    assets:checking:dbs
+
+2025-03-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $890.00
+    assets:checking:dbs
+
+2025-03-22 Weekend Activities - Sentosa
+    liabilities:creditcard:dbs              $-125.00
+    expenses:entertainment:activities       $125.00
+
+2025-03-23 Grocery Shopping - Sheng Siong
+    liabilities:creditcard:citibank         $-58.90
+    expenses:food:groceries                  $58.90
+
+2025-03-24 Stock Dividend - CapitaLand REIT
+    assets:checking:dbs                     $112.50
+    income:dividends
+
+2025-03-25 Spa Treatment - Mandarin Oriental
+    liabilities:creditcard:dbs              $-380.00
+    expenses:health:wellness                $380.00
+
+2025-03-26 Clothing - Zara
+    liabilities:creditcard:citibank         $-189.90
+    expenses:shopping:clothes               $189.90
+
+2025-03-27 Weekend Brunch - Shangri-La
+    liabilities:creditcard:dbs              $-168.90
+    expenses:food:eatingout                 $168.90
+
+2025-03-28 Pharmacy Visit - Guardian
+    liabilities:creditcard:citibank         $-38.60
+    expenses:health:pharmacy                 $38.60
+
+2025-03-29 Online Course - LinkedIn Learning
+    liabilities:creditcard:dbs              $-99.99
+    expenses:education:courses               $99.99
+
+2025-03-30 Investment - Tech Stocks
+    assets:investments:stocks               $1,800.00
+    assets:checking:dbs
+
+2025-03-31 Monthly Savings Transfer
+    assets:savings:dbs                      $2,300.00
+    assets:checking:dbs
+
+; April 2025 Transactions
+2025-04-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $9,000.00
+    income:salary
+
+2025-04-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2025-04-03 Easter Shopping - Vivocity
+    liabilities:creditcard:dbs              $-189.60
+    expenses:shopping:misc                  $189.60
+
+2025-04-04 Weekend Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-88.70
+    expenses:food:groceries                  $88.70
+
+2025-04-05 Good Friday Brunch - Fullerton Hotel
+    liabilities:creditcard:dbs              $-280.00
+    expenses:food:eatingout                 $280.00
+
+2025-04-06 Transport - Easter Weekend
+    liabilities:creditcard:citibank         $-52.90
+    expenses:transport:rideshare             $52.90
+
+2025-04-07 Coffee Meeting - Dean & DeLuca
+    liabilities:creditcard:dbs              $-18.90
+    expenses:food:eatingout                  $18.90
+
+2025-04-08 Weekend Market - Chinatown
+    liabilities:creditcard:citibank         $-45.60
+    expenses:food:groceries                  $45.60
+
+2025-04-09 Movie Night - Shaw Theatres
+    liabilities:creditcard:dbs              $-38.00
+    expenses:entertainment:movies            $38.00
+
+2025-04-10 Utilities - SP Group
+    expenses:housing:utilities              $205.80
+    assets:checking:dbs
+
+2025-04-11 Annual Insurance Payment
+    expenses:insurance:health               $1,350.00
+    assets:checking:dbs
+
+2025-04-12 Lunch Meeting - Marina Bay Sands
+    liabilities:creditcard:citibank         $-125.00
+    expenses:food:eatingout                 $125.00
+
+2025-04-13 Easter Sunday Dinner - Ritz Carlton
+    liabilities:creditcard:dbs              $-380.00
+    expenses:food:eatingout                 $380.00
+
+2025-04-14 Online Shopping - Lazada
+    liabilities:creditcard:citibank         $-134.90
+    expenses:shopping:misc                  $134.90
+
+2025-04-15 Professional Development Course
+    expenses:education:courses              $580.00
+    assets:checking:dbs
+
+2025-04-16 Grab Food Multiple Orders
+    liabilities:creditcard:dbs              $-68.40
+    expenses:food:eatingout                  $68.40
+
+2025-04-17 Beauty Treatment - Sephora
+    liabilities:creditcard:citibank         $-189.00
+    expenses:personal:beauty                $189.00
+
+2025-04-18 Weekend Activities - Gardens by the Bay
+    liabilities:creditcard:dbs              $-85.00
+    expenses:entertainment:activities        $85.00
+
+2025-04-19 Coffee Subscription - Blue Bottle
+    liabilities:creditcard:citibank         $-56.00
+    expenses:food:groceries                  $56.00
+
+2025-04-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $1,150.00
+    assets:checking:dbs
+
+2025-04-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $920.00
+    assets:checking:dbs
+
+2025-04-22 Spring Bonus
+    assets:checking:dbs                     $2,500.00
+    income:bonus
+
+2025-04-23 Celebration Dinner - Cut by Wolfgang Puck
+    liabilities:creditcard:dbs              $-420.00
+    expenses:food:eatingout                 $420.00
+
+2025-04-24 Tech Accessories - Apple Store
+    liabilities:creditcard:citibank         $-199.00
+    expenses:tech:accessories               $199.00
+
+2025-04-25 Stock Dividend - Singapore Airlines
+    assets:checking:dbs                     $145.90
+    income:dividends
+
+2025-04-26 Weekend Groceries - NTUC
+    liabilities:creditcard:dbs              $-76.50
+    expenses:food:groceries                  $76.50
+
+2025-04-27 Health Checkup - Raffles Medical
+    expenses:health:medical                 $320.00
+    assets:checking:dbs
+
+2025-04-28 Clothing - H&M
+    liabilities:creditcard:citibank         $-145.60
+    expenses:shopping:clothes               $145.60
+
+2025-04-29 Weekend Brunch - Boat Quay
+    liabilities:creditcard:dbs              $-125.80
+    expenses:food:eatingout                 $125.80
+
+2025-04-30 Monthly Savings Transfer
+    assets:savings:dbs                      $2,500.00
+    assets:checking:dbs
+
+; May 2025 Transactions (matching your provided data)
+2025-05-01 Salary - Tech Solutions Pte Ltd
+    assets:checking:dbs                     $9,200.00
+    income:salary
+
+2025-05-02 Mortgage Payment
+    expenses:housing:mortgage               $2,100.00
+    assets:checking:dbs
+
+2025-05-02 BUS/MRT 629775989
+    liabilities:creditcard:dbs               $-1.89
+    expenses:transport:public                 $1.89
+
+2025-05-02 NTUC FP-TANJONG PAGAR
+    liabilities:creditcard:dbs               $-8.30
+    expenses:food:groceries                   $8.30
+
+2025-05-03 BUS/MRT 630317396
+    liabilities:creditcard:citibank          $-1.19
+    expenses:transport:public                 $1.19
+
+2025-05-03 LIHO TEA (R1 PTE LTD)
+    liabilities:creditcard:dbs               $-3.90
+    expenses:food:eatingout                   $3.90
+
+2025-05-04 FOUR LEAVES -THOMSON P
+    liabilities:creditcard:citibank          $-4.40
+    expenses:food:eatingout                   $4.40
+
+2025-05-05 BUS/MRT 631311325
+    liabilities:creditcard:dbs               $-3.78
+    expenses:transport:public                 $3.78
+
+2025-05-06 Labour Day Activities - Sentosa
+    liabilities:creditcard:citibank         $-125.00
+    expenses:entertainment:activities       $125.00
+
+2025-05-07 831_8OS063
+    liabilities:creditcard:dbs               $-4.70
+    expenses:food:eatingout                   $4.70
+
+2025-05-07 BUS/MRT 632501487
+    liabilities:creditcard:citibank          $-3.36
+    expenses:transport:public                 $3.36
+
+2025-05-07 MCDONALD'S (YCK)
+    liabilities:creditcard:dbs               $-3.85
+    expenses:food:eatingout                   $3.85
+
+2025-05-08 Weekend Groceries - Cold Storage
+    liabilities:creditcard:citibank         $-89.50
+    expenses:food:groceries                  $89.50
+
+2025-05-09 AUTO-PYT FROM ACCT#817171124891051
+    liabilities:creditcard:dbs              $177.00
+    assets:checking:dbs
+
+2025-05-09 GRAB* 99FA670F7F527C12
+    liabilities:creditcard:citibank         $-20.00
+    expenses:food:eatingout                  $20.00
+
+2025-05-09 BUS/MRT 633719238
+    liabilities:creditcard:dbs               $-1.89
+    expenses:transport:public                 $1.89
+
+2025-05-09 GREAT EASTERN GENERAL
+    liabilities:creditcard:citibank         $-64.90
+    expenses:travel:insurance                $64.90
+
+2025-05-09 AGODA.COM SKY GATE H INTERNET SG
+    liabilities:creditcard:dbs             $-155.76
+    expenses:travel:accommodation           $155.76
+
+2025-05-09 KLOOK TRAVEL FLICKKET
+    liabilities:creditcard:citibank         $-49.19
+    expenses:travel:activities               $49.19
+
+2025-05-10 Utilities - SP Group
+    expenses:housing:utilities              $218.50
+    assets:checking:dbs
+
+2025-05-10 WINDSURF WINDSURF.COM CA USD16.35
+    liabilities:creditcard:dbs              $-22.00
+    expenses:tech:software                   $22.00
+
+2025-05-11 Weekend Market - Tekka Centre
+    liabilities:creditcard:citibank         $-38.60
+    expenses:food:groceries                  $38.60
+
+2025-05-12 Mother's Day Brunch - Shangri-La
+    liabilities:creditcard:dbs              $-320.00
+    expenses:food:eatingout                 $320.00
+
+2025-05-13 Beauty Treatment - SK-II
+    liabilities:creditcard:citibank         $-280.00
+    expenses:personal:beauty                $280.00
+
+2025-05-14 Professional Course - Coursera
+    expenses:education:courses              $189.00
+    assets:checking:dbs
+
+2025-05-15 Coffee Meeting - TWG Tea
+    liabilities:creditcard:dbs              $-22.80
+    expenses:food:eatingout                  $22.80
+
+2025-05-16 Online Shopping - Amazon
+    liabilities:creditcard:citibank         $-156.90
+    expenses:shopping:misc                  $156.90
+
+2025-05-17 Weekend Dinner - Marina Bay
+    liabilities:creditcard:dbs              $-125.80
+    expenses:food:eatingout                 $125.80
+
+2025-05-18 GRAB* A-7STRJDNGWT9CAV
+    liabilities:creditcard:citibank         $-33.40
+    expenses:travel:transport                $33.40
+
+2025-05-18 SHIN DUNG YANG 01719 TAOYUAN CITY TW TWD378.00
+    liabilities:creditcard:dbs              $-16.82
+    expenses:travel:food                     $16.82
+
+2025-05-19 BUS/MRT 639147444
+    liabilities:creditcard:citibank          $-2.59
+    expenses:transport:public                 $2.59
+
+2025-05-20 BUS/MRT 639723966
+    liabilities:creditcard:dbs               $-1.89
+    expenses:transport:public                 $1.89
+
+2025-05-20 GRAB* 8038C185BC8BAFCB
+    liabilities:creditcard:citibank         $-17.00
+    expenses:food:eatingout                  $17.00
+
+2025-05-20 Credit Card Payment - DBS
+    liabilities:creditcard:dbs              $950.00
+    assets:checking:dbs
+
+2025-05-21 Credit Card Payment - Citibank
+    liabilities:creditcard:citibank         $820.00
+    assets:checking:dbs
+
+2025-05-21 MUCHACHOS - FRASERS
+    liabilities:creditcard:dbs              $-45.60
+    expenses:food:eatingout                  $45.60
+
+2025-05-21 BUS/MRT 640308786
+    liabilities:creditcard:citibank          $-1.89
+    expenses:transport:public                 $1.89
+
+2025-05-22 SHENG SIONG SUPERMKT-S
+    liabilities:creditcard:dbs              $-22.04
+    expenses:food:groceries                  $22.04
+
+2025-05-22 BUS/MRT 640915443
+    liabilities:creditcard:citibank          $-1.19
+    expenses:transport:public                 $1.19
+
+2025-05-23 BUS/MRT 641495913
+    liabilities:creditcard:dbs               $-3.78
+    expenses:transport:public                 $3.78
+
+2025-05-24 Stock Dividend - CapitaLand REIT
+    assets:checking:dbs                     $98.40
+    income:dividends
+
+2025-05-25 BUS/MRT 642734989
+    liabilities:creditcard:citibank          $-2.38
+    expenses:transport:public                 $2.38
+
+2025-05-25 FOODLOFT (107) ST 1
+    liabilities:creditcard:dbs              $-25.80
+    expenses:food:eatingout                  $25.80
+
+2025-05-26 BUS/MRT 643229678
+    liabilities:creditcard:citibank          $-1.19
+    expenses:transport:public                 $1.19
+
+2025-05-26 SP BUTTERBEE ACTIVE TSIM SHA TSUI HK
+    liabilities:creditcard:dbs              $-33.18
+    expenses:shopping:clothes                $33.18
+
+2025-05-27 GRAB* 959039330ADD18A4
+    liabilities:creditcard:citibank         $-15.00
+    expenses:food:eatingout                  $15.00
+
+2025-05-28 BUS/MRT 644446403
+    liabilities:creditcard:dbs               $-2.38
+    expenses:transport:public                 $2.38
+
+2025-05-28 Investment - Additional ETF Purchase
+    assets:investments:stocks               $1,800.00
+    assets:checking:dbs
+
+2025-05-29 BUS/MRT 645053581
+    liabilities:creditcard:citibank          $-3.44
+    expenses:transport:public                 $3.44
+
+2025-05-30 NET*MEN DON
+    liabilities:creditcard:dbs               $-3.20
+    expenses:food:eatingout                   $3.20
+
+2025-05-30 NET*MEN DON
+    liabilities:creditcard:citibank          $-2.80
+    expenses:food:eatingout                   $2.80
+
+2025-05-30 BUS/MRT 645642252
+    liabilities:creditcard:dbs               $-3.04
+    expenses:transport:public                 $3.04
+
+2025-05-30 OLD CHANG KEE
+    liabilities:creditcard:citibank          $-2.00
+    expenses:food:eatingout                   $2.00
+
+2025-05-30 MALAYSIA BOLEH - BUGIS
+    liabilities:creditcard:dbs               $-2.00
+    expenses:food:eatingout                   $2.00
+
+2025-05-30 SOURCEGRAPH.COM WWW.SOURCEGRA CA USD10.00
+    liabilities:creditcard:citibank         $-13.40
+    expenses:tech:software                   $13.40
+
+2025-05-30 IUIGA - FUNAN SINGAPORE 179 SG
+    liabilities:creditcard:dbs               $-3.90
+    expenses:house:supplies                   $3.90
+
+2025-05-31 Monthly Savings Transfer
+    assets:savings:dbs                      $2,200.00
+    assets:checking:dbs
