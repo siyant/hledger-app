@@ -8,7 +8,7 @@ fn main() {
         Ok(report) => {
             println!("Cashflow Report: {}", report.title);
             println!("Number of periods: {}", report.dates.len());
-            
+
             for subreport in &report.subreports {
                 println!("\n{}", subreport.name);
                 for row in &subreport.data.rows {
@@ -18,7 +18,7 @@ fn main() {
                     println!("  Total: {:?}", totals.total);
                 }
             }
-            
+
             if let Some(grand_total) = &report.totals {
                 println!("\nGrand Total: {:?}", grand_total.total);
             }
@@ -43,10 +43,7 @@ fn main() {
     }
 
     // Cashflow with custom query
-    let options = CashflowOptions::new()
-        .query("bank")
-        .empty()
-        .row_total();
+    let options = CashflowOptions::new().query("bank").empty().row_total();
 
     match get_cashflow(Some(Path::new("test.journal")), options) {
         Ok(report) => {

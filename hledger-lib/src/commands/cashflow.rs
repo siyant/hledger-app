@@ -1,4 +1,6 @@
-use crate::commands::balance::{extract_date_from_tagged_value, parse_amounts, PeriodDate, PeriodicBalance, PeriodicBalanceRow};
+use crate::commands::balance::{
+    extract_date_from_tagged_value, parse_amounts, PeriodDate, PeriodicBalance, PeriodicBalanceRow,
+};
 use crate::{HLedgerError, Result};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -424,12 +426,10 @@ pub fn get_cashflow(
     }
 
     // Execute command
-    let output = cmd
-        .output()
-        .map_err(|e| match e.kind() {
-            std::io::ErrorKind::NotFound => HLedgerError::HLedgerNotFound,
-            _ => HLedgerError::Io(e),
-        })?;
+    let output = cmd.output().map_err(|e| match e.kind() {
+        std::io::ErrorKind::NotFound => HLedgerError::HLedgerNotFound,
+        _ => HLedgerError::Io(e),
+    })?;
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr).to_string();
@@ -450,11 +450,13 @@ pub fn parse_cashflow(json_str: &str) -> Result<CashflowReport> {
 
 fn parse_cashflow_report(value: &serde_json::Value) -> Result<CashflowReport> {
     use crate::commands::balance::extract_date_from_tagged_value;
-    let obj = value.as_object()
-        .ok_or_else(|| HLedgerError::ParseError("Expected JSON object for cashflow report".to_string()))?;
+    let obj = value.as_object().ok_or_else(|| {
+        HLedgerError::ParseError("Expected JSON object for cashflow report".to_string())
+    })?;
 
     // Extract title
-    let title = obj.get("cbrTitle")
+    let title = obj
+        .get("cbrTitle")
         .and_then(|v| v.as_str())
         .unwrap_or("Cashflow Statement")
         .to_string();
@@ -478,9 +480,9 @@ fn parse_cashflow_report(value: &serde_json::Value) -> Result<CashflowReport> {
     }
 
     // Parse subreports
-    let subreports_json = obj.get("cbrSubreports").ok_or_else(|| {
-        HLedgerError::ParseError("Missing cbrSubreports in cashflow".to_string())
-    })?;
+    let subreports_json = obj
+        .get("cbrSubreports")
+        .ok_or_else(|| HLedgerError::ParseError("Missing cbrSubreports in cashflow".to_string()))?;
 
     let mut subreports = Vec::new();
     if let Some(subreports_array) = subreports_json.as_array() {
@@ -516,8 +518,9 @@ fn parse_cashflow_report(value: &serde_json::Value) -> Result<CashflowReport> {
 }
 
 fn parse_periodic_balance_value(value: &serde_json::Value) -> Result<PeriodicBalance> {
-    let obj = value.as_object()
-        .ok_or_else(|| HLedgerError::ParseError("Expected object for periodic balance".to_string()))?;
+    let obj = value.as_object().ok_or_else(|| {
+        HLedgerError::ParseError("Expected object for periodic balance".to_string())
+    })?;
 
     // Parse dates from prDates
     let dates_json = obj.get("prDates").ok_or_else(|| {
@@ -551,19 +554,26 @@ fn parse_periodic_balance_value(value: &serde_json::Value) -> Result<PeriodicBal
     }
 
     // Parse totals from prTotals
-    let totals = obj.get("prTotals")
+    let totals = obj
+        .get("prTotals")
         .map(|v| parse_periodic_row_value(v))
         .transpose()?;
 
-    Ok(PeriodicBalance { dates, rows, totals })
+    Ok(PeriodicBalance {
+        dates,
+        rows,
+        totals,
+    })
 }
 
 fn parse_periodic_row_value(value: &serde_json::Value) -> Result<PeriodicBalanceRow> {
-    let obj = value.as_object()
-        .ok_or_else(|| HLedgerError::ParseError("Expected object for periodic balance row".to_string()))?;
+    let obj = value.as_object().ok_or_else(|| {
+        HLedgerError::ParseError("Expected object for periodic balance row".to_string())
+    })?;
 
     // Get account name from prrName (can be string or empty array for totals)
-    let account = obj.get("prrName")
+    let account = obj
+        .get("prrName")
         .map(|v| {
             if let Some(s) = v.as_str() {
                 s.to_string()
@@ -584,12 +594,11 @@ fn parse_periodic_row_value(value: &serde_json::Value) -> Result<PeriodicBalance
     }
 
     // Parse total from prrTotal using existing function
-    let total = obj.get("prrTotal")
-        .map(|v| parse_amounts(v))
-        .transpose()?;
+    let total = obj.get("prrTotal").map(|v| parse_amounts(v)).transpose()?;
 
     // Parse average from prrAverage using existing function
-    let average = obj.get("prrAverage")
+    let average = obj
+        .get("prrAverage")
         .map(|v| parse_amounts(v))
         .transpose()?;
 

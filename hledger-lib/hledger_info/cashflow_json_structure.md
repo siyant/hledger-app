@@ -6,16 +6,30 @@ The cashflow report uses the same structure as the balance sheet and income stat
 
 ```rust
 pub struct CashflowReport {
-    pub title: String,       // cbrTitle
-    pub dates: Vec<(PeriodDate, PeriodDate)>, // cbrDates
-    pub subreports: Vec<CashflowSubreport>,   // cbrSubreports
-    pub totals: PeriodicBalanceRow,           // cbrTotals
+    /// Report title
+    pub title: String,
+    /// Period date ranges for the entire report
+    pub dates: Vec<PeriodDate>,
+    /// Subreports (Cash flows)
+    pub subreports: Vec<CashflowSubreport>,
+    /// Overall totals across all subreports
+    pub totals: Option<PeriodicBalanceRow>,
 }
 
 pub struct CashflowSubreport {
-    pub name: String,              // First element of tuple
-    pub data: PeriodicBalance,     // Second element of tuple
-    pub increases_total: bool,     // Third element of tuple
+    /// The name of the subreport (always "Cash flows" for cashflow)
+    pub name: String,
+    /// The periodic balance data
+    pub data: PeriodicBalance,
+    /// Whether this subreport increases the overall total (always true for cashflow)
+    pub increases_total: bool,
+}
+
+pub struct PeriodDate {
+    /// Start date (ISO format)
+    pub start: String,
+    /// End date (ISO format)
+    pub end: String,
 }
 ```
 
@@ -26,7 +40,7 @@ The cashflow command returns a CompoundBalanceReport with the following fields:
 - `cbrTitle`: String - The report title (e.g., "Cashflow Statement 2024-01-01..2024-01-10")
 - `cbrDates`: Array of date pairs - The reporting period(s)
 - `cbrSubreports`: Array of subreports - Always contains one subreport named "Cash flows"
-- `cbrTotals`: PeriodicBalanceRow - The overall totals
+- `cbrTotals`: PeriodicBalanceRow (optional) - The overall totals
 
 Each subreport is a 3-element array:
 1. String - Subreport name (always "Cash flows" for cashflow)
