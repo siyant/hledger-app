@@ -29,7 +29,7 @@ function App() {
       />
 
       {/* Main Content */}
-      <div className="ml-80 p-8">
+      <div className="ml-80 p-8 pt-6">
         <div className="max-w-5xl mx-auto w-full">
           <Tabs>
             <TabList aria-label="hledger data views" className="w-fit">
@@ -37,14 +37,14 @@ function App() {
               <Tab id="verification">Verification</Tab>
               <Tab
                 id="balancesheet"
-                className="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-px before:h-6 before:bg-border"
+                className="relative ml-4 before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-px before:h-6 before:bg-muted-foreground/10"
               >
                 Balance Sheet
               </Tab>
               <Tab id="incomestatement">Income Statement</Tab>
               <Tab
                 id="accounts"
-                className="relative before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-px before:h-6 before:bg-border"
+                className="relative ml-4 before:content-[''] before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:w-px before:h-6 before:bg-muted-foreground/10"
               >
                 Accounts
               </Tab>

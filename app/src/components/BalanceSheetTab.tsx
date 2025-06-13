@@ -378,7 +378,7 @@ export function BalanceSheetTab({ searchQuery, dateRange, selectedJournalFile }:
     <Card>
       <CardHeader>
         <CardTitle>Balance Sheet</CardTitle>
-        <CardDescription>View assets, liabilities, and equity</CardDescription>
+        <CardDescription>View assets and liabilities</CardDescription>
 
         <div className="flex flex-col space-y-2 mt-2">
           <div className="flex flex-row gap-2 items-center">
