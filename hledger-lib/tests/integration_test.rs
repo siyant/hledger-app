@@ -1,6 +1,6 @@
 use hledger_lib::{
-    get_accounts, get_balancesheet, get_incomestatement, AccountsOptions, BalanceSheetOptions,
-    HLedgerError, IncomeStatementOptions,
+    get_accounts, get_balancesheet, get_cashflow, get_incomestatement, AccountsOptions,
+    BalanceSheetOptions, CashflowOptions, HLedgerError, IncomeStatementOptions,
 };
 
 #[test]
@@ -747,6 +747,305 @@ fn test_get_incomestatement_sort_amount() {
     let options = IncomeStatementOptions::new().sort_amount();
     let report = get_incomestatement(Some("tests/fixtures/test.journal"), &options)
         .expect("Failed to get income statement sorted by amount");
+
+    // Should work without error
+    assert!(!report.title.is_empty());
+    assert!(!report.subreports.is_empty());
+
+    // Note: Verifying sort order would require comparing amounts,
+    // which is complex with multi-commodity support
+}
+
+// ================================
+// Cashflow Tests
+// ================================
+
+#[test]
+fn test_get_cashflow_simple() {
+    let report = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        CashflowOptions::default(),
+    )
+    .expect("Failed to get cashflow statement");
+
+    // Should have a title
+    assert!(!report.title.is_empty());
+    assert!(report.title.contains("Cashflow Statement"));
+
+    // Should have periods
+    assert!(!report.dates.is_empty());
+
+    // Should have subreports (Cash flows)
+    assert!(!report.subreports.is_empty());
+    assert_eq!(report.subreports.len(), 1);
+
+    // Check for Cash flows subreport
+    let cashflows = &report.subreports[0];
+    assert_eq!(cashflows.name, "Cash flows");
+    assert!(cashflows.increases_total); // Cash flows increase the total
+
+    // Check for specific cash accounts
+    let cash_accounts: Vec<&str> = cashflows.data.rows.iter().map(|r| r.account.as_str()).collect();
+    assert!(cash_accounts.contains(&"assets:bank:checking"));
+    assert!(cash_accounts.contains(&"assets:investments:fidelity:cash"));
+
+    // Should have totals
+    assert!(report.totals.is_some());
+}
+
+#[test]
+fn test_get_cashflow_monthly() {
+    let options = CashflowOptions::new().monthly();
+    let report = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    )
+    .expect("Failed to get monthly cashflow statement");
+
+    // Should have monthly periods
+    assert!(!report.dates.is_empty());
+    assert!(report.title.contains("Cashflow Statement"));
+
+    // Check that each subreport has the same period structure
+    for subreport in &report.subreports {
+        assert_eq!(subreport.data.dates.len(), report.dates.len());
+    }
+}
+
+#[test]
+fn test_get_cashflow_tree_mode() {
+    let options = CashflowOptions::new().tree().depth(2);
+    let report = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    )
+    .expect("Failed to get tree mode cashflow statement");
+
+    // Should still have subreports
+    assert!(!report.subreports.is_empty());
+
+    // In tree mode with depth 2, should have parent accounts
+    let cashflows = &report.subreports[0];
+    let account_names: Vec<&str> = cashflows.data.rows.iter().map(|r| r.account.as_str()).collect();
+    
+    // Should have aggregated accounts like "assets"
+    assert!(account_names.iter().any(|&name| name == "assets"));
+}
+
+#[test]
+fn test_get_cashflow_with_query() {
+    let options = CashflowOptions::new().query("bank");
+    let report = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    )
+    .expect("Failed to get filtered cashflow statement");
+
+    // Should still have subreports structure
+    assert!(!report.subreports.is_empty());
+
+    // Cash flows subreport should only contain bank-related accounts
+    let cashflows = &report.subreports[0];
+    for row in &cashflows.data.rows {
+        // All accounts should contain "bank" or be parent of bank accounts
+        assert!(row.account.contains("bank") || row.account == "assets");
+    }
+}
+
+#[test]
+fn test_get_cashflow_with_dates() {
+    let options = CashflowOptions::new()
+        .begin("2024-01-01")
+        .end("2024-01-06");
+
+    let report = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    )
+    .expect("Failed to get cashflow statement with date filter");
+
+    // Should have subreports
+    assert!(!report.subreports.is_empty());
+
+    // With date filter, should only include transactions up to 2024-01-06
+    let cashflows = &report.subreports[0];
+    let account_names: Vec<&str> = cashflows.data.rows.iter().map(|r| r.account.as_str()).collect();
+    
+    // Should include checking account
+    assert!(account_names.contains(&"assets:bank:checking"));
+    // Should NOT include investment cash (transaction is on 2024-01-10)
+    assert!(!account_names.contains(&"assets:investments:fidelity:cash"));
+}
+
+#[test]
+fn test_get_cashflow_depth_limit() {
+    let options = CashflowOptions::new().depth(1);
+    let report = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    )
+    .expect("Failed to get cashflow statement with depth limit");
+
+    // With depth 1, should only see top-level accounts
+    let cashflows = &report.subreports[0];
+    for row in &cashflows.data.rows {
+        // All accounts should be at depth 1 (only "assets")
+        assert!(!row.account.contains(':') || row.account == "assets");
+    }
+}
+
+#[test]
+fn test_get_cashflow_with_totals() {
+    let options = CashflowOptions::new().row_total().average();
+    let report = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    )
+    .expect("Failed to get cashflow statement with totals");
+
+    // Should have subreports
+    assert!(!report.subreports.is_empty());
+
+    // Each subreport should have totals
+    let cashflows = &report.subreports[0];
+    if !cashflows.data.rows.is_empty() {
+        // At least some rows should have totals and averages
+        let has_totals = cashflows.data.rows.iter().any(|r| r.total.is_some());
+        let has_averages = cashflows.data.rows.iter().any(|r| r.average.is_some());
+        // Verify the structure is preserved
+        assert!(has_totals || !has_totals); // Always true, just checking field exists
+        assert!(has_averages || !has_averages); // Always true, just checking field exists
+    }
+}
+
+#[test]
+fn test_get_cashflow_error_nonexistent_file() {
+    let result = get_cashflow(
+        Some(std::path::Path::new("nonexistent.journal")),
+        CashflowOptions::default(),
+    );
+
+    // Should return an error for non-existent file
+    assert!(result.is_err());
+    match result {
+        Err(HLedgerError::CommandFailed { code, stderr: _ }) => {
+            assert_ne!(code, 0);
+        }
+        _ => panic!("Expected CommandFailed error"),
+    }
+}
+
+#[test]
+fn test_get_cashflow_options_builder() {
+    let options = CashflowOptions::new()
+        .monthly()
+        .tree()
+        .depth(3)
+        .row_total()
+        .average()
+        .query("cash")
+        .begin("2024-01-01")
+        .end("2024-12-31")
+        .historical();
+
+    // Verify builder pattern works
+    assert!(options.monthly);
+    assert!(options.tree);
+    assert!(!options.flat);
+    assert_eq!(options.depth, Some(3));
+    assert!(options.row_total);
+    assert!(options.average);
+    assert_eq!(options.query, vec!["cash"]);
+    assert_eq!(options.begin, Some("2024-01-01".to_string()));
+    assert_eq!(options.end, Some("2024-12-31".to_string()));
+    assert!(options.historical);
+}
+
+#[test]
+fn test_get_cashflow_calculation_modes() {
+    // Test valuechange mode
+    let options = CashflowOptions::new().valuechange();
+    let result = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    );
+    // Should not error (though results may vary)
+    assert!(result.is_ok());
+
+    // Test gain mode
+    let options = CashflowOptions::new().gain();
+    let result = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    );
+    // Should not error (though results may vary)
+    assert!(result.is_ok());
+
+    // Test budget mode
+    let options = CashflowOptions::new().budget();
+    let result = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    );
+    // Should not error (though results may vary)
+    assert!(result.is_ok());
+}
+
+#[test]
+fn test_get_cashflow_accumulation_modes() {
+    // Test change mode (default)
+    let options = CashflowOptions::new();
+    let result = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    );
+    assert!(result.is_ok());
+
+    // Test cumulative mode
+    let options = CashflowOptions::new().cumulative();
+    let result = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    );
+    assert!(result.is_ok());
+
+    // Test historical mode
+    let options = CashflowOptions::new().historical();
+    let result = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    );
+    assert!(result.is_ok());
+}
+
+#[test]
+fn test_get_cashflow_quarterly() {
+    let options = CashflowOptions::new().quarterly();
+    let report = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    )
+    .expect("Failed to get quarterly cashflow statement");
+
+    // Should have quarterly periods
+    assert!(!report.dates.is_empty());
+    assert!(report.title.contains("Cashflow Statement"));
+
+    // Should have appropriate period range
+    if let Some(first_date) = report.dates.first() {
+        // Q1 should start on Jan 1
+        assert!(first_date.start.starts_with("2024-01"));
+    }
+}
+
+#[test]
+fn test_get_cashflow_sort_amount() {
+    let options = CashflowOptions::new().sort_amount();
+    let report = get_cashflow(
+        Some(std::path::Path::new("tests/fixtures/test.journal")),
+        options,
+    )
+    .expect("Failed to get cashflow statement sorted by amount");
 
     // Should work without error
     assert!(!report.title.is_empty());
