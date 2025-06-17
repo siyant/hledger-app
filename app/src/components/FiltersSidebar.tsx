@@ -5,9 +5,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Toggle, ToggleButtonGroup } from "@/components/ui/toggle";
 import { type DateValue, getLocalTimeZone, today } from "@internationalized/date";
 import { invoke } from "@tauri-apps/api/core";
-import { X } from "lucide-react";
+import { X, Plus, Trash2 } from "lucide-react";
 import type React from "react";
 import { useState, useEffect } from "react";
+import { loadJournalStore, saveJournalFiles, saveLastSelectedFile, removeJournalFile } from "@/utils/journalStore";
 
 interface FiltersSidebarProps {
   searchQuery: string;
@@ -73,23 +74,35 @@ export function FiltersSidebar({
   const [selectedDateRange, setSelectedDateRange] = useState<string>("");
   const [journalFiles, setJournalFiles] = useState<string[]>([]);
 
-  // Load journal files from environment variable on mount
+  // Load journal files from store on mount
   useEffect(() => {
-    async function loadJournalFiles() {
+    async function loadJournalFilesFromStore() {
       try {
-        const files = await invoke<string[]>("get_journal_files");
-        setJournalFiles(files);
-        // If no journal file is selected and files are available, select the first one
-        if (!selectedJournalFile && files.length > 0) {
-          onJournalFileChange(files[0]);
+        const store = await loadJournalStore();
+        setJournalFiles(store.journalFiles);
+
+        // If no journal file is selected and we have a last selected file, use it
+        if (!selectedJournalFile && store.lastSelectedJournalFile) {
+          onJournalFileChange(store.lastSelectedJournalFile);
+        }
+        // Otherwise, if no journal file is selected but files are available, select the first one
+        else if (!selectedJournalFile && store.journalFiles.length > 0) {
+          onJournalFileChange(store.journalFiles[0]);
         }
       } catch (error) {
-        console.error("Failed to load journal files:", error);
+        console.error("Failed to load journal files from store:", error);
         setJournalFiles([]);
       }
     }
-    loadJournalFiles();
-  }, [selectedJournalFile, onJournalFileChange]);
+    loadJournalFilesFromStore();
+  }, []); // Remove dependencies to only run once on mount
+
+  // Save selected file to store when it changes
+  useEffect(() => {
+    if (selectedJournalFile) {
+      saveLastSelectedFile(selectedJournalFile).catch(console.error);
+    }
+  }, [selectedJournalFile]);
 
   // Helper function to get just the filename from a full path
   const getFileName = (filePath: string) => {
@@ -140,32 +153,126 @@ export function FiltersSidebar({
           <h2 className="text-lg font-semibold mb-3">Filters & Options</h2>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-muted-foreground mb-2 block">Journal File</label>
-              {journalFiles.length === 0 && (
-                <div className="mb-2">
-                  <p className="text-sm text-red-500">Please set HLEDGER_JOURNAL_FILES or LEDGER_FILE</p>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium text-muted-foreground">Journal Files</label>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={async () => {
+                    try {
+                      const files = await invoke<string[]>("select_journal_files");
+                      console.log("Selected files:", files);
+
+                      if (files && files.length > 0) {
+                        // Merge new files with existing ones (avoid duplicates)
+                        const existingFiles = new Set(journalFiles);
+                        const newFiles = files.filter((file) => !existingFiles.has(file));
+                        const updatedFiles = [...journalFiles, ...newFiles];
+
+                        // Save the updated files to the store
+                        await saveJournalFiles(updatedFiles);
+
+                        // Update local state
+                        setJournalFiles(updatedFiles);
+
+                        // If no file is currently selected, select the first new file
+                        if (!selectedJournalFile && newFiles.length > 0) {
+                          onJournalFileChange(newFiles[0]);
+                        }
+                      }
+                    } catch (error) {
+                      console.error("Failed to select files:", error);
+                    }
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Files
+                </Button>
+              </div>
+
+              {journalFiles.length > 0 ? (
+                <div className="space-y-2">
+                  <Select value={selectedJournalFile} onValueChange={onJournalFileChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a journal file" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {journalFiles.map((file) => (
+                        <SelectItem key={file} value={file}>
+                          {getFileName(file)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* File management */}
+                  <div className="max-h-32 overflow-y-auto space-y-1">
+                    {journalFiles.map((file) => (
+                      <div
+                        key={file}
+                        className="flex items-center justify-between text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1"
+                      >
+                        <span className="truncate flex-1" title={file}>
+                          {getFileName(file)}
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-5 w-5 p-0 text-muted-foreground hover:text-destructive"
+                          onClick={async () => {
+                            try {
+                              const updatedFiles = await removeJournalFile(file);
+                              setJournalFiles(updatedFiles);
+
+                              // If the removed file was selected, select another one
+                              if (selectedJournalFile === file) {
+                                if (updatedFiles.length > 0) {
+                                  onJournalFileChange(updatedFiles[0]);
+                                } else {
+                                  onJournalFileChange("");
+                                }
+                              }
+                            } catch (error) {
+                              console.error("Failed to remove file:", error);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-4 text-muted-foreground">
+                  <p className="text-sm mb-2">No journal files configured</p>
+                  <Button
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        const files = await invoke<string[]>("select_journal_files");
+                        console.log("Selected files:", files);
+
+                        if (files && files.length > 0) {
+                          // Save the new files to the store
+                          await saveJournalFiles(files);
+
+                          // Update local state
+                          setJournalFiles(files);
+
+                          // Select the first file
+                          onJournalFileChange(files[0]);
+                        }
+                      } catch (error) {
+                        console.error("Failed to select files:", error);
+                      }
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Your First Journal File
+                  </Button>
                 </div>
               )}
-              <Select value={selectedJournalFile} onValueChange={onJournalFileChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a journal file">
-                    {selectedJournalFile ? getFileName(selectedJournalFile) : "Select a journal file"}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {journalFiles.length > 0 ? (
-                    journalFiles.map((file) => (
-                      <SelectItem key={file} value={file}>
-                        {getFileName(file)}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="__no_files__" disabled>
-                      No journal files available
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
             </div>
 
             <div>

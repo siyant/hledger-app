@@ -42,14 +42,9 @@ Have not set up configuration of journal files in a built app, so it doesn't wor
 
 ### Journal Files
 
-By default, hledger-app will use the journal file specified in your `LEDGER_FILE` environment variable.
+hledger-app includes a built-in file picker that allows you to easily add and manage your journal files directly within the application.
 
-To configure multiple journal files that you can easily switch between in the app's dropdown:
-
-1. Set the `HLEDGER_JOURNAL_FILES` environment variable
-2. Provide a comma-separated list of full paths to your journal files
-
-Example:
-```bash
-export HLEDGER_JOURNAL_FILES="/path/to/personal.journal,/path/to/business.journal,/path/to/investments.journal"
-```
+1. Launch the application
+2. In the sidebar, click the "Add Files" button or "Add Your First Journal File" if no files are configured
+3. Select one or more journal files (.journal, .ledger, .hledger, .dat) from your file system
+4. The files will be saved and remembered for future sessions

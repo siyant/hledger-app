@@ -1,26 +1,35 @@
+use tauri_plugin_dialog::DialogExt;
+
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
-fn get_journal_files() -> Result<Vec<String>, String> {
-    // First try HLEDGER_JOURNAL_FILES (comma-separated list)
-    if let Ok(files_str) = std::env::var("HLEDGER_JOURNAL_FILES") {
-        let files: Vec<String> = files_str
-            .split(',')
-            .map(|s| s.trim().to_string())
-            .filter(|s| !s.is_empty())
-            .collect();
-        return Ok(files);
-    }
+async fn select_journal_files(app: tauri::AppHandle) -> Result<Vec<String>, String> {
+    use std::sync::mpsc;
 
-    // Fall back to LEDGER_FILE (single file)
-    if let Ok(ledger_file) = std::env::var("LEDGER_FILE") {
-        let file = ledger_file.trim().to_string();
-        if !file.is_empty() {
-            return Ok(vec![file]);
+    let (tx, rx) = mpsc::channel();
+
+    app.dialog()
+        .file()
+        .add_filter("Journal Files", &["journal", "ledger", "hledger", "dat"])
+        .set_title("Select hledger Journal Files")
+        .pick_files(move |file_paths| {
+            tx.send(file_paths).unwrap();
+        });
+
+    match rx.recv() {
+        Ok(Some(files)) => {
+            let paths: Vec<String> = files.into_iter().map(|f| f.to_string()).collect();
+            println!("Selected files: {:?}", paths);
+            Ok(paths)
+        }
+        Ok(None) => {
+            println!("No files selected");
+            Ok(vec![])
+        }
+        Err(_) => {
+            println!("Error receiving file selection");
+            Ok(vec![])
         }
     }
-
-    // Return empty list if neither environment variable is set
-    Ok(vec![])
 }
 
 #[tauri::command]
@@ -87,8 +96,10 @@ fn get_print(
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_store::Builder::default().build())
         .invoke_handler(tauri::generate_handler![
-            get_journal_files,
+            select_journal_files,
             get_accounts,
             get_balance,
             get_balancesheet,

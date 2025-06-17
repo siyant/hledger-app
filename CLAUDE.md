@@ -120,3 +120,5 @@ bunx shadcn@latest add button
 ## Memories
 
 - **Date Range Handling**: hledger treats begin dates as inclusive but end dates as exclusive (transactions before the end date). However, users expect both start and end dates to be inclusive in the UI. Therefore, when passing date ranges from the frontend to hledger commands, add 1 day to the end date to make it inclusive for users. Example: user selects May 1-5 → send begin=May 1, end=May 6 to hledger
+
+- **Journal File Management**: The app uses a built-in file picker with persistent storage (tauri-plugin-store). Files are stored in `journal-files.json` with the structure: `{"journalFiles": ["path1", "path2"], "lastSelectedJournalFile": "path1"}`. The `select_journal_files` Tauri command opens a file dialog, and the frontend manages the file list and selection state.
