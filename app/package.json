@@ -41,6 +41,7 @@
   "homepage": "https://github.com/vivekkalyan/hledger-app#readme",
   "dependencies": {
     "@internationalized/date": "^3.8.1",
+    "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-slot": "^1.2.3",
     "@tauri-apps/api": ">=2.0.0",

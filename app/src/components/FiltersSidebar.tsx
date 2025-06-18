@@ -9,6 +9,16 @@ import { X, Plus, Trash2 } from "lucide-react";
 import type React from "react";
 import { useState, useEffect } from "react";
 import { loadJournalStore, saveJournalFiles, saveLastSelectedFile, removeJournalFile } from "@/utils/journalStore";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface FiltersSidebarProps {
   searchQuery: string;
@@ -73,6 +83,7 @@ export function FiltersSidebar({
 }: FiltersSidebarProps) {
   const [selectedDateRange, setSelectedDateRange] = useState<string>("");
   const [journalFiles, setJournalFiles] = useState<string[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   // Load journal files from store on mount
   useEffect(() => {
@@ -81,21 +92,27 @@ export function FiltersSidebar({
         const store = await loadJournalStore();
         setJournalFiles(store.journalFiles);
 
-        // If no journal file is selected and we have a last selected file, use it
-        if (!selectedJournalFile && store.lastSelectedJournalFile) {
+        // If no journal files are configured, automatically open the dialog
+        if (store.journalFiles.length === 0) {
+          setDialogOpen(true);
+        }
+        // If we have a last selected file, use it
+        else if (store.lastSelectedJournalFile) {
           onJournalFileChange(store.lastSelectedJournalFile);
         }
-        // Otherwise, if no journal file is selected but files are available, select the first one
-        else if (!selectedJournalFile && store.journalFiles.length > 0) {
+        // Otherwise, if files are available, select the first one
+        else if (store.journalFiles.length > 0) {
           onJournalFileChange(store.journalFiles[0]);
         }
       } catch (error) {
         console.error("Failed to load journal files from store:", error);
         setJournalFiles([]);
+        // Also open dialog on error since there are no files
+        setDialogOpen(true);
       }
     }
     loadJournalFilesFromStore();
-  }, []); // Remove dependencies to only run once on mount
+  }, [onJournalFileChange]); // Remove dependencies to only run once on mount
 
   // Save selected file to store when it changes
   useEffect(() => {
@@ -107,6 +124,34 @@ export function FiltersSidebar({
   // Helper function to get just the filename from a full path
   const getFileName = (filePath: string) => {
     return filePath.split("/").pop() || filePath;
+  };
+
+  // Function to handle adding files
+  const handleAddFiles = async () => {
+    try {
+      const files = await invoke<string[]>("select_journal_files");
+      console.log("Selected files:", files);
+
+      if (files && files.length > 0) {
+        // Merge new files with existing ones (avoid duplicates)
+        const existingFiles = new Set(journalFiles);
+        const newFiles = files.filter((file) => !existingFiles.has(file));
+        const updatedFiles = [...journalFiles, ...newFiles];
+
+        // Save the updated files to the store
+        await saveJournalFiles(updatedFiles);
+
+        // Update local state
+        setJournalFiles(updatedFiles);
+
+        // If no file is currently selected, select the first file from the updated list
+        if (!selectedJournalFile && updatedFiles.length > 0) {
+          onJournalFileChange(updatedFiles[0]);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to select files:", error);
+    }
   };
 
   // Clear search query
@@ -154,120 +199,103 @@ export function FiltersSidebar({
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-muted-foreground">Journal Files</label>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={async () => {
-                    try {
-                      const files = await invoke<string[]>("select_journal_files");
-                      console.log("Selected files:", files);
+                <label className="text-sm font-medium text-muted-foreground">Journal File</label>
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="ghost" className="text-xs text-muted-foreground p-2 h-5">
+                      Manage
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                      <DialogTitle>Manage Journal Files</DialogTitle>
+                      <DialogDescription>Select journal files to view data for</DialogDescription>
+                    </DialogHeader>
 
-                      if (files && files.length > 0) {
-                        // Merge new files with existing ones (avoid duplicates)
-                        const existingFiles = new Set(journalFiles);
-                        const newFiles = files.filter((file) => !existingFiles.has(file));
-                        const updatedFiles = [...journalFiles, ...newFiles];
+                    <div className="space-y-4">
+                      {journalFiles.length > 0 ? (
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Configured Files:</label>
+                          <div className="max-h-64 overflow-y-auto space-y-2">
+                            {journalFiles.map((file) => (
+                              <div key={file} className="flex items-center justify-between px-3 py-2 border rounded-lg">
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate" title={file}>
+                                    {getFileName(file)}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground truncate" title={file}>
+                                    {file}
+                                  </p>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="ml-2 text-destructive hover:text-destructive"
+                                  onClick={async () => {
+                                    try {
+                                      const updatedFiles = await removeJournalFile(file);
+                                      setJournalFiles(updatedFiles);
 
-                        // Save the updated files to the store
-                        await saveJournalFiles(updatedFiles);
+                                      // If the removed file was selected, select another one
+                                      if (selectedJournalFile === file) {
+                                        if (updatedFiles.length > 0) {
+                                          onJournalFileChange(updatedFiles[0]);
+                                        } else {
+                                          onJournalFileChange("");
+                                        }
+                                      }
+                                      // If no file is selected and there are files available, select the first one
+                                      else if (!selectedJournalFile && updatedFiles.length > 0) {
+                                        onJournalFileChange(updatedFiles[0]);
+                                      }
+                                    } catch (error) {
+                                      console.error("Failed to remove file:", error);
+                                    }
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-6 text-muted-foreground">
+                          <p className="text-sm">No journal files configured</p>
+                        </div>
+                      )}
+                    </div>
 
-                        // Update local state
-                        setJournalFiles(updatedFiles);
-
-                        // If no file is currently selected, select the first new file
-                        if (!selectedJournalFile && newFiles.length > 0) {
-                          onJournalFileChange(newFiles[0]);
-                        }
-                      }
-                    } catch (error) {
-                      console.error("Failed to select files:", error);
-                    }
-                  }}
-                >
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add Files
-                </Button>
+                    <DialogFooter>
+                      <Button onClick={handleAddFiles}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Select Files
+                      </Button>
+                      <DialogClose asChild>
+                        <Button variant="outline">Done</Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               {journalFiles.length > 0 ? (
-                <div className="space-y-2">
-                  <Select value={selectedJournalFile} onValueChange={onJournalFileChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a journal file" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {journalFiles.map((file) => (
-                        <SelectItem key={file} value={file}>
-                          {getFileName(file)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {/* File management */}
-                  <div className="max-h-32 overflow-y-auto space-y-1">
+                <Select value={selectedJournalFile} onValueChange={onJournalFileChange}>
+                  <SelectTrigger className="w-full bg-background">
+                    <SelectValue placeholder="Select a journal file" />
+                  </SelectTrigger>
+                  <SelectContent>
                     {journalFiles.map((file) => (
-                      <div
-                        key={file}
-                        className="flex items-center justify-between text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1"
-                      >
-                        <span className="truncate flex-1" title={file}>
-                          {getFileName(file)}
-                        </span>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-5 w-5 p-0 text-muted-foreground hover:text-destructive"
-                          onClick={async () => {
-                            try {
-                              const updatedFiles = await removeJournalFile(file);
-                              setJournalFiles(updatedFiles);
-
-                              // If the removed file was selected, select another one
-                              if (selectedJournalFile === file) {
-                                if (updatedFiles.length > 0) {
-                                  onJournalFileChange(updatedFiles[0]);
-                                } else {
-                                  onJournalFileChange("");
-                                }
-                              }
-                            } catch (error) {
-                              console.error("Failed to remove file:", error);
-                            }
-                          }}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
+                      <SelectItem key={file} value={file}>
+                        {getFileName(file)}
+                      </SelectItem>
                     ))}
-                  </div>
-                </div>
+                  </SelectContent>
+                </Select>
               ) : (
                 <div className="text-center py-4 text-muted-foreground">
                   <p className="text-sm mb-2">No journal files configured</p>
-                  <Button
-                    size="sm"
-                    onClick={async () => {
-                      try {
-                        const files = await invoke<string[]>("select_journal_files");
-                        console.log("Selected files:", files);
-
-                        if (files && files.length > 0) {
-                          // Save the new files to the store
-                          await saveJournalFiles(files);
-
-                          // Update local state
-                          setJournalFiles(files);
-
-                          // Select the first file
-                          onJournalFileChange(files[0]);
-                        }
-                      } catch (error) {
-                        console.error("Failed to select files:", error);
-                      }
-                    }}
-                  >
+                  <Button size="sm" onClick={handleAddFiles}>
                     <Plus className="h-4 w-4 mr-1" />
                     Add Your First Journal File
                   </Button>
