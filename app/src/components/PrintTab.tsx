@@ -1,7 +1,9 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { type PrintTransaction, type PrintReport, createDefaultPrintOptions } from "@/types/hledger.types";
 import type { DateValue } from "@internationalized/date";
 import { invoke } from "@tauri-apps/api/core";
+import { File } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -62,6 +64,18 @@ export function PrintTab({ searchQuery, dateRange, selectedJournalFile }: PrintT
     return `${amount.commodity}${amount.quantity}`;
   };
 
+  const copySourceLocation = async (transaction: PrintTransaction) => {
+    if (transaction.source_positions && transaction.source_positions.length > 0) {
+      const sourcePosition = transaction.source_positions[0];
+      const sourceLocation = `${sourcePosition.file}:${sourcePosition.line}`;
+      try {
+        await navigator.clipboard.writeText(sourceLocation);
+      } catch (error) {
+        console.error("Failed to copy source location:", error);
+      }
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -86,8 +100,8 @@ export function PrintTab({ searchQuery, dateRange, selectedJournalFile }: PrintT
                 <div className="space-y-0">
                   {transactions.map((transaction, transactionIndex) => (
                     <div key={transactionIndex}>
-                      {transactionIndex > 0 && <div className="border-t border-muted-foreground/20 my-4" />}
-                      <div className="space-y-2">
+                      {transactionIndex > 0 && <div className="border-t border-muted-foreground/20 my-4 mx-2" />}
+                      <div className="px-2 space-y-2">
                         {/* Transaction header */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
@@ -97,9 +111,22 @@ export function PrintTab({ searchQuery, dateRange, selectedJournalFile }: PrintT
                             )}
                             <span className="text-sm font-medium">{transaction.description}</span>
                           </div>
-                          {transaction.code && (
-                            <span className="text-xs font-mono text-muted-foreground">({transaction.code})</span>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {transaction.code && (
+                              <span className="text-xs font-mono text-muted-foreground">({transaction.code})</span>
+                            )}
+                            {transaction.source_positions && transaction.source_positions.length > 0 && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => copySourceLocation(transaction)}
+                                className="h-6 w-6 p-0"
+                                title="Copy source location"
+                              >
+                                <File className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
                         </div>
                         {transaction.comment && <p className="text-xs text-muted-foreground">{transaction.comment}</p>}
 
