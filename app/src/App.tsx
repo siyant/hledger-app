@@ -2,6 +2,7 @@ import { DashboardTab } from "@/components/DashboardTab";
 import VerificationTab from "@/components/VerificationTab";
 import { AccountsTab } from "@/components/AccountsTab";
 import { BalancesTab } from "@/components/BalancesTab";
+import { PrintTab } from "@/components/PrintTab";
 import { BalanceSheetTab } from "@/components/BalanceSheetTab";
 import { IncomeStatementTab } from "@/components/IncomeStatementTab";
 import { FiltersSidebar } from "@/components/FiltersSidebar";
@@ -16,6 +17,7 @@ function App() {
     end: DateValue;
   } | null>(null);
   const [selectedJournalFile, setSelectedJournalFile] = useState("");
+  const [currencyMode, setCurrencyMode] = useState("original");
 
   return (
     <div className="min-h-screen bg-background">
@@ -26,6 +28,8 @@ function App() {
         onDateRangeChange={setDateRange}
         selectedJournalFile={selectedJournalFile}
         onJournalFileChange={setSelectedJournalFile}
+        currencyMode={currencyMode}
+        onCurrencyModeChange={setCurrencyMode}
       />
 
       {/* Main Content */}
@@ -49,6 +53,7 @@ function App() {
                 Accounts
               </Tab>
               <Tab id="balances">Balances</Tab>
+              <Tab id="print">Print</Tab>
             </TabList>
 
             <TabPanel id="dashboard">
@@ -64,7 +69,12 @@ function App() {
             </TabPanel>
 
             <TabPanel id="balances">
-              <BalancesTab searchQuery={searchQuery} dateRange={dateRange} selectedJournalFile={selectedJournalFile} />
+              <BalancesTab
+                searchQuery={searchQuery}
+                dateRange={dateRange}
+                selectedJournalFile={selectedJournalFile}
+                currencyMode={currencyMode}
+              />
             </TabPanel>
 
             <TabPanel id="balancesheet">
@@ -72,6 +82,7 @@ function App() {
                 searchQuery={searchQuery}
                 dateRange={dateRange}
                 selectedJournalFile={selectedJournalFile}
+                currencyMode={currencyMode}
               />
             </TabPanel>
 
@@ -80,7 +91,12 @@ function App() {
                 searchQuery={searchQuery}
                 dateRange={dateRange}
                 selectedJournalFile={selectedJournalFile}
+                currencyMode={currencyMode}
               />
+            </TabPanel>
+
+            <TabPanel id="print">
+              <PrintTab searchQuery={searchQuery} dateRange={dateRange} selectedJournalFile={selectedJournalFile} />
             </TabPanel>
           </Tabs>
         </div>

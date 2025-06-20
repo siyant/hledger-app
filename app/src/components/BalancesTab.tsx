@@ -19,15 +19,15 @@ interface BalancesTabProps {
   searchQuery: string;
   dateRange: { start: DateValue; end: DateValue } | null;
   selectedJournalFile: string;
+  currencyMode: string;
 }
 
-export function BalancesTab({ searchQuery, dateRange, selectedJournalFile }: BalancesTabProps) {
+export function BalancesTab({ searchQuery, dateRange, selectedJournalFile, currencyMode }: BalancesTabProps) {
   const [balances, setBalances] = useState<BalanceAccount[]>([]);
   const [periodicData, setPeriodicData] = useState<PeriodicBalance | null>(null);
   const [balanceDisplayMode, setBalanceDisplayMode] = useState<string>("flat");
   const [periodMode, setPeriodMode] = useState<string>("none");
   const [depthMode, setDepthMode] = useState<string>("none");
-  const [currencyMode, setCurrencyMode] = useState<string>("original");
   const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(new Set());
 
   // Memoized calculation of which accounts have children
@@ -278,14 +278,6 @@ export function BalancesTab({ searchQuery, dateRange, selectedJournalFile }: Bal
     }
   };
 
-  // Handle currency mode selection
-  const handleCurrencyMode = (keys: Set<React.Key>) => {
-    const selected = Array.from(keys)[0] as string;
-    if (selected) {
-      setCurrencyMode(selected);
-    }
-  };
-
   // Fetch balances when searchQuery, dateRange, or balanceDisplayMode changes
   useEffect(() => {
     fetchBalances(searchQuery, dateRange);
@@ -357,22 +349,6 @@ export function BalancesTab({ searchQuery, dateRange, selectedJournalFile }: Bal
               </Toggle>
               <Toggle id="5" size="xs" className="font-normal">
                 5
-              </Toggle>
-            </ToggleButtonGroup>
-          </div>
-
-          <div className="flex flex-row gap-2 items-center">
-            <label className="text-sm font-medium text-muted-foreground block w-16">Currency</label>
-            <ToggleButtonGroup
-              selectedKeys={[currencyMode]}
-              onSelectionChange={handleCurrencyMode}
-              className="justify-start"
-            >
-              <Toggle id="original" size="xs" className="font-normal">
-                Original
-              </Toggle>
-              <Toggle id="$" size="xs" className="font-normal">
-                $
               </Toggle>
             </ToggleButtonGroup>
           </div>

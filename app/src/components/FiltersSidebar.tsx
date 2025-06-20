@@ -27,6 +27,8 @@ interface FiltersSidebarProps {
   onDateRangeChange: (range: { start: DateValue; end: DateValue } | null) => void;
   selectedJournalFile: string;
   onJournalFileChange: (file: string) => void;
+  currencyMode: string;
+  onCurrencyModeChange: (mode: string) => void;
 }
 
 // Date range utilities
@@ -80,6 +82,8 @@ export function FiltersSidebar({
   onDateRangeChange,
   selectedJournalFile,
   onJournalFileChange,
+  currencyMode,
+  onCurrencyModeChange,
 }: FiltersSidebarProps) {
   const [selectedDateRange, setSelectedDateRange] = useState<string>("");
   const [journalFiles, setJournalFiles] = useState<string[]>([]);
@@ -340,6 +344,28 @@ export function FiltersSidebar({
 
                 <JollyDateRangePicker className="w-full" value={dateRange} onChange={handleCustomDateRange} />
               </div>
+            </div>
+
+            {/* Currency Selector */}
+            <div>
+              <label className="text-sm font-medium text-muted-foreground block mb-2">Currency</label>
+              <ToggleButtonGroup
+                selectedKeys={[currencyMode]}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string;
+                  if (selected) {
+                    onCurrencyModeChange(selected);
+                  }
+                }}
+                className="w-full"
+              >
+                <Toggle id="original" size="sm" className="text-xs font-normal flex-1">
+                  Original
+                </Toggle>
+                <Toggle id="$" size="sm" className="text-xs font-normal flex-1">
+                  $
+                </Toggle>
+              </ToggleButtonGroup>
             </div>
           </div>
         </div>

@@ -17,14 +17,14 @@ interface BalanceSheetTabProps {
   searchQuery: string;
   dateRange: { start: DateValue; end: DateValue } | null;
   selectedJournalFile: string;
+  currencyMode: string;
 }
 
-export function BalanceSheetTab({ searchQuery, dateRange, selectedJournalFile }: BalanceSheetTabProps) {
+export function BalanceSheetTab({ searchQuery, dateRange, selectedJournalFile, currencyMode }: BalanceSheetTabProps) {
   const [balanceSheetData, setBalanceSheetData] = useState<BalanceSheetReport | null>(null);
   const [balanceDisplayMode, setBalanceDisplayMode] = useState<string>("flat");
   const [periodMode, setPeriodMode] = useState<string>("none");
   const [depthMode, setDepthMode] = useState<string>("none");
-  const [currencyMode, setCurrencyMode] = useState<string>("original");
   const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(new Set());
 
   // Memoized calculation of which accounts have children
@@ -218,14 +218,6 @@ export function BalanceSheetTab({ searchQuery, dateRange, selectedJournalFile }:
     const selected = Array.from(keys)[0] as string;
     if (selected) {
       setDepthMode(selected);
-    }
-  };
-
-  // Handle currency mode selection
-  const handleCurrencyMode = (keys: Set<React.Key>) => {
-    const selected = Array.from(keys)[0] as string;
-    if (selected) {
-      setCurrencyMode(selected);
     }
   };
 
@@ -469,22 +461,6 @@ export function BalanceSheetTab({ searchQuery, dateRange, selectedJournalFile }:
               </Toggle>
               <Toggle id="5" size="xs" className="font-normal">
                 5
-              </Toggle>
-            </ToggleButtonGroup>
-          </div>
-
-          <div className="flex flex-row gap-2 items-center">
-            <label className="text-sm font-medium text-muted-foreground block w-16">Currency</label>
-            <ToggleButtonGroup
-              selectedKeys={[currencyMode]}
-              onSelectionChange={handleCurrencyMode}
-              className="justify-start"
-            >
-              <Toggle id="original" size="xs" className="font-normal">
-                Original
-              </Toggle>
-              <Toggle id="$" size="xs" className="font-normal">
-                $
               </Toggle>
             </ToggleButtonGroup>
           </div>
