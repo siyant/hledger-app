@@ -23,6 +23,8 @@ export function IncomeStatementTab({ searchQuery, dateRange, selectedJournalFile
   const [incomeStatementData, setIncomeStatementData] = useState<IncomeStatementReport | null>(null);
   const [balanceDisplayMode, setBalanceDisplayMode] = useState<string>("flat");
   const [periodMode, setPeriodMode] = useState<string>("none");
+  const [depthMode, setDepthMode] = useState<string>("none");
+  const [currencyMode, setCurrencyMode] = useState<string>("original");
   const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(new Set());
 
   // Memoized calculation of which accounts have children
@@ -166,6 +168,16 @@ export function IncomeStatementTab({ searchQuery, dateRange, selectedJournalFile
         options.tree = false;
       }
 
+      // Set depth option
+      if (depthMode !== "none") {
+        options.depth = parseInt(depthMode, 10);
+      }
+
+      // Set exchange/currency option
+      if (currencyMode === "$") {
+        options.exchange = "$";
+      }
+
       try {
         const incomeStatementReport = await invoke<IncomeStatementReport>("get_incomestatement", {
           journalFile: selectedJournalFile,
@@ -178,7 +190,7 @@ export function IncomeStatementTab({ searchQuery, dateRange, selectedJournalFile
         setIncomeStatementData(null);
       }
     },
-    [balanceDisplayMode, periodMode, selectedJournalFile],
+    [balanceDisplayMode, periodMode, depthMode, currencyMode, selectedJournalFile],
   );
 
   // Handle balance display mode selection
@@ -198,6 +210,22 @@ export function IncomeStatementTab({ searchQuery, dateRange, selectedJournalFile
       setPeriodMode(selected);
       // Clear expanded state when switching period modes
       setExpandedAccounts(new Set());
+    }
+  };
+
+  // Handle depth mode selection
+  const handleDepthMode = (keys: Set<React.Key>) => {
+    const selected = Array.from(keys)[0] as string;
+    if (selected) {
+      setDepthMode(selected);
+    }
+  };
+
+  // Handle currency mode selection
+  const handleCurrencyMode = (keys: Set<React.Key>) => {
+    const selected = Array.from(keys)[0] as string;
+    if (selected) {
+      setCurrencyMode(selected);
     }
   };
 
@@ -417,6 +445,46 @@ export function IncomeStatementTab({ searchQuery, dateRange, selectedJournalFile
               </Toggle>
               <Toggle id="yearly" size="xs" className="font-normal">
                 Yearly
+              </Toggle>
+            </ToggleButtonGroup>
+          </div>
+
+          <div className="flex flex-row gap-2 items-center">
+            <label className="text-sm font-medium text-muted-foreground block w-16">Depth</label>
+            <ToggleButtonGroup selectedKeys={[depthMode]} onSelectionChange={handleDepthMode} className="justify-start">
+              <Toggle id="none" size="xs" className="font-normal">
+                No limit
+              </Toggle>
+              <Toggle id="1" size="xs" className="font-normal">
+                1
+              </Toggle>
+              <Toggle id="2" size="xs" className="font-normal">
+                2
+              </Toggle>
+              <Toggle id="3" size="xs" className="font-normal">
+                3
+              </Toggle>
+              <Toggle id="4" size="xs" className="font-normal">
+                4
+              </Toggle>
+              <Toggle id="5" size="xs" className="font-normal">
+                5
+              </Toggle>
+            </ToggleButtonGroup>
+          </div>
+
+          <div className="flex flex-row gap-2 items-center">
+            <label className="text-sm font-medium text-muted-foreground block w-16">Currency</label>
+            <ToggleButtonGroup
+              selectedKeys={[currencyMode]}
+              onSelectionChange={handleCurrencyMode}
+              className="justify-start"
+            >
+              <Toggle id="original" size="xs" className="font-normal">
+                Original
+              </Toggle>
+              <Toggle id="$" size="xs" className="font-normal">
+                $
               </Toggle>
             </ToggleButtonGroup>
           </div>
