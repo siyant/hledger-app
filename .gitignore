@@ -1,4 +1,5 @@
 .env
 target/
+node_modules/
 
 **/.claude/settings.local.json
