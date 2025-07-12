@@ -8,8 +8,6 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint src",
-    "format": "biome format --write src/",
-    "format:check": "biome format src/",
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
