@@ -1,7 +1,6 @@
 use crate::commands::balance::{PeriodDate, PeriodicBalanceRow};
-use crate::{HLedgerError, Result};
+use crate::{get_hledger_command, HLedgerError, Result};
 use serde::{Deserialize, Serialize};
-use std::process::Command;
 use ts_rs::TS;
 
 /// Options for the balancesheet command
@@ -277,10 +276,11 @@ impl BalanceSheetOptions {
 
 /// Get balance sheet report from hledger
 pub fn get_balancesheet(
+    hledger_path: Option<&str>,
     journal_file: Option<&str>,
-    options: &BalanceSheetOptions,
+    options: &BalanceSheetOptions
 ) -> Result<BalanceSheetReport> {
-    let mut cmd = Command::new("hledger");
+    let mut cmd = get_hledger_command(hledger_path);
 
     if let Some(file) = journal_file {
         cmd.arg("-f").arg(file);

@@ -38,7 +38,7 @@ fn get_accounts(
     options: hledger_lib::AccountsOptions,
 ) -> Result<Vec<String>, String> {
     let file_ref = Some(journal_file.as_str());
-    match hledger_lib::get_accounts(file_ref, &options) {
+    match hledger_lib::get_accounts(None, file_ref, &options) {
         Ok(accounts) => Ok(accounts),
         Err(e) => Err(format!("Failed to get accounts: {}", e)),
     }
@@ -50,7 +50,7 @@ fn get_balance(
     options: hledger_lib::BalanceOptions,
 ) -> Result<hledger_lib::BalanceReport, String> {
     let file_ref = Some(journal_file.as_str());
-    match hledger_lib::get_balance(file_ref, &options) {
+    match hledger_lib::get_balance(None, file_ref, &options) {
         Ok(balance) => Ok(balance),
         Err(e) => Err(format!("Failed to get balance: {}", e)),
     }
@@ -62,7 +62,7 @@ fn get_balancesheet(
     options: hledger_lib::BalanceSheetOptions,
 ) -> Result<hledger_lib::BalanceSheetReport, String> {
     let file_ref = Some(journal_file.as_str());
-    match hledger_lib::get_balancesheet(file_ref, &options) {
+    match hledger_lib::get_balancesheet(None, file_ref, &options) {
         Ok(balancesheet) => Ok(balancesheet),
         Err(e) => Err(format!("Failed to get balancesheet: {}", e)),
     }
@@ -74,7 +74,7 @@ fn get_incomestatement(
     options: hledger_lib::IncomeStatementOptions,
 ) -> Result<hledger_lib::IncomeStatementReport, String> {
     let file_ref = Some(journal_file.as_str());
-    match hledger_lib::get_incomestatement(file_ref, &options) {
+    match hledger_lib::get_incomestatement(None, file_ref, &options) {
         Ok(incomestatement) => Ok(incomestatement),
         Err(e) => Err(format!("Failed to get incomestatement: {}", e)),
     }
@@ -86,7 +86,7 @@ fn get_print(
     options: hledger_lib::PrintOptions,
 ) -> Result<hledger_lib::PrintReport, String> {
     let file_ref = Some(journal_file.as_str());
-    match hledger_lib::get_print(file_ref, &options) {
+    match hledger_lib::get_print(None, file_ref, &options) {
         Ok(print_report) => Ok(print_report),
         Err(e) => Err(format!("Failed to get print: {}", e)),
     }

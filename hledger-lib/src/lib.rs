@@ -1,4 +1,5 @@
 pub mod commands;
+pub mod config;
 pub mod error;
 
 pub use commands::accounts::{get_accounts, AccountsOptions};
@@ -12,6 +13,7 @@ pub use commands::print::{
     get_print, AmountStyle, BalanceAssertion, Price, PrintAmount, PrintOptions, PrintPosting,
     PrintReport, PrintTransaction, SourcePosition,
 };
+pub use config::get_hledger_command;
 pub use error::HLedgerError;
 
 pub type Result<T> = std::result::Result<T, HLedgerError>;

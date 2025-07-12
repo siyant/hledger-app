@@ -1,10 +1,9 @@
 use crate::commands::balance::{
     extract_date_from_tagged_value, parse_amounts, PeriodDate, PeriodicBalance, PeriodicBalanceRow,
 };
-use crate::{HLedgerError, Result};
+use crate::{get_hledger_command, HLedgerError, Result};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-use std::process::Command;
 use ts_rs::TS;
 
 /// Options for the cashflow command
@@ -295,10 +294,11 @@ pub struct CashflowSubreport {
 
 /// Get cashflow statement from hledger
 pub fn get_cashflow(
+    hledger_path: Option<&str>,
     journal_path: Option<&Path>,
-    options: CashflowOptions,
+    options: CashflowOptions
 ) -> Result<CashflowReport> {
-    let mut cmd = Command::new("hledger");
+    let mut cmd = get_hledger_command(hledger_path);
 
     // Add journal file if provided
     if let Some(path) = journal_path {

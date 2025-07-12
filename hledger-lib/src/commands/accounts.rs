@@ -1,6 +1,5 @@
-use crate::{HLedgerError, Result};
+use crate::{get_hledger_command, HLedgerError, Result};
 use serde::{Deserialize, Serialize};
-use std::process::Command;
 use ts_rs::TS;
 
 /// Options for the accounts command
@@ -155,8 +154,12 @@ impl AccountsOptions {
 }
 
 /// Get account names from the hledger journal with specified options
-pub fn get_accounts(journal_file: Option<&str>, options: &AccountsOptions) -> Result<Vec<String>> {
-    let mut cmd = Command::new("hledger");
+pub fn get_accounts(
+    hledger_path: Option<&str>,
+    journal_file: Option<&str>, 
+    options: &AccountsOptions
+) -> Result<Vec<String>> {
+    let mut cmd = get_hledger_command(hledger_path);
 
     if let Some(file) = journal_file {
         cmd.arg("-f").arg(file);

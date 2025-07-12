@@ -1,7 +1,6 @@
-use crate::{HLedgerError, Result};
+use crate::{get_hledger_command, HLedgerError, Result};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::process::Command;
 use ts_rs::TS;
 
 /// Custom serde module for Decimal to/from string
@@ -360,8 +359,12 @@ impl BalanceOptions {
 }
 
 /// Get balance report from hledger
-pub fn get_balance(journal_file: Option<&str>, options: &BalanceOptions) -> Result<BalanceReport> {
-    let mut cmd = Command::new("hledger");
+pub fn get_balance(
+    hledger_path: Option<&str>,
+    journal_file: Option<&str>, 
+    options: &BalanceOptions
+) -> Result<BalanceReport> {
+    let mut cmd = get_hledger_command(hledger_path);
 
     if let Some(file) = journal_file {
         cmd.arg("-f").arg(file);
