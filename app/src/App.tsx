@@ -6,6 +6,7 @@ import { PrintTab } from "@/components/PrintTab";
 import { BalanceSheetTab } from "@/components/BalanceSheetTab";
 import { IncomeStatementTab } from "@/components/IncomeStatementTab";
 import { FiltersSidebar } from "@/components/FiltersSidebar";
+import { ConfigDialog } from "@/components/ConfigDialog";
 import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/tabs";
 import type { DateValue } from "@internationalized/date";
 import { useState } from "react";
@@ -18,6 +19,7 @@ function App() {
   } | null>(null);
   const [selectedJournalFile, setSelectedJournalFile] = useState("");
   const [currencyMode, setCurrencyMode] = useState("original");
+  const [configDialogOpen, setConfigDialogOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
@@ -30,6 +32,15 @@ function App() {
         onJournalFileChange={setSelectedJournalFile}
         currencyMode={currencyMode}
         onCurrencyModeChange={setCurrencyMode}
+        dialogOpen={configDialogOpen}
+        onDialogOpenChange={setConfigDialogOpen}
+      />
+
+      <ConfigDialog
+        open={configDialogOpen}
+        onOpenChange={setConfigDialogOpen}
+        selectedJournalFile={selectedJournalFile}
+        onJournalFileChange={setSelectedJournalFile}
       />
 
       {/* Main Content */}

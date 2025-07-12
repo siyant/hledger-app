@@ -4,21 +4,10 @@ import { JollySearchField } from "@/components/ui/searchfield";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Toggle, ToggleButtonGroup } from "@/components/ui/toggle";
 import { type DateValue, getLocalTimeZone, today } from "@internationalized/date";
-import { invoke } from "@tauri-apps/api/core";
-import { X, Plus, Trash2 } from "lucide-react";
+import { X, Plus } from "lucide-react";
 import type React from "react";
 import { useState, useEffect } from "react";
-import { loadJournalStore, saveJournalFiles, saveLastSelectedFile, removeJournalFile } from "@/utils/journalStore";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { loadConfig, saveLastSelectedFile } from "@/utils/configStore";
 
 interface FiltersSidebarProps {
   searchQuery: string;
@@ -29,6 +18,8 @@ interface FiltersSidebarProps {
   onJournalFileChange: (file: string) => void;
   currencyMode: string;
   onCurrencyModeChange: (mode: string) => void;
+  dialogOpen: boolean;
+  onDialogOpenChange: (open: boolean) => void;
 }
 
 // Date range utilities
@@ -84,21 +75,21 @@ export function FiltersSidebar({
   onJournalFileChange,
   currencyMode,
   onCurrencyModeChange,
+  onDialogOpenChange,
 }: FiltersSidebarProps) {
   const [selectedDateRange, setSelectedDateRange] = useState<string>("");
   const [journalFiles, setJournalFiles] = useState<string[]>([]);
-  const [dialogOpen, setDialogOpen] = useState(false);
 
   // Load journal files from store on mount
   useEffect(() => {
     async function loadJournalFilesFromStore() {
       try {
-        const store = await loadJournalStore();
+        const store = await loadConfig();
         setJournalFiles(store.journalFiles);
 
         // If no journal files are configured, automatically open the dialog
         if (store.journalFiles.length === 0) {
-          setDialogOpen(true);
+          onDialogOpenChange(true);
         }
         // If we have a last selected file, use it
         else if (store.lastSelectedJournalFile) {
@@ -112,11 +103,11 @@ export function FiltersSidebar({
         console.error("Failed to load journal files from store:", error);
         setJournalFiles([]);
         // Also open dialog on error since there are no files
-        setDialogOpen(true);
+        onDialogOpenChange(true);
       }
     }
     loadJournalFilesFromStore();
-  }, [onJournalFileChange]); // Remove dependencies to only run once on mount
+  }, [onJournalFileChange, onDialogOpenChange]); // Add onDialogOpenChange to dependencies
 
   // Save selected file to store when it changes
   useEffect(() => {
@@ -130,32 +121,9 @@ export function FiltersSidebar({
     return filePath.split("/").pop() || filePath;
   };
 
-  // Function to handle adding files
-  const handleAddFiles = async () => {
-    try {
-      const files = await invoke<string[]>("select_journal_files");
-      console.log("Selected files:", files);
-
-      if (files && files.length > 0) {
-        // Merge new files with existing ones (avoid duplicates)
-        const existingFiles = new Set(journalFiles);
-        const newFiles = files.filter((file) => !existingFiles.has(file));
-        const updatedFiles = [...journalFiles, ...newFiles];
-
-        // Save the updated files to the store
-        await saveJournalFiles(updatedFiles);
-
-        // Update local state
-        setJournalFiles(updatedFiles);
-
-        // If no file is currently selected, select the first file from the updated list
-        if (!selectedJournalFile && updatedFiles.length > 0) {
-          onJournalFileChange(updatedFiles[0]);
-        }
-      }
-    } catch (error) {
-      console.error("Failed to select files:", error);
-    }
+  // Function to handle opening config dialog
+  const handleOpenConfig = () => {
+    onDialogOpenChange(true);
   };
 
   // Clear search query
@@ -204,83 +172,9 @@ export function FiltersSidebar({
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium text-muted-foreground">Journal File</label>
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="ghost" className="text-xs text-muted-foreground p-2 h-5">
-                      Manage
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[500px]">
-                    <DialogHeader>
-                      <DialogTitle>Manage Journal Files</DialogTitle>
-                      <DialogDescription>Select journal files to view data for</DialogDescription>
-                    </DialogHeader>
-
-                    <div className="space-y-4">
-                      {journalFiles.length > 0 ? (
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Configured Files:</label>
-                          <div className="max-h-64 overflow-y-auto space-y-2">
-                            {journalFiles.map((file) => (
-                              <div key={file} className="flex items-center justify-between px-3 py-2 border rounded-lg">
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate" title={file}>
-                                    {getFileName(file)}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground truncate" title={file}>
-                                    {file}
-                                  </p>
-                                </div>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="ml-2 text-destructive hover:text-destructive"
-                                  onClick={async () => {
-                                    try {
-                                      const updatedFiles = await removeJournalFile(file);
-                                      setJournalFiles(updatedFiles);
-
-                                      // If the removed file was selected, select another one
-                                      if (selectedJournalFile === file) {
-                                        if (updatedFiles.length > 0) {
-                                          onJournalFileChange(updatedFiles[0]);
-                                        } else {
-                                          onJournalFileChange("");
-                                        }
-                                      }
-                                      // If no file is selected and there are files available, select the first one
-                                      else if (!selectedJournalFile && updatedFiles.length > 0) {
-                                        onJournalFileChange(updatedFiles[0]);
-                                      }
-                                    } catch (error) {
-                                      console.error("Failed to remove file:", error);
-                                    }
-                                  }}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-center py-6 text-muted-foreground">
-                          <p className="text-sm">No journal files configured</p>
-                        </div>
-                      )}
-                    </div>
-
-                    <DialogFooter>
-                      <Button onClick={handleAddFiles}>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Select Files
-                      </Button>
-                      <DialogClose asChild>
-                        <Button variant="outline">Done</Button>
-                      </DialogClose>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                <Button size="sm" variant="ghost" className="text-xs text-muted-foreground p-2 h-5" onClick={handleOpenConfig}>
+                  Manage
+                </Button>
               </div>
 
               {journalFiles.length > 0 ? (
@@ -299,7 +193,7 @@ export function FiltersSidebar({
               ) : (
                 <div className="text-center py-4 text-muted-foreground">
                   <p className="text-sm mb-2">No journal files configured</p>
-                  <Button size="sm" onClick={handleAddFiles}>
+                  <Button size="sm" onClick={handleOpenConfig}>
                     <Plus className="h-4 w-4 mr-1" />
                     Add Your First Journal File
                   </Button>
