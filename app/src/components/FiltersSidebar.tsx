@@ -6,8 +6,7 @@ import { Toggle, ToggleButtonGroup } from "@/components/ui/toggle";
 import { type DateValue, getLocalTimeZone, today } from "@internationalized/date";
 import { X, Plus } from "lucide-react";
 import type React from "react";
-import { useState, useEffect } from "react";
-import { loadConfig, saveLastSelectedFile } from "@/utils/configStore";
+import { useState } from "react";
 
 interface FiltersSidebarProps {
   searchQuery: string;
@@ -20,6 +19,7 @@ interface FiltersSidebarProps {
   onCurrencyModeChange: (mode: string) => void;
   dialogOpen: boolean;
   onDialogOpenChange: (open: boolean) => void;
+  journalFiles: string[];
 }
 
 // Date range utilities
@@ -76,45 +76,10 @@ export function FiltersSidebar({
   currencyMode,
   onCurrencyModeChange,
   onDialogOpenChange,
+  journalFiles,
 }: FiltersSidebarProps) {
   const [selectedDateRange, setSelectedDateRange] = useState<string>("");
-  const [journalFiles, setJournalFiles] = useState<string[]>([]);
 
-  // Load journal files from store on mount
-  useEffect(() => {
-    async function loadJournalFilesFromStore() {
-      try {
-        const store = await loadConfig();
-        setJournalFiles(store.journalFiles);
-
-        // If no journal files are configured, automatically open the dialog
-        if (store.journalFiles.length === 0) {
-          onDialogOpenChange(true);
-        }
-        // If we have a last selected file, use it
-        else if (store.lastSelectedJournalFile) {
-          onJournalFileChange(store.lastSelectedJournalFile);
-        }
-        // Otherwise, if files are available, select the first one
-        else if (store.journalFiles.length > 0) {
-          onJournalFileChange(store.journalFiles[0]);
-        }
-      } catch (error) {
-        console.error("Failed to load journal files from store:", error);
-        setJournalFiles([]);
-        // Also open dialog on error since there are no files
-        onDialogOpenChange(true);
-      }
-    }
-    loadJournalFilesFromStore();
-  }, [onJournalFileChange, onDialogOpenChange]); // Add onDialogOpenChange to dependencies
-
-  // Save selected file to store when it changes
-  useEffect(() => {
-    if (selectedJournalFile) {
-      saveLastSelectedFile(selectedJournalFile).catch(console.error);
-    }
-  }, [selectedJournalFile]);
 
   // Helper function to get just the filename from a full path
   const getFileName = (filePath: string) => {

@@ -9,7 +9,8 @@ import { FiltersSidebar } from "@/components/FiltersSidebar";
 import { ConfigDialog } from "@/components/ConfigDialog";
 import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/tabs";
 import type { DateValue } from "@internationalized/date";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { loadConfig, saveLastSelectedFile } from "@/utils/configStore";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,6 +21,43 @@ function App() {
   const [selectedJournalFile, setSelectedJournalFile] = useState("");
   const [currencyMode, setCurrencyMode] = useState("original");
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
+  const [journalFiles, setJournalFiles] = useState<string[]>([]);
+
+  // Load journal files from store on mount
+  useEffect(() => {
+    async function loadJournalFilesFromStore() {
+      try {
+        const store = await loadConfig();
+        setJournalFiles(store.journalFiles);
+
+        // If no journal files are configured, automatically open the dialog
+        if (store.journalFiles.length === 0) {
+          setConfigDialogOpen(true);
+        }
+        // If we have a last selected file, use it
+        else if (store.lastSelectedJournalFile) {
+          setSelectedJournalFile(store.lastSelectedJournalFile);
+        }
+        // Otherwise, if files are available, select the first one
+        else if (store.journalFiles.length > 0) {
+          setSelectedJournalFile(store.journalFiles[0]);
+        }
+      } catch (error) {
+        console.error("Failed to load journal files from store:", error);
+        setJournalFiles([]);
+        // Also open dialog on error since there are no files
+        setConfigDialogOpen(true);
+      }
+    }
+    loadJournalFilesFromStore();
+  }, []);
+
+  // Save selected file to store when it changes
+  useEffect(() => {
+    if (selectedJournalFile) {
+      saveLastSelectedFile(selectedJournalFile).catch(console.error);
+    }
+  }, [selectedJournalFile]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -34,6 +72,7 @@ function App() {
         onCurrencyModeChange={setCurrencyMode}
         dialogOpen={configDialogOpen}
         onDialogOpenChange={setConfigDialogOpen}
+        journalFiles={journalFiles}
       />
 
       <ConfigDialog
@@ -41,6 +80,8 @@ function App() {
         onOpenChange={setConfigDialogOpen}
         selectedJournalFile={selectedJournalFile}
         onJournalFileChange={setSelectedJournalFile}
+        journalFiles={journalFiles}
+        onJournalFilesChange={setJournalFiles}
       />
 
       {/* Main Content */}

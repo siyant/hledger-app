@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { invoke } from "@tauri-apps/api/core";
 import { Plus, Trash2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { loadConfig, saveJournalFiles, removeJournalFile } from "@/utils/configStore";
+import { saveJournalFiles, removeJournalFile } from "@/utils/configStore";
 import {
   Dialog,
   DialogClose,
@@ -18,6 +17,8 @@ interface ConfigDialogProps {
   onOpenChange: (open: boolean) => void;
   selectedJournalFile: string;
   onJournalFileChange: (file: string) => void;
+  journalFiles: string[];
+  onJournalFilesChange: (files: string[]) => void;
 }
 
 export function ConfigDialog({
@@ -25,24 +26,10 @@ export function ConfigDialog({
   onOpenChange,
   selectedJournalFile,
   onJournalFileChange,
+  journalFiles,
+  onJournalFilesChange,
 }: ConfigDialogProps) {
-  const [journalFiles, setJournalFiles] = useState<string[]>([]);
 
-  // Load journal files from store when dialog opens
-  useEffect(() => {
-    if (open) {
-      async function loadJournalFilesFromStore() {
-        try {
-          const store = await loadConfig();
-          setJournalFiles(store.journalFiles);
-        } catch (error) {
-          console.error("Failed to load journal files from store:", error);
-          setJournalFiles([]);
-        }
-      }
-      loadJournalFilesFromStore();
-    }
-  }, [open]);
 
   // Helper function to get just the filename from a full path
   const getFileName = (filePath: string) => {
@@ -64,8 +51,8 @@ export function ConfigDialog({
         // Save the updated files to the store
         await saveJournalFiles(updatedFiles);
 
-        // Update local state
-        setJournalFiles(updatedFiles);
+        // Update parent state
+        onJournalFilesChange(updatedFiles);
 
         // If no file is currently selected, select the first file from the updated list
         if (!selectedJournalFile && updatedFiles.length > 0) {
@@ -107,7 +94,7 @@ export function ConfigDialog({
                       onClick={async () => {
                         try {
                           const updatedFiles = await removeJournalFile(file);
-                          setJournalFiles(updatedFiles);
+                          onJournalFilesChange(updatedFiles);
 
                           // If the removed file was selected, select another one
                           if (selectedJournalFile === file) {
