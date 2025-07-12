@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { invoke } from "@tauri-apps/api/core";
 import { Plus, Trash2 } from "lucide-react";
-import { saveJournalFiles, removeJournalFile } from "@/utils/configStore";
+import { useState, useEffect } from "react";
+import { saveJournalFiles, removeJournalFile, loadConfig, saveHledgerPath } from "@/utils/configStore";
 import {
   Dialog,
   DialogClose,
@@ -29,6 +31,33 @@ export function ConfigDialog({
   journalFiles,
   onJournalFilesChange,
 }: ConfigDialogProps) {
+  const [hledgerPath, setHledgerPath] = useState("");
+
+  // Load hledger path from store when dialog opens
+  useEffect(() => {
+    if (open) {
+      async function loadHledgerPathFromStore() {
+        try {
+          const store = await loadConfig();
+          setHledgerPath(store.hledgerPath || "");
+        } catch (error) {
+          console.error("Failed to load hledger path from store:", error);
+          setHledgerPath("");
+        }
+      }
+      loadHledgerPathFromStore();
+    }
+  }, [open]);
+
+  // Handle hledger path change
+  const handleHledgerPathChange = async (value: string) => {
+    setHledgerPath(value);
+    try {
+      await saveHledgerPath(value);
+    } catch (error) {
+      console.error("Failed to save hledger path:", error);
+    }
+  };
 
 
   // Helper function to get just the filename from a full path
@@ -68,14 +97,30 @@ export function ConfigDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Manage Journal Files</DialogTitle>
-          <DialogDescription>Select journal files to view data for</DialogDescription>
+          <DialogTitle>Manage Configuration</DialogTitle>
+          <DialogDescription>Configure hledger settings and journal files</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {journalFiles.length > 0 ? (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Configured Files:</label>
+        <div className="space-y-6">
+          {/* hledger Binary Path Section */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium">hledger Binary Path</label>
+            <Input
+              value={hledgerPath}
+              onChange={(e) => handleHledgerPathChange(e.target.value)}
+              placeholder="Enter path to hledger binary (e.g., /usr/local/bin/hledger)"
+              className="w-full"
+            />
+            <p className="text-xs text-muted-foreground">
+              Specify the full path to your hledger binary. Leave empty to use system PATH.
+            </p>
+          </div>
+
+          {/* Journal Files Section */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Journal Files</label>
+            {journalFiles.length > 0 ? (
+              <div className="space-y-2">
               <div className="max-h-64 overflow-y-auto space-y-2">
                 {journalFiles.map((file) => (
                   <div key={file} className="flex items-center justify-between px-3 py-2 border rounded-lg">
@@ -119,11 +164,12 @@ export function ConfigDialog({
                 ))}
               </div>
             </div>
-          ) : (
-            <div className="text-center py-6 text-muted-foreground">
-              <p className="text-sm">No journal files configured</p>
-            </div>
-          )}
+            ) : (
+              <div className="text-center py-6 text-muted-foreground">
+                <p className="text-sm">No journal files configured</p>
+              </div>
+            )}
+          </div>
         </div>
 
         <DialogFooter>
