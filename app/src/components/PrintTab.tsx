@@ -4,7 +4,6 @@ import { type PrintTransaction, type PrintReport, createDefaultPrintOptions } fr
 import type { DateValue } from "@internationalized/date";
 import { invoke } from "@tauri-apps/api/core";
 import { File } from "lucide-react";
-import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 
 interface PrintTabProps {
