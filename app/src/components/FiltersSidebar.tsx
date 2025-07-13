@@ -80,7 +80,6 @@ export function FiltersSidebar({
 }: FiltersSidebarProps) {
   const [selectedDateRange, setSelectedDateRange] = useState<string>("");
 
-
   // Helper function to get just the filename from a full path
   const getFileName = (filePath: string) => {
     return filePath.split("/").pop() || filePath;
@@ -137,7 +136,12 @@ export function FiltersSidebar({
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium text-muted-foreground">Journal File</label>
-                <Button size="sm" variant="ghost" className="text-xs text-muted-foreground p-2 h-5" onClick={handleOpenConfig}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-xs text-muted-foreground p-2 h-5"
+                  onClick={handleOpenConfig}
+                >
                   Manage
                 </Button>
               </div>

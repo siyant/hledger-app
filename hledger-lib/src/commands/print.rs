@@ -235,8 +235,8 @@ impl PrintOptions {
 /// Get print report from hledger
 pub fn get_print(
     hledger_path: Option<&str>,
-    journal_file: Option<&str>, 
-    options: &PrintOptions
+    journal_file: Option<&str>,
+    options: &PrintOptions,
 ) -> Result<PrintReport> {
     let mut cmd = get_hledger_command(hledger_path);
 
@@ -343,10 +343,7 @@ fn parse_transaction(value: &serde_json::Value) -> Result<PrintTransaction> {
         .as_object()
         .ok_or_else(|| HLedgerError::ParseError("Transaction should be an object".to_string()))?;
 
-    let index = obj
-        .get("tindex")
-        .and_then(|i| i.as_u64())
-        .unwrap_or(0) as u32;
+    let index = obj.get("tindex").and_then(|i| i.as_u64()).unwrap_or(0) as u32;
 
     let date = obj
         .get("tdate")
@@ -608,10 +605,7 @@ fn parse_amount_style(value: &serde_json::Value) -> Result<AmountStyle> {
         .and_then(|d| d.as_str())
         .map(|s| s.to_string());
 
-    let precision = obj
-        .get("asprecision")
-        .and_then(|p| p.as_u64())
-        .unwrap_or(2) as u16;
+    let precision = obj.get("asprecision").and_then(|p| p.as_u64()).unwrap_or(2) as u16;
 
     let rounding = obj
         .get("asrounding")
@@ -649,9 +643,9 @@ fn parse_balance_assertion(value: &serde_json::Value) -> Result<Option<BalanceAs
         return Ok(None);
     }
 
-    let obj = value
-        .as_object()
-        .ok_or_else(|| HLedgerError::ParseError("Balance assertion should be an object".to_string()))?;
+    let obj = value.as_object().ok_or_else(|| {
+        HLedgerError::ParseError("Balance assertion should be an object".to_string())
+    })?;
 
     let amount = if let Some(amount_json) = obj.get("baamount") {
         parse_single_print_amount(amount_json)?
@@ -733,10 +727,7 @@ fn parse_single_print_amount(value: &serde_json::Value) -> Result<PrintAmount> {
 fn parse_source_position(value: &serde_json::Value) -> Option<SourcePosition> {
     let obj = value.as_object()?;
 
-    let line = obj
-        .get("sourceLine")
-        .and_then(|l| l.as_u64())
-        .unwrap_or(0) as u32;
+    let line = obj.get("sourceLine").and_then(|l| l.as_u64()).unwrap_or(0) as u32;
 
     let column = obj
         .get("sourceColumn")

@@ -278,7 +278,7 @@ impl IncomeStatementOptions {
 pub fn get_incomestatement(
     hledger_path: Option<&str>,
     journal_file: Option<&str>,
-    options: &IncomeStatementOptions
+    options: &IncomeStatementOptions,
 ) -> Result<IncomeStatementReport> {
     let mut cmd = get_hledger_command(hledger_path);
 

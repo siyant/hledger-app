@@ -278,7 +278,7 @@ impl BalanceSheetOptions {
 pub fn get_balancesheet(
     hledger_path: Option<&str>,
     journal_file: Option<&str>,
-    options: &BalanceSheetOptions
+    options: &BalanceSheetOptions,
 ) -> Result<BalanceSheetReport> {
     let mut cmd = get_hledger_command(hledger_path);
 

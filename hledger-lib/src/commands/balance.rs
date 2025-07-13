@@ -361,8 +361,8 @@ impl BalanceOptions {
 /// Get balance report from hledger
 pub fn get_balance(
     hledger_path: Option<&str>,
-    journal_file: Option<&str>, 
-    options: &BalanceOptions
+    journal_file: Option<&str>,
+    options: &BalanceOptions,
 ) -> Result<BalanceReport> {
     let mut cmd = get_hledger_command(hledger_path);
 

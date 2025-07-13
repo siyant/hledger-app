@@ -53,9 +53,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Test with filters
     println!("\n=== Print with Date Range ===");
-    let options = PrintOptions::new()
-        .begin("2024-01-01")
-        .end("2024-01-06");
+    let options = PrintOptions::new().begin("2024-01-01").end("2024-01-06");
 
     match get_print(Some("tests/fixtures/test.journal"), &options) {
         Ok(transactions) => {
@@ -78,8 +76,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!("  {} - {}", txn.date, txn.description);
                 for posting in &txn.postings {
                     if posting.account.starts_with("expenses") {
-                        println!("    {} {:?}", posting.account, 
-                            posting.amounts.iter()
+                        println!(
+                            "    {} {:?}",
+                            posting.account,
+                            posting
+                                .amounts
+                                .iter()
                                 .map(|a| format!("{}{}", a.commodity, a.quantity))
                                 .collect::<Vec<_>>()
                         );

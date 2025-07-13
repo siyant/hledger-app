@@ -296,7 +296,7 @@ pub struct CashflowSubreport {
 pub fn get_cashflow(
     hledger_path: Option<&str>,
     journal_path: Option<&Path>,
-    options: CashflowOptions
+    options: CashflowOptions,
 ) -> Result<CashflowReport> {
     let mut cmd = get_hledger_command(hledger_path);
 

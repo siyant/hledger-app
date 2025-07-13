@@ -156,8 +156,8 @@ impl AccountsOptions {
 /// Get account names from the hledger journal with specified options
 pub fn get_accounts(
     hledger_path: Option<&str>,
-    journal_file: Option<&str>, 
-    options: &AccountsOptions
+    journal_file: Option<&str>,
+    options: &AccountsOptions,
 ) -> Result<Vec<String>> {
     let mut cmd = get_hledger_command(hledger_path);
 

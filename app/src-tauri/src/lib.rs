@@ -18,7 +18,7 @@ async fn set_hledger_path(
     // Update state
     let mut hledger_path = state.hledger_path.lock().unwrap();
     *hledger_path = Some(path.clone());
-    
+
     Ok(())
 }
 
@@ -34,11 +34,11 @@ fn test_hledger_path(path: String) -> Result<String, String> {
         .arg("--version")
         .output()
         .map_err(|e| format!("Failed to execute hledger: {}", e))?;
-    
+
     if !output.status.success() {
         return Err("hledger command failed".to_string());
     }
-    
+
     let version = String::from_utf8_lossy(&output.stdout);
     Ok(version.trim().to_string())
 }
@@ -82,7 +82,7 @@ fn get_accounts(
 ) -> Result<Vec<String>, String> {
     let hledger_path = state.hledger_path.lock().unwrap();
     let path_ref = hledger_path.as_ref().map(|s| s.as_str());
-    
+
     let file_ref = Some(journal_file.as_str());
     match hledger_lib::get_accounts(path_ref, file_ref, &options) {
         Ok(accounts) => Ok(accounts),
@@ -98,7 +98,7 @@ fn get_balance(
 ) -> Result<hledger_lib::BalanceReport, String> {
     let hledger_path = state.hledger_path.lock().unwrap();
     let path_ref = hledger_path.as_ref().map(|s| s.as_str());
-    
+
     let file_ref = Some(journal_file.as_str());
     match hledger_lib::get_balance(path_ref, file_ref, &options) {
         Ok(balance) => Ok(balance),
@@ -114,7 +114,7 @@ fn get_balancesheet(
 ) -> Result<hledger_lib::BalanceSheetReport, String> {
     let hledger_path = state.hledger_path.lock().unwrap();
     let path_ref = hledger_path.as_ref().map(|s| s.as_str());
-    
+
     let file_ref = Some(journal_file.as_str());
     match hledger_lib::get_balancesheet(path_ref, file_ref, &options) {
         Ok(balancesheet) => Ok(balancesheet),
@@ -130,7 +130,7 @@ fn get_incomestatement(
 ) -> Result<hledger_lib::IncomeStatementReport, String> {
     let hledger_path = state.hledger_path.lock().unwrap();
     let path_ref = hledger_path.as_ref().map(|s| s.as_str());
-    
+
     let file_ref = Some(journal_file.as_str());
     match hledger_lib::get_incomestatement(path_ref, file_ref, &options) {
         Ok(incomestatement) => Ok(incomestatement),
@@ -146,7 +146,7 @@ fn get_print(
 ) -> Result<hledger_lib::PrintReport, String> {
     let hledger_path = state.hledger_path.lock().unwrap();
     let path_ref = hledger_path.as_ref().map(|s| s.as_str());
-    
+
     let file_ref = Some(journal_file.as_str());
     match hledger_lib::get_print(path_ref, file_ref, &options) {
         Ok(print_report) => Ok(print_report),

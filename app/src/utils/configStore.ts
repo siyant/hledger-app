@@ -6,17 +6,17 @@ interface AppConfig {
   lastSelectedJournalFile: string | null;
 }
 
-const STORE_FILE = "config.json";  // Renamed from journal-files.json
+const STORE_FILE = "config.json"; // Renamed from journal-files.json
 
 export async function loadConfig(): Promise<AppConfig> {
   const store = await load(STORE_FILE, { autoSave: true });
-  
+
   const hledgerPath = (await store.get<string | null>("hledgerPath")) || null;
   const journalFiles = (await store.get<string[]>("journalFiles")) || [];
   const lastSelectedJournalFile = (await store.get<string | null>("lastSelectedJournalFile")) || null;
-  
+
   console.log("Loaded from config store:", { hledgerPath, journalFiles, lastSelectedJournalFile });
-  
+
   return { hledgerPath, journalFiles, lastSelectedJournalFile };
 }
 

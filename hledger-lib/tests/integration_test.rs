@@ -1075,14 +1075,14 @@ fn test_get_cashflow_sort_amount() {
 #[test]
 fn test_get_print_basic() {
     use hledger_lib::{get_print, PrintOptions};
-    
+
     let options = PrintOptions::new();
     let result = get_print(Some("tests/fixtures/test.journal"), &options);
     assert!(result.is_ok());
 
     let transactions = result.unwrap();
     assert_eq!(transactions.len(), 3);
-    
+
     // Check first transaction
     let first = &transactions[0];
     assert_eq!(first.date, "2024-01-01");
@@ -1094,11 +1094,9 @@ fn test_get_print_basic() {
 #[test]
 fn test_get_print_with_date_filter() {
     use hledger_lib::{get_print, PrintOptions};
-    
-    let options = PrintOptions::new()
-        .begin("2024-01-01")
-        .end("2024-01-06");
-    
+
+    let options = PrintOptions::new().begin("2024-01-01").end("2024-01-06");
+
     let result = get_print(Some("tests/fixtures/test.journal"), &options);
     assert!(result.is_ok());
 
@@ -1109,18 +1107,20 @@ fn test_get_print_with_date_filter() {
 #[test]
 fn test_get_print_with_query() {
     use hledger_lib::{get_print, PrintOptions};
-    
+
     let options = PrintOptions::new().query("expenses");
-    
+
     let result = get_print(Some("tests/fixtures/test.journal"), &options);
     assert!(result.is_ok());
 
     let transactions = result.unwrap();
     assert_eq!(transactions.len(), 2);
-    
+
     // All transactions should involve expense accounts
     for txn in &transactions {
-        let has_expense = txn.postings.iter()
+        let has_expense = txn
+            .postings
+            .iter()
             .any(|p| p.account.starts_with("expenses"));
         assert!(has_expense);
     }
@@ -1129,28 +1129,30 @@ fn test_get_print_with_query() {
 #[test]
 fn test_get_print_transaction_details() {
     use hledger_lib::{get_print, PrintOptions};
-    
+
     let options = PrintOptions::new();
     let result = get_print(Some("tests/fixtures/test.journal"), &options);
     assert!(result.is_ok());
 
     let transactions = result.unwrap();
     let investment_txn = &transactions[2]; // Investment purchase
-    
+
     assert_eq!(investment_txn.description, "Investment purchase");
     assert_eq!(investment_txn.postings.len(), 3);
-    
+
     // Check the GOOG posting with price
-    let goog_posting = investment_txn.postings.iter()
+    let goog_posting = investment_txn
+        .postings
+        .iter()
         .find(|p| p.account == "assets:investments:fidelity:goog")
         .unwrap();
-    
+
     assert_eq!(goog_posting.amounts.len(), 1);
     let goog_amount = &goog_posting.amounts[0];
     assert_eq!(goog_amount.commodity, "GOOG");
     assert_eq!(goog_amount.quantity.to_string(), "2");
     assert!(goog_amount.price.is_some());
-    
+
     let price = goog_amount.price.as_ref().unwrap();
     assert_eq!(price.commodity, "$");
     assert_eq!(price.quantity.to_string(), "150.00");
@@ -1159,7 +1161,7 @@ fn test_get_print_transaction_details() {
 #[test]
 fn test_get_print_posting_types() {
     use hledger_lib::{get_print, PrintOptions};
-    
+
     let options = PrintOptions::new();
     let result = get_print(Some("tests/fixtures/test.journal"), &options);
     assert!(result.is_ok());
@@ -1178,19 +1180,19 @@ fn test_get_print_empty_journal() {
     use hledger_lib::{get_print, PrintOptions};
     use std::fs;
     use std::io::Write;
-    
+
     // Create a temporary empty journal
     let temp_file = "tests/fixtures/empty_test.journal";
     let mut file = fs::File::create(temp_file).unwrap();
     writeln!(file, "; Empty journal").unwrap();
-    
+
     let options = PrintOptions::new();
     let result = get_print(Some(temp_file), &options);
     assert!(result.is_ok());
-    
+
     let transactions = result.unwrap();
     assert_eq!(transactions.len(), 0);
-    
+
     // Clean up
     fs::remove_file(temp_file).ok();
 }
@@ -1198,7 +1200,7 @@ fn test_get_print_empty_journal() {
 #[test]
 fn test_get_print_error_nonexistent_file() {
     use hledger_lib::{get_print, PrintOptions};
-    
+
     let options = PrintOptions::new();
     let result = get_print(Some("nonexistent.journal"), &options);
     assert!(result.is_err());
@@ -1207,7 +1209,7 @@ fn test_get_print_error_nonexistent_file() {
 #[test]
 fn test_get_print_options_builder() {
     use hledger_lib::{get_print, PrintOptions};
-    
+
     let options = PrintOptions::new()
         .explicit()
         .show_costs()
@@ -1216,7 +1218,7 @@ fn test_get_print_options_builder() {
         .begin("2024-01-01")
         .end("2024-12-31")
         .query("assets");
-    
+
     assert!(options.explicit);
     assert!(options.show_costs);
     assert!(options.cleared);
