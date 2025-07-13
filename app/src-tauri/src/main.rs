@@ -5,5 +5,5 @@ use dotenv::dotenv;
 
 fn main() {
     dotenv().ok(); // This line loads the environment variables from the ".env" file.
-    hledger_app_lib::run()
+    hledger_gui_lib::run()
 }
