@@ -1,10 +1,40 @@
 {
+  "name": "hledger-gui",
+  "private": false,
+  "version": "0.2.0",
+  "description": "A desktop app for viewing hledger data",
+  "keywords": [
+    "hledger",
+    "accounting",
+    "finance",
+    "desktop-app",
+    "tauri",
+    "rust",
+    "react",
+    "typescript"
+  ],
+  "author": {
+    "name": "Teo Si-Yan",
+    "url": "https://teosiyan.com"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/siyant/hledger-gui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/siyant/hledger-gui/issues"
+  },
+  "homepage": "https://github.com/siyant/hledger-gui#readme",
   "dependencies": {},
   "devDependencies": {
     "@biomejs/biome": "2.1.1"
   },
   "scripts": {
-    "format": "biome format --write",
-    "format:check": "biome format"
+    "format": "bun run format:biome && bun run format:lib && bun run format:tauri",
+    "format:biome": "biome format --write",
+    "format:lib": "cd hledger-lib && cargo fmt",
+    "format:tauri": "cd app/src-tauri && cargo fmt",
+    "format:check": "biome format && (cd hledger-lib && cargo fmt --check) && (cd app/src-tauri && cargo fmt --check)"
   }
 }

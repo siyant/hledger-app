@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-hledger-app is a desktop application for viewing hledger reports and charts. It uses hledger-lib (Rust) to interact with the hledger CLI tool and presents the data through a Tauri/React UI.
+hledger-gui is a desktop application for viewing hledger reports and charts. It uses hledger-lib (Rust) to interact with the hledger CLI tool and presents the data through a Tauri/React UI.
 
 ## Commands
 

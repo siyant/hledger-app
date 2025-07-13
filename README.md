@@ -1,4 +1,4 @@
-# hledger-app
+# hledger-gui
 
 A desktop application for viewing your hledger data. This app provides an intuitive interface for exploring your hledger financial data with a visual dashboard with charts, as well as various reports including balance sheet, income statement, and balances.
 
@@ -21,8 +21,8 @@ Expandable tree view to drill down:
 
 1. Clone this repository:
    ```bash
-   git clone git@github.com:vivekkalyan/hledger-app.git
-   cd hledger-app
+   git clone git@github.com:siyant/hledger-gui.git
+   cd hledger-gui
    ```
 
 2. Install dependencies:
@@ -42,7 +42,7 @@ Have not set up configuration of journal files in a built app, so it doesn't wor
 
 ### Journal Files
 
-hledger-app includes a built-in file picker that allows you to easily add and manage your journal files directly within the application.
+hledger-gui includes a built-in file picker that allows you to easily add and manage your journal files directly within the application.
 
 1. Launch the application
 2. In the sidebar, click the "Add Files" button or "Add Your First Journal File" if no files are configured
