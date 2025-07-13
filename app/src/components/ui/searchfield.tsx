@@ -87,12 +87,12 @@ function JollySearchField({ label, description, className, errorMessage, ...prop
       className={composeRenderProps(className, (className) => cn("group flex flex-col gap-2", className))}
       {...props}
     >
-      {label != undefined && <Label>{label}</Label>}
+      {label !== undefined && <Label>{label}</Label>}
       <FieldGroup>
         <SearchIcon aria-hidden className="size-4 text-muted-foreground" />
         <SearchFieldInput placeholder="Search..." />
         <SearchFieldClear>
-          <XIcon aria-hidden className="size-4" />
+          <XIcon aria-hidden className="size-4 cursor-pointer" />
         </SearchFieldClear>
       </FieldGroup>
       {description && (
@@ -105,5 +105,5 @@ function JollySearchField({ label, description, className, errorMessage, ...prop
   );
 }
 
-export { SearchField, SearchFieldGroup, SearchFieldInput, SearchFieldClear, JollySearchField };
+export { JollySearchField, SearchField, SearchFieldClear, SearchFieldGroup, SearchFieldInput };
 export type { JollySearchFieldProps };

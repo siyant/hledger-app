@@ -1,12 +1,14 @@
+import { type DateValue, getLocalTimeZone, today } from "@internationalized/date";
+import { Plus, X } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { JollyDateRangePicker } from "@/components/ui/date-picker";
+import { Label } from "@/components/ui/label";
 import { JollySearchField } from "@/components/ui/searchfield";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Toggle, ToggleButtonGroup } from "@/components/ui/toggle";
-import { type DateValue, getLocalTimeZone, today } from "@internationalized/date";
-import { X, Plus } from "lucide-react";
-import type React from "react";
-import { useState } from "react";
 
 interface FiltersSidebarProps {
   searchQuery: string;
@@ -129,13 +131,13 @@ export function FiltersSidebar({
   };
   return (
     <div className="fixed left-0 top-0 w-80 h-screen bg-muted/30 border-r border-border p-6 overflow-y-auto">
-      <div className="space-y-6">
+      <div className="grid gap-6">
         <div>
           <h2 className="text-lg font-semibold mb-3">Filters & Options</h2>
-          <div className="space-y-4">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-muted-foreground">Journal File</label>
+          <div className="grid gap-6">
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <Label>Journal File</Label>
                 <Button
                   size="sm"
                   variant="ghost"
@@ -170,14 +172,14 @@ export function FiltersSidebar({
               )}
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-muted-foreground mb-2 block">Search Accounts</label>
+            <div className="grid gap-2">
+              <Label>Search Accounts</Label>
               <JollySearchField value={searchQuery} onChange={onSearchQueryChange} onClear={clearSearch} />
             </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-muted-foreground">Date Range</label>
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <Label>Date Range</Label>
                 {(selectedDateRange || dateRange) && (
                   <Button
                     variant="ghost"
@@ -189,7 +191,7 @@ export function FiltersSidebar({
                   </Button>
                 )}
               </div>
-              <div className="space-y-0">
+              <div className="grid gap-2">
                 <ToggleButtonGroup
                   selectedKeys={selectedDateRange ? [selectedDateRange] : []}
                   onSelectionChange={handlePresetSelection}
@@ -205,13 +207,12 @@ export function FiltersSidebar({
                   </Toggle>
                 </ToggleButtonGroup>
 
-                <JollyDateRangePicker className="w-full" value={dateRange} onChange={handleCustomDateRange} />
+                <JollyDateRangePicker className="w-full gap-0" value={dateRange} onChange={handleCustomDateRange} />
               </div>
             </div>
 
-            {/* Currency Selector */}
-            <div>
-              <label className="text-sm font-medium text-muted-foreground block mb-2">Currency</label>
+            <div className="grid gap-2">
+              <Label>Currency</Label>
               <ToggleButtonGroup
                 selectedKeys={[currencyMode]}
                 onSelectionChange={(keys) => {

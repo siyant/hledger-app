@@ -1,15 +1,16 @@
-import { DashboardTab } from "@/components/DashboardTab";
-import VerificationTab from "@/components/VerificationTab";
-import { AccountsTab } from "@/components/AccountsTab";
-import { BalancesTab } from "@/components/BalancesTab";
-import { PrintTab } from "@/components/PrintTab";
-import { BalanceSheetTab } from "@/components/BalanceSheetTab";
-import { IncomeStatementTab } from "@/components/IncomeStatementTab";
-import { FiltersSidebar } from "@/components/FiltersSidebar";
-import { ConfigDialog } from "@/components/ConfigDialog";
-import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/tabs";
 import type { DateValue } from "@internationalized/date";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+
+import { AccountsTab } from "@/components/AccountsTab";
+import { BalanceSheetTab } from "@/components/BalanceSheetTab";
+import { BalancesTab } from "@/components/BalancesTab";
+import { ConfigDialog } from "@/components/ConfigDialog";
+import { DashboardTab } from "@/components/DashboardTab";
+import { FiltersSidebar } from "@/components/FiltersSidebar";
+import { IncomeStatementTab } from "@/components/IncomeStatementTab";
+import { PrintTab } from "@/components/PrintTab";
+import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/tabs";
+import VerificationTab from "@/components/VerificationTab";
 import { loadConfig, saveLastSelectedFile } from "@/utils/configStore";
 
 function App() {
@@ -30,8 +31,8 @@ function App() {
         const store = await loadConfig();
         setJournalFiles(store.journalFiles);
 
-        // If no journal files are configured, automatically open the dialog
-        if (store.journalFiles.length === 0) {
+        // If no hledger path or journal files are configured, automatically open the dialog
+        if (store.hledgerPath == null || store.journalFiles.length === 0) {
           setConfigDialogOpen(true);
         }
         // If we have a last selected file, use it
