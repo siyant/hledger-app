@@ -2,6 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
+      "name": "hledger-gui",
       "devDependencies": {
         "@biomejs/biome": "2.1.1",
       },
