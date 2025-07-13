@@ -2,13 +2,13 @@
   "name": "hledger-gui-app",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "tauri dev",
+    "dev:ui": "vite",
+    "build": "tauri build",
+    "build:ui": "tsc -b && vite build",
     "lint": "eslint src",
-    "preview": "vite preview",
-    "tauri": "tauri",
-    "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build"
+    "preview:ui": "vite preview",
+    "tauri": "tauri"
   },
   "dependencies": {
     "@internationalized/date": "^3.8.1",
